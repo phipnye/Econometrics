@@ -1,0 +1,329 @@
+---
+title: "Problem Set 2"
+author: "Philip Nye"
+date: "2/26/2022"
+output: pdf_document
+header-includes:
+  - \pagenumbering{gobble}
+  - \usepackage{mathrsfs}
+---
+
+\tableofcontents
+\newpage
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(wooldridge)
+library(corrplot)
+library(stargazer)
+options(scipen=999)
+nbasal <- wooldridge::nbasal
+```
+
+# NBA Wages - Practical
+## Problem 1
+\begin{enumerate}
+\item Draw a boxplot for the players’ wages. (If you don’t know how to do a given plot etc. then consult the user manual by clicking the ’Help’ menu). Which way are the players’ wages skewed? Towards infinity or zero?
+\end{enumerate}
+
+```{r Boxplot, include=TRUE,echo=FALSE, fig.width=5,fig.height=3}
+ggplot(nbasal, aes(y=wage)) +
+  geom_boxplot()
+```
+
+## Problem 2
+\begin{enumerate}
+\setcounter{enumi}{1}
+\item Let’s investigate the relationships between variables in our dataset. In practice if two variables are highly correlated with one another, then we may run into the problems caused by multicollinearity. This will make it hard for ordinary least squares to decipher the effect of one variable from another in a regression model. One way of investigating the relationships is via their correlation. If you select the option of ’Correlation matrix’ from the ’View’ menu, and include all the variables in the dataset, this will output the bivariate correlations between all variables in the NBA dataset. This can be a useful tool to allow one to get a quick handle on the data by seeing how strong the relationship is between different variables in your dataset. Are there any variables that are particularly highly correlated with experience? What would be the issue of including both of these measures in a regression with wages as the dependent variable?
+\end{enumerate}
+```{r Correlation Matrix, include=TRUE, echo=FALSE,fig.width=12,fig.height=12}
+corr_matrix <- cor(nbasal,use = "pairwise.complete.obs")
+corrplot(corr_matrix, addCoef.col = 'black', col = COL2('PiYG'))
+```
+`exper` is highly correlated with `age`, `expersq`, and `agesq`. Including more than one of these variables as regressors in our model will lead to a high level of multicollinearity.  Intuitively, OLS is going to struggle to disentangle the effect of experience from age on players’ wages. This will be realised by a large estimated standard error for both coefficients, and perhaps a lack of individual significance.
+
+## Problem 3
+\begin{enumerate}
+\setcounter{enumi}{2}
+\item Another useful aspect of a correlation matrix is that it can give you a feel for which variables are correlated with your dependent variable. Which variables (other than the log of wages), show the highest correlation with wages?
+\end{enumerate}
+`wage` has a relatively high correlation with `exper`, `minutes`, `points`, `rebounds`, and `avgmin`.
+
+## Problem 4
+\begin{enumerate}
+\setcounter{enumi}{3}
+\item Graphically investigate whether players who are more experienced earn more. How strong is the correlation between these two variables?
+\end{enumerate}
+```{r Exerience Graph, echo=FALSE,include=TRUE}
+ggplot(nbasal, aes(x=wage, y=exper))+
+  geom_point(color="blue")+
+  theme_classic()
+```
+The graph suggests players with more experience tend to be paid higher wages. The correlation between `exper` and `wage` is `r cor(nbasal$wage,nbasal$exper)`.
+
+\newpage
+## Problem 5
+\begin{enumerate}
+\setcounter{enumi}{4}
+\item Create an ordinary least squares model which investigates how experience affects a player’s wages. (Tip: You can save models for future use/viewing by clicking ’save as icon and close’ in the model window. To access your model go to View → Icon view then click on the model. If you right click on a model you can change its name.)
+\end{enumerate}
+```{r Bivariate Experience Model, echo=F, results='asis'}
+lm_exper <- lm(wage ~ exper, data=nbasal)
+stargazer(lm_exper, 
+          title="Bivariate Experience Model",
+          style="all",
+          header=F,
+          label="Simple Linear Regression of Experience on NBA Wages")
+```
+
+## Problem 6
+\begin{enumerate}
+\setcounter{enumi}{5}
+\item What is the average wage increase associated with an increase in experience by one year implied by your model?
+\end{enumerate}
+In this simple model, an increase in experience by one year is associated with an approximate $`r round(lm_exper[["coefficients"]][2],0)`K increase in average wage.
+
+## Problem 7
+\begin{enumerate}
+\setcounter{enumi}{6}
+\item Do you think that the estimates of the effect of experience on wages is likely too big or too small? Which Gauss-Markov assumption is being violated, and why?
+\end{enumerate}
+
+The zero conditional mean of the error term assumption is being violated such that $E[u|exper]\neq0$. This is due to omitted variable bias in which independent variables that are correlated with both `exper` and `wage` are not included in the model. In this instance, it's likely the coefficient on `exper` is upwardly biased as both `exper` and `wage` are positively correlated with `points`, `rebounds`, and `assists`. In other words, experience is taking credit for these other omitted variables in our model.
+
+\newpage
+## Problem 8
+\begin{enumerate}
+\setcounter{enumi}{7}
+\item Create another regression with wages as a dependent variable, and age as the independent variable (along with a constant). Does this imply that the effect of age is positive or negative?
+\end{enumerate}
+
+```{r Bivariate Age Model, results='asis',echo=FALSE}
+lm_age <- lm(wage ~ age, data=nbasal)
+stargazer(lm_age, 
+          title="Bivariate Age Model",
+          style="all",
+          header=F,
+          label="Simple Linear Regression of Age on NBA Wages")
+```
+This model implies that the effect of age is positive such that an increase in age by one year is associated with an approximate $`r round(lm_age[["coefficients"]][2],0)`K increase in wage.
+
+## Problem 9
+\begin{enumerate}
+\setcounter{enumi}{8}
+\item What would would be the average wage implied by your model for an individual of 30? What about for a 90 year old? What is the problem with the latter estimate?
+\end{enumerate}
+From our model, the average wage for an individual of 30 would be about $`r round(lm_age[["coefficients"]][2] * 30 + lm_age[["coefficients"]][1],0)`K while an individual of 90 would earn about \$`r round(lm_age[["coefficients"]][2] * 90 + lm_age[["coefficients"]][1],0)`K. Clearly, it's ridiculous to think an NBA team would pay more for a player who's 90 in comparison with an individual who is 30. This emphasizes the need for caution when predicting out of sample results. (Out of sample here means that we currently do not have any data for the wages of 90 year old basketball players.)
+
+## Problem 10
+\begin{enumerate}
+\setcounter{enumi}{9}
+\item How might we rectify the issue of the unrealistic estimates from the previous model?
+\end{enumerate}
+First off, one should refrain from trying to predict out of sample results. We didn't have any (nor do they exist) entries for 90 year olds in the NBA. Thus, it's unwise to try to predict a 90 year old NBA player's salary. Additionally, to rectify the previous model we should add `agesq` as a regressor so that a diminishing marginal return to age can be expressed in our model.
+
+\newpage
+## Problem 11
+\begin{enumerate}
+\setcounter{enumi}{10}
+\item Now create a regression with both experience and age in the model. What has happened to the sign of the coefficient on age? Why has this happened?
+\end{enumerate}
+```{r Experience and Age Model, results='asis',echo=FALSE}
+lm_age_exper <- lm(wage ~ age + exper,data=nbasal)
+stargazer(lm_age_exper,
+          title = "Experience and Age Multiple Linear Regression Model",
+          header=F,
+          style="all",
+          label="Multiple Linear Regression of Experience and Age on NBA Wages")
+```
+The coefficient on age changed from `r lm_age[["coefficients"]][2]` in the bivariate model to `r lm_age_exper[["coefficients"]][2]` in the new model. This has occurred because of the high level of multicollinearity in this model. The correlation between `age` and `exper` is `r cor(nbasal$age,nbasal$exper)`. Clearly, OLS is having difficulty deciphering between the effects of `age` and `exper` on `wage` in this model.
+
+\newpage
+## Problem 12
+\begin{enumerate}
+\setcounter{enumi}{11}
+\item Let’s now try to examine whether individuals who score more points tend to earn more by creating a regression of wages on points per game (and a constant). You can view a graph of the fitted regression line by navigating to Graphs → Fitted, actual plot from within the model window. The option you should select is ’against points’. From this you can see a graph of actual vs predicted wages vs points. What does your model suggest would be the increase in wages for an increase in 10 points per game?
+\end{enumerate}
+```{r Bivariate Points Model, results='asis', echo=FALSE}
+lm_points <- lm(wage ~ points,data = nbasal)
+stargazer(lm_points, 
+          title="Bivariate Points Model",
+          style="all",
+          header=F,
+          label="Simple Linear Regression of Points on NBA Wages")
+```
+```{r Points LM Graph, echo=FALSE,include=TRUE,fig.width=5,fig.height=3}
+ggplot(data=nbasal, mapping = aes(x=points, y=wage))+
+  geom_point(color="blue")+
+  geom_line(mapping=aes(x=points, y=lm_points[["coefficients"]][2] * points),color="red")+
+  theme_classic()
+```
+
+This model suggests an increase of $`r round(lm_points[["coefficients"]][2] * 10,0)`K in wages for an increase in 10 points per game.
+
+\newpage
+## Problem 13
+\begin{enumerate}
+\setcounter{enumi}{12}
+\item You can look at a graph of the residuals (the estimated errors) from the regression, by clicking into the model (if you are not already in the model window), and navigating to Graphs → Residual plot. There are then a number of different options available, from seeing a plot of residuals against observation number to seeing a plot against the values of experience. Which of these plots should you use to graphically inspect for heteroscedasticity?
+\end{enumerate}
+One should look at a plot of the residuals against the independent variable in the model, `points`.
+```{r Residuals Plot, include=TRUE, echo=FALSE}
+ggplot(nbasal)+
+  geom_line(aes(x=points,y = 0), color="black", linetype="dashed", alpha=0.9)+
+  geom_point(aes(points, wage - lm_points[["coefficients"]][2] * points - lm_points[["coefficients"]][1]),color="blue") +
+  theme_bw() +
+  labs(x="Points", y="Residuals")
+```
+
+## Problem 14
+\begin{enumerate}
+\setcounter{enumi}{13}
+\item Does there appear to be heteroscedasticity? What might be causing it? How might we rectify it?
+\end{enumerate}
+
+There definitely appears to be some larger variance in the residuals for point values between 10 and 20 and smaller variance for point values greater than 20. This may be a result of model misspecification. We might rectify this by adding additional regressors to our model.
+
+## Problem 15
+\begin{enumerate}
+\setcounter{enumi}{14}
+\item Do you think that the effect of points on wages predicted by your model is too high or low? Why might this be the case?
+\end{enumerate}
+I think that the effect of points on wages predicted by your model is too high. I doubt a team is willing to pay an additional $`r round(lm_points[["coefficients"]][2] * 1000,0)` for each additional point a player scores on average. Looking other factors that may play an important role in wage such as `rebounds` and `assists`, they too are positively correlated with `points` and `wage` meaning our coefficient on `points` is likely crediting `points` too much for additions to `wage`.
+
+\newpage
+
+## Problem 16
+\begin{enumerate}
+\setcounter{enumi}{15}
+\item We are now going to create two new variables in Gretl: ’pointsq’ and ’pointsc’ equal to the square of points and its cube respectively. To do this navigate to Add → Define new variable... This allows a user to enter a formula for the construction of a new variable from an old one. For example to create ’pointsq’, you can enter the formula: ’pointsq = pointsˆ2’. Here the ’ˆ’ means ’raise that variable to the power’. Go ahead and create ’pointsq’ and ’pointsc’.
+\end{enumerate}
+```{r Adding Data Variables, echo=TRUE,include=TRUE}
+nbasal <- nbasal %>%
+  mutate(
+    pointsq = points ** 2,
+    pointsc = points ** 3
+  )
+head(nbasal)
+```
+
+\newpage
+## Problem 17
+![]("Screenshot_Problem_17.jpg")
+```{r Point Models,results='asis',echo=FALSE}
+lm_points_sq <- lm(wage ~ points + pointsq, data = nbasal)
+lm_points_sq_cub <- lm(wage ~ points + pointsq + pointsc, data = nbasal)
+stargazer(lm_points, lm_points_sq, lm_points_sq_cub,
+          title="Comparing Points Models",
+          style="all",
+          header=F,
+          label="Points Models",
+          omit.stat="f")
+```
+\begin{enumerate}
+\setcounter{enumi}{16}
+\item 
+\begin{enumerate}
+\item The third model, $wage_i=\alpha+\beta_1points_i+\beta_2pointsq_i+\beta_3pointsc_i$, has the greatest coefficient of determination (as expected because $R^2$ doesn't decline as regressors are added to a model). This mean the independent variables in the model explain about 44.2% of the variation in the dependent variable, `wage`.
+\item For each additional cubed point a player scores on average, we expect to see an increase of \$`r round(lm_points_sq_cub[["coefficients"]][4] * 1000,0)` to a player's wage. It also implies a diminishing diminishing return of points on wage.
+\item The third model, $wage_i=\alpha+\beta_1points_i+\beta_2pointsq_i+\beta_3pointsc_i$, also has the greatest $\bar{R^2}$, value.
+\item Solely based on $\bar{R^2}$, I would prefer the third model; however, based on my intuition I would've suggested the second model because I believe there's an increasing return in wage to points.
+\end{enumerate}
+\end{enumerate}
+```{r Squared Points Model Graph, include=TRUE,echo=FALSE,fig.width=5,fig.height=3}
+ggplot(nbasal, aes(points,wage))+
+  geom_point(color="blue")+
+  geom_line(aes(points, lm_points_sq[["coefficients"]][3] * pointsq + lm_points_sq[["coefficients"]][2] * points + lm_points_sq[["coefficients"]][1]),color="red")+
+  theme_classic()+
+  labs(subtitle = "Plot of Second Model")
+```
+
+```{r Cubed Points Model Graph, include=TRUE,echo=FALSE,fig.width=5,fig.height=3}
+ggplot(nbasal, aes(points,wage))+
+  geom_point(color="blue")+
+  geom_line(aes(points, lm_points_sq_cub[["coefficients"]][4] * pointsc + lm_points_sq_cub[["coefficients"]][3] * pointsq + lm_points_sq_cub[["coefficients"]][2] * points + lm_points_sq[["coefficients"]][1]),color="red")+
+  theme_classic()+
+  labs(subtitle = "Plot of Third Model")
+```
+
+\newpage
+## Problem 18
+\begin{enumerate}
+\setcounter{enumi}{17}
+\item Freestyle: try to create a model which you believe captures explains players wages best in terms of other attributes.
+\end{enumerate}
+```{r Trying For Best Model, results='asis',echo=FALSE}
+lm1 <- lm(wage ~ exper + expersq + points + rebounds + assists, data=nbasal)
+lm2 <- lm(wage ~ age + agesq + points + rebounds + assists, data=nbasal)
+lm3 <- lm(wage ~ exper + expersq + points + pointsq + rebounds + assists, data=nbasal)
+lm4 <- lm(wage ~ age + agesq + points + pointsq + rebounds + assists, data=nbasal)
+stargazer(lm1, lm2, lm3, lm4,
+          title="Comparing Models",
+          style="all",
+          header=F,
+          label="Best Model Attempts",
+          omit.stat="f")
+```
+All of the models I tested have a similar coefficient of determination and adjusted $R^2$ with the third model marginally taking the cake in each. Instantly, solely based on intuition, I would drop the second and fourth model from consideration because the desire for age is negative but has increasing returns. This is likely due to better players staying in the NBA longer, but it doesn't make sense intuitively. The other two models are as I expected where experience is valued but at a decreasing rate. Personally, I would choose the third model because I believe there's an increasing return to points. Additionally, while I could go searching for a model that provides a greater $\bar{R^2}$, I believe this model and the coefficients makes sense intuitively.
+
+\newpage
+
+# Theory
+## Problem 1
+![]("Screenshot_Problem_1.jpg")
+\begin{enumerate}
+\item 
+\begin{enumerate}
+\item It means, for each additional broken window on a block, the average property value drops \$10K.
+\item The causes of endogeneity in this model are the omitted variables. There are several factors that are likely correlated with the number of broken windows on a block and housing prices. Such variables may include the number of crimes in the area, the level of wealth in the area, and many other factors. This model may also suffer from reverse causality in which cheaper (or possibly more expensive) homes are more likely to suffer from broken windows.
+\item It likely overstates (the actual value is less negative) the effect of broken windows on house prices because the coefficient likely captures some of the effect of the omitted variables discussed in the previous part.
+\item The new model now attempts to capture some of the effect of crime in an area, which is reducing some (or possibly all) of the bias on the broken windows coefficient. Separately, neither of the coefficients are statistically significant because there's likely a high level of multicollinearity in this model.
+\end{enumerate}
+\end{enumerate}
+
+## Problem 2
+![]("Screenshot_Problem_2.jpg")
+\begin{enumerate}
+\setcounter{enumi}{1}
+\item 
+\begin{enumerate}
+\item The law of iterated expectations states $E[X_i\varepsilon_i]=E[E[X_i\varepsilon_i|X_i]]=E[X_iE[\varepsilon_i|X_i]]=E[X_i\cdot 0]=0$
+\item 
+$$corr(X_i,\varepsilon_i)=\frac{cov(X_i,\varepsilon_i)}{\sigma_X\sigma_\varepsilon}$$
+$$=\frac{E[X_i\varepsilon_i] - E[X_i]E[\varepsilon_i]}{\sigma_X\sigma_\varepsilon}$$
+$$=\frac{0 - E[X_i]\cdot 0}{\sigma_X\sigma_\varepsilon}=0$$
+\item No, a covariance of zero doesn't necessarily imply independence. It's possible for two random variables to have a zero covariance but still be dependent on one another.
+\end{enumerate}
+\end{enumerate}
+
+\newpage
+## Problem 3
+\begin{enumerate}
+\setcounter{enumi}{2}
+\item \textbf{A researcher is interested in measuring what the effect of an individual’s innate ’language intelligence’ is on their ability to learn a language. She finds 100 volunteers for the study who have all not learned French before, nor have they learned any other languages to any serious fluency. Her theory is that those individuals who have higher innate measures of ’language intelligence’ will take less time to reach of level of proficiency in French.}
+
+\textbf{Each volunteer is enrolled in a day course in basic French, and is tested at the end of the day in their progress in the language. At the end of the day each participant also takes a standardised IQ test. The researcher then carries out the following regression:}
+$$score_i=\alpha+\beta IQ_i+u_i$$
+\begin{enumerate}
+\item \textbf{Do you think that $\beta$ fairly represents the effect of an incremental point of IQ on an individual’s performance in the end of day test? Why/why not?}
+\item \textbf{The above equation is amended to include any other relevant explanatory variables. The researcher is aware that IQ is not a perfect measure of an individual’s ’language intelligence’. However, she supposes that it is an adequate proxy - meaning that it is not a biased estimate of ’language intelligence’. Will the least squares estimator $\hat{\beta}$ be unbiased?}
+\item \textbf{Prove either way your answer for the last question.}
+\end{enumerate}
+\end{enumerate}
+
+\begin{enumerate}
+\setcounter{enumi}{2}
+\item 
+\begin{enumerate}
+\item No, I don't think $\beta$ fairly represents the effect of an incremental point of IQ on an individual’s performance in the end of day test. There are several other factors that may be correlated to both IQ and an individual's test score. Wealth, age, and GPA may be omitted variables from the true population model. Additionally, it may be the case that some individuals already know a language similar to French while others may not.
+\item This new model likely underestimates the effect of ’language intelligence’ on their language learning abilities. An individual with a higher IQ doesn't necessarily signify a 1:1 ratio of return on IQ to score.
+\item Suppose $IQ_i = lang\_abil_i + \varepsilon_i$. By definition, we have $$cov(lang\_abil_i,\varepsilon_i)=0$$
+Thus, we know the covariance between IQ and the error term is
+$$ cov(IQ_i,\varepsilon_i) = cov(lang\_abil_i + \varepsilon_i,\varepsilon_i)=0+\sigma_\varepsilon^2=\sigma_\varepsilon^2$$
+The true population model is $$score_i=\gamma_0+\gamma_1 lang\_abil + \eta_i$$
+, which can be rewritten as $$score_i=\gamma_0+\gamma_1 (IQ_i - \varepsilon_i) + \eta_i$$
+or
+$$score_i=\gamma_0+\gamma_1 IQ_i + (\eta_i - \gamma_1\varepsilon_i)$$
+This violates the exogeneity assumption because $cov(IQ_i,\varepsilon_i)=\sigma_\varepsilon^2\neq0$ and thus $\beta$ is likely biased.
+\end{enumerate}
+\end{enumerate}

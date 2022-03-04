@@ -1,0 +1,92 @@
+\documentclass[11pt,letterhead]{article}
+\usepackage[a4paper,total={6in,9in}]{geometry}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\pagenumbering{gobble}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\begin{titlepage}
+\begin{centering}
+\textbf{\LARGE{Proof of the Gauss Markov Theorem}}\\~\\
+\vspace{0.5cm}
+\textbf{\Large{By: Philip Nye}}
+\tableofcontents
+\end{centering}
+\end{titlepage}
+\newpage
+\section{Gauss Markov Assumptions}
+\subsection{Assumptions}
+\begin{itemize}
+\item Assumption 1: The population model is linear in parameters such that $$y_i=\alpha +\beta_1x_{i,1}+...+\beta_mx_{i,m}+u_i$$
+\item Assumption 2: The sample data $\{x_{i,1},...x_{i,m},y_i\}$ is a random sample.
+\item Assumption 3: The error term has a zero conditional mean such that $$E[u|x_{i,1},...x_{i,m}]=0$$
+\item Assumption 4: The error term is homoskedastic such that $$Var(u|x_{i,1},...x_{i,m})=\sigma_u^2$$
+\item Assumption 5: None of the regressors exhibit perfect collinearity with one another.
+\item Assumption 6: There exists no serial correlation between the error terms such that $$cov(u_i,u_j)=0 \: \forall \: i\neq j$$Note: Assumption 2 is sufficient to satisfy assumption 6 in the case of cross-sectional data (see below for proof).
+\end{itemize}
+\subsection{Proof that Random Sampling Implies Zero Serial Correlation with Cross-Sectional Data}
+Under assumption 2, we know the sample data is independent and identically distributed (i.i.d), meaning drawing one observation does not make drawing another observation any more or less likely and that the observations come from the same distribution. Thus, for some observation $i\neq j$,
+$$cov(y_i,y_j)=E[y_i y_j]-E[y_i]E[y_j]=E[y_i]E[y_j]-E[y_i]E[y_j]=0$$
+Similarly, by our first assumption that $y_i=\alpha+\beta_1x_{i,1}+...+\beta_{i,m}x_{i,m}+u_i$
+$$0=cov(y_i,y_j)=cov(\alpha+\beta_1x_{i,1}+...+\beta_{i,m}x_{i,m}+u_i,\alpha+\beta_1x_{j,1}+...+\beta_{j,m}x_{j,m}+u_j)$$
+$$=\sum_{s=1}^m \sum_{t=1}^m \beta_s \beta_t cov(x_{i,s},x_{j,t}) + \sum_{s=1}^m \beta_s cov(x_{i,s},u_j) + \sum_{t=1}^m \beta_t cov(x_{j,t},u_i) + cov(u_i,u_j)$$
+Using the fact that the sample is i.i.d., $$\sum_{s=1}^m \sum_{t=1}^m \beta_s \beta_t cov(x_{i,s},x_{j,t})=0$$ Also, by the exogeneity assumption, $$\sum_{s=1}^m \beta_s cov(x_{i,s},u_j) + \sum_{t=1}^m \beta_t cov(x_{j,t},u_i)=0$$ Leaving us with $$cov(u_i,u_j)=0$$
+\newpage
+\section{Gauss Markov Theorem Proofs}
+\subsection{Proof of Unbiasedness}
+Assuming a simple bivariate population model in which $$y_i=\alpha+\beta^Px_i+u_i$$
+we've shown, using first order conditions, $$\hat{\beta}_{LS}=\frac{\sum_{i=1}^n (x_i-\bar{x})y_i}{\sum_{i=1}^n(x_i-\bar{x})^2}=\sum_{i=1}^n v_i y_i$$
+where $v_i=\frac{(x_i-\bar{x})}{\sum_{i=1}^n (x_i-\bar{x})^2}$.\\~\\
+Note: $\sum_{i=1}^n v_i=0$ since the numerator of $v_i$ comes out to $\sum_{i=1}^n (x_i-\bar{x})= \sum_{i=1}^n x_i - \sum_{i=1}^n \bar{x}=n\bar{x}-n\bar{x}=0$\\~\\
+However, $\sum_{i=1}^n v_i^2=(\frac{(x_i-\bar{x})}{\sum_{i=1}^n (x_i-\bar{x})^2})^2=\frac{1}{\sum_{i=1}^n (x_i-\bar{x})^2}>0$\\~\\
+Using these results, we know $$E[\hat{\beta}_{LS}]=E[\sum_{i=1}^n v_i y_i]=\sum_{i=1}^n E[v_i y_i]=\sum_{i=1}^n E[\alpha v_i + \beta^P x_i v_i+u_i v_i]$$
+$$=\alpha \sum_{i=1}^n E[v_i] + \beta^P \sum_{i=1}^n E[x_i v_i]+\sum_{i=1}^n E[u_i v_i]$$
+$$=\alpha \sum_{i=1}^n 0 + \beta^P \sum_{i=1}^n E[\frac{(x_i-\bar{x})x_i}{\sum_{i=1}^n(x_i-\bar{x})x_i}]+\sum_{i=1}^n E[u_i v_i]$$
+$$=\beta^P+\sum_{i=1}^n E[u_i v_i]$$
+Using the exogeneity assumption, we know $E[u_i v_i]=E[u_i]E[v_i]=0\cdot E[v_i]=0$, and thus
+$$E[\hat{\beta}_{LS}]=\beta^P+\sum_{i=1}^n 0=\beta^P$$
+
+
+$\therefore$ Under the Gauss Markov assumptions, we know the least squares estimator $\hat{\beta}_{LS}$ is unbiased as $E[\hat{\beta}_{LS}]=\beta^P$.
+\newpage
+\subsection{Proof of Greatest Efficiency}
+$$\hat{\beta}_{LS}=\sum_{i=1}^n y_i v_i = \sum_{i=1}^n \alpha v_i + \beta^P x_i v_i+u_i v_i= \beta^P + \sum_{i=1}^n u_i v_i$$
+
+$$\to Var(\hat{\beta}_{LS})=Var(\beta^P + \sum_{i=1}^n u_i v_i)=Var(\sum_{i=1}^n u_i v_i)$$
+Using the exogeneity and zero serial correlation assumptions,
+$$Var(\sum_{i=1}^n u_i v_i)=\sum_{i=1}^n Var(u_i v_i)=\sum_{i=1}^n v_i^2 Var(u_i)$$
+Under homoskedasticity, $Var(u_i)=\sigma_u^2$, a constant, so
+$$\sum_{i=1}^n v_i^2 Var(u_i)=\sigma_u^2\sum_{i=1}^n v_i^2=\frac{\sigma_u^2}{\sum_{i=1}^n (x_i-\bar{x})^2}>0$$
+Now, take another arbitrary unbiased estimator of $\beta^P, \tilde{\beta}$.
+By the linearity constraint, $$\tilde{\beta}=\sum_{i=1}^n b_i y_i=\alpha \sum_{i=1}^n b_i + \beta^P \sum_{i=1}^n b_i x_i + \sum_{i=1}^n b_i u_i$$
+Also, under the unbiased constraint, $$E[\tilde{\beta}]=\beta^P$$
+So, $$E[\tilde{\beta}]=E[\alpha \sum_{i=1}^n b_i + \beta^P \sum_{i=1}^n b_i x_i + \sum_{i=1}^n b_i u_i]=\alpha \sum_{i=1}^n b_i + \beta^P \sum_{i=1}^n b_i x_i$$
+as $b_i$ implicity contains $x_i$, which, by assumption, is exogenous from the error term $u_i$.\\
+Thus, it must be the case that
+\begin{equation}
+\sum_{i=1}^n b_i=0
+\end{equation}
+\begin{equation}
+\sum_{i=1}^n b_i x_i=1
+\end{equation}
+$$\to Var(\tilde{\beta})=Var(\sum_{i=1}^n b_i y_i)=Var(\sum_{i=1}^n \alpha b_i + \beta^P b_i x_i + b_i u_i)$$
+$$=Var(\alpha \sum_{i=1}^n b_i + \beta^P \sum_{i=1}^n b_i x_i + \sum_{i=1}^n b_i u_i)=Var(\beta^P + \sum_{i=1}^n b_i u_i)=Var(\sum_{i=1}^n b_i u_i)$$
+Under the homoskedasticity and random sampling assumptions, $$Var(\sum_{i=1}^n b_i u_i)=\sum_{i=1}^n Var(b_i u_i)=\sum_{i=1}^n b_i^2 Var(u_i)=\sigma_u^2 \sum_{i=1}^n b_i^2$$
+\newpage
+Now, suppose $b_i=v_i + c_i$ where $v_i=\frac{(x_i-\bar{x})}{\sum_{i=1}^n (x_i-\bar{x})^2}$ and $c_i$ equals some arbitrary difference from the least squares weights.
+Thus, $$Var(\tilde{\beta})=\sigma_u^2 \sum_{i=1}^n b_i^2=\sigma_u^2\sum_{i=1}^n v_i^2 + 2\sigma_u^2\sum_{i=1}^n v_i c_i + \sigma_u^2\sum_{i=1}^n c_i^2$$
+$$=Var(\hat{\beta}_{LS})+2\sigma_u^2\sum_{i=1}^n v_i c_i + \sigma_u^2\sum_{i=1}^n c_i^2$$
+Remembering the conditions that $\sum_{i=1}^n v_i=0$ and $\sum_{i=1}^n b_i=0$.
+$$\sum_{i=1}^n b_i=\sum_{i=1}^n v_i + \sum_{i=1}^n c_i=0 + \sum_{i=1}^n c_i=\sum_{i=1}^n c_i$$
+$$\to \sum_{i=1}^n c_i=0$$
+Similarly, since $\sum_{i=1}^n v_i x_i=1$ and $\sum_{i=1}^n b_i x_i=1$,
+$$\sum_{i=1}^n b_i x_i=1=\sum_{i=1}^n (v_i+c_i)x_i=\sum_{i=1}^n v_i x_i+\sum_{i=1}^n c_i x_i=1+\sum_{i=1}^n c_i x_i$$
+$$\to \sum_{i=1}^n c_i x_i=0$$
+Finally, returning to the variance of $\tilde{\beta}$,
+$$Var(\tilde{\beta})=Var(\hat{\beta}_{LS})+2\sigma_u^2\sum_{i=1}^n v_i c_i + \sigma_u^2\sum_{i=1}^n c_i^2$$
+where $$2\sigma_u^2\sum_{i=1}^n v_i c_i=2\sigma_u^2\sum_{i=1}^n \frac{(x_i-\bar{x})c_i}{\sum_{i=1}^n (x_i-\bar{x})^2}=2\sigma_u^2\frac{\sum_{i=1}^n c_i x_i -\bar{x}\sum_{i=1}^nc_i}{\sum_{i=1}^n (x_i-\bar{x})^2}=0$$ since $\sum_{i=1}^n c_i=0$ and $\sum_{i=1}^n c_i x_i=0$.\\~\\
+Thus, $$Var(\tilde{\beta})=Var(\hat{\beta}_{LS}) + \sigma_u^2\sum_{i=1}^n c_i^2 \geq Var(\hat{\beta}_{LS})$$ as $\sigma_u^2 \geq 0$ and $\sum_{i=1}^n c_i^2 \geq 0$.\\~\\
+$\therefore \hat{\beta}_{LS}$ is the best linear unbiased estimator of the population parameter $\beta^P$ because any other linear unbiased estimator has at least as much variance as the least square estimator under the Gauss Markov assumptions.
+\end{document}

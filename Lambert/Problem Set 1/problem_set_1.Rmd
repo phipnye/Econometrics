@@ -1,0 +1,361 @@
+---
+title: "Problem Set 1"
+author: "Philip Nye"
+date: "2/8/2022"
+output: pdf_document
+header-includes:
+  - \pagenumbering{gobble}
+  - \usepackage{mathrsfs}
+---
+\tableofcontents
+\newpage
+# Crime and Unemployment - Practical
+## Problem 1
+\begin{enumerate}
+\item Firstly let’s look at our data. This is the most important part of econometrics, and it is often forgotten. Let’s draw a histogram of the Violence data. Left click on the ’Violence’ data to select it, then Variable → Frequency distribution, at the top of the Gretl GUI. Select the number of bins equal to 19, and select the then click ’ok’. A nice histogram should pop up as a figure.
+\end{enumerate}
+```{r Number_1, fig.height=3,fig.width=5}
+library(tidyverse)
+
+violence_data <- readxl::read_xls("problemset1.xls")
+
+ggplot(violence_data, aes(Violence)) +
+  geom_histogram(bins = 19) +
+  theme_classic()
+```
+
+\newpage
+## Problem 2
+\begin{enumerate}
+\setcounter{enumi}{1}
+\item Draw a similar histogram (with 19 bins) of the Unemployment data, and report the unemployment rate bin which has the highest frequency.
+\end{enumerate}
+```{r Number_2,fig.height=3,fig.width=5}
+ggplot(violence_data, aes(Unemployment)) +
+  geom_histogram(bins=19) +
+  theme_classic()
+```
+\
+\
+Approximating the intervals for the bins, the bins that share the highest frequency are the bins on the interval (6.5,6.9) and (7.75,8).
+
+## Problem 3
+\begin{enumerate}
+\setcounter{enumi}{2}
+\item Can you find out which State has the highest rate of violent crime reported? To do this you just need to click on the ’Violence’ variable, then look for the state with the highest violence rate.
+\end{enumerate}
+
+The State with the highest rate of violent crime reported is `r arrange(violence_data, desc(Violence))$State[1]` (if D.C. counts). If D.C. doesn't count, then `r arrange(violence_data, desc(Violence))$State[2]` is the answer.
+
+\newpage
+## Problem 4
+\begin{enumerate}
+\setcounter{enumi}{3}
+\item  Another way of understanding a dataset it to look at its summary statistics. Gretl provides a nice, and simple way of doing this. In order to view this information for a given variable, just click ’Variable’ → ’Summary Statistics’. This will provide a statistical summary of a given variable. Why not have a look at the Unemployment dataset’s summary statistics?
+\end{enumerate}
+
+```{r Summary_Stats, results='asis'}
+skewness <- function(x, na.rm = FALSE){
+  if(any(ina <- is.na(x))) {
+    if(na.rm) 
+      x <- x[!ina]
+    else
+      return(NA)
+  }
+  skew <- sqrt(length(x)) * sum((x - mean(x)) ^ 3) / (sum((x - mean(x)) ^ 2) ^ (3/2))
+  return(skew)
+}
+
+kurtosis <- function(x, na.rm = FALSE){
+  if(any(ina <- is.na(x))) {
+    if(na.rm) 
+      x <- x[!ina]
+    else
+      return(NA)
+  }
+  
+  kurt <- length(x) * sum((x - mean(x)) ^ 4) / (sum((x - mean(x)) ^ 2) ^ 2)
+  return(kurt)
+}
+
+
+summary_table <- function(data, round_to = 3){
+  data.numeric <- data[,sapply(data, is.numeric)]
+  cat("\\begin{table}[h!] \n")
+  cat("\\resizebox{\\textwidth}{!} \n")
+  cat("{ \n")
+  cat("\\begin{tabular}{|l")
+  for(i in seq(ncol(data.numeric)+1)){
+    cat("|c")
+  }
+  cat("|} \n")
+  cat("\\hline \n")
+  stats <- matrix(nrow = 9,ncol = ncol(data.numeric) + 1)
+  stats[,1] <- c(" ", "Mean", "Median", "Maximum", "Minimum", "Variance",
+                 "Std. Dev.", "Skewness", "Kurtosis")
+  for(i in seq.int(from=2,to=ncol(stats))){
+    stats[,i] <- c(colnames(data.numeric)[i-1],
+                   round(mean(data.numeric[[i-1]]),round_to), 
+                   round(median(data.numeric[[i-1]]),round_to),
+                   round(max(data.numeric[[i-1]]),round_to),
+                   round(min(data.numeric[[i-1]]),round_to),
+                   round(var(data.numeric[[i-1]]),round_to),
+                   round(sd(data.numeric[[i-1]]),round_to),
+                   round(skewness(data.numeric[[i-1]]),round_to),
+                   round(kurtosis(data.numeric[[i-1]]),round_to))
+  }
+  for(i in seq(nrow(stats))){
+    cat("\\hline \n")
+    for(ind in seq(ncol(stats)-1)){
+      cat(paste(stats[i,ind], " & "))
+    }
+    cat(paste(stats[i,ncol(stats)], "\\\\ \n"))
+  }
+  cat("\\hline \n")
+  cat("\\hline \n")
+  cat("\\end{tabular} \n")
+  cat("} \n")
+  cat("\\end{table}")
+}
+
+summary_table(violence_data)
+```
+
+\newpage
+## Problem 5
+\begin{enumerate}
+\setcounter{enumi}{4}
+\item Let’s look at whether it we can visibly see if there is any relationship between unemployment and violent crime rates by drawing a scatterplot. To do this go to View → Graph specified vars → X-Y scatter. Then select ’Violence’ as a Yaxis variable variable, and ’Unemployment’ as an X-axis variable. This should produce a scatterplot with a fitted regression line. From this, there appears to be some sort of positive relationship between ’Violence’ and ’Unemployment’.
+\end{enumerate}
+```{r Number_5, fig.height=3,fig.width=5}
+slr1 <- lm(Violence ~ Unemployment, data = violence_data)
+violence_data <- violence_data %>%
+  mutate(
+    pred_violence = unname(slr1[["coefficients"]][1]) + unname(slr1[["coefficients"]][2]) * Unemployment 
+  )
+
+ggplot(violence_data, aes(Unemployment, Violence))+
+  geom_point(color="blue") +
+  geom_line(aes(Unemployment, pred_violence), color="red") +
+  theme_classic()
+```
+
+## Problem 6
+\begin{enumerate}
+\setcounter{enumi}{5}
+\item One way of quantifying the relationship between two variables is via their correlation coefficient. You can find this on Gretl by going to ’View’ → ’Correlation matrix. If you then select both ’Violence’ and ’Unemployment’ you should see an outputted correlation (along with associated p values etc.) of around 0.42. What does this mean?
+\end{enumerate}
+
+The correlation between 'Violence' and 'Unemployment' is `r cor(violence_data$Violence, violence_data$Unemployment)`. This value means there's a positive correlation between 'Violence' and 'Unemployment.' More specifically, when the value for 'Violence' exceeds its average, 'Unemployment' also tends to exceed its respective average.
+
+## Problem 7
+\begin{enumerate}
+\setcounter{enumi}{6}
+\item Since we’ve inspected our variables sufficiently, it is now time to run our first regression. Let’s run an ordinary least squares regression with ’Violence’ as a dependent variable, and ’Unemployment’ (and a constant) as an independent variable. To do this go to ’Model’ → ’Ordinary Least Squares’. Then select ’Violence’ as a dependent variable, and ’Unemployment’ as an independent (a constant should already be in the list of independent variables) and click ’ok’. This should provide a read-out of the results from your first OLS regression!
+\end{enumerate}
+```{r Number_3, results='asis',message=FALSE}
+library(stargazer)
+
+stargazer(slr1,
+          title = "How Unemployment May Influence Violence",
+          style = "all",
+          summary = T,
+          dep.var.labels.include=T,
+          df=T,
+          digits = 3,
+          float=F,
+          header=F,
+          model.names=T)
+```
+
+## Problem 8
+\begin{enumerate}
+\setcounter{enumi}{7}
+\item What is the coefficient on ’Unemployment’? What is the interpretation of this value?
+\end{enumerate}
+The coefficient of 'Unemployment' is `r unname(slr1[["coefficients"]][2])`. This means for every percentage (unit) increase in 'Unemployment,' one can expect a `r unname(slr1[["coefficients"]][2])` unit increase in 'Violence.'
+
+## Problem 9
+\begin{enumerate}
+\setcounter{enumi}{8}
+\item What would this model predict would be the increase in the rate of violent crime for a 1 standard deviation increase in unemployment? What is this increase in terms of standard deviations of the rate of violence?
+\end{enumerate}
+
+This model would predict an increase of `r unname(slr1[["coefficients"]][2]) * sqrt(var(violence_data$Unemployment))` cases for a 1 standard deviation (`r sqrt(var(violence_data$Unemployment))` units) increase in unemployment. In terms of standard deviations of the rate of violence, this is a `r unname(slr1[["coefficients"]][2]) * sqrt(var(violence_data$Unemployment)) / sqrt(var(violence_data$Violence))` standard deviation increase in the rate of violence.
+
+## Problem 10
+\begin{enumerate}
+\setcounter{enumi}{9}
+\item What does a regression of the rate of unemployment on violent crime rates (the other way round to that in the last part) suggest would be the increase in the unemployment rate for a 1 standard deviation increase in the rate of violent crime?
+\end{enumerate}
+```{r Number 10}
+slr2 <- lm(Unemployment ~ Violence, data = violence_data)
+```
+
+A regression of the rate of unemployment on violent crime rates suggests the increase in the unemployment rate for a 1 standard deviation increase in the rate of violent crime would be a `r slr2[["coefficients"]][2] * sqrt(var(violence_data$Violence))`% increase in the violent crime rate.
+
+## Problem 11
+\begin{enumerate}
+\setcounter{enumi}{10}
+\item Can you use this regression to uncover what it suggests the increase in unemployment associated with a 1 standard deviation increase in violent crime? Is this the same as we found previously? Why is this the same/different?
+\end{enumerate}
+Note that this is completely different to the results which we obtained from our OLS regression of ’Violence’ on ’Unemployment’. This is because of the fact that the regression of y on x is not the same as the regression of x on y. The former minimizes square distances of ’y’ from the line, whereas the latter minimizes square distances in ’x’. Rearranging the latter regression equation will hence not yield the former. For example this model suggests that a 1.58% increase in the unemployment rate will increase violence rates by 467.6! Very different to the previous estimate.
+
+## Problem 12
+\begin{enumerate}
+\setcounter{enumi}{11}
+\item What can you conclude about the causal mechanism between violent crime and unemployment based on the two regressions you have run? Does violent crime cause unemployment or vice versa?
+\end{enumerate}
+No, the regression certainly doesn't entail any causality. It's likely there are several other unmeasurable factors that are influencing the violence rate and are also correlated with unemployment.
+
+## Problem 13
+\begin{enumerate}
+\setcounter{enumi}{12}
+\item Why might it be incorrect to conclude that increases in unemployment lead to increases in rates of violent crime?
+\end{enumerate}
+
+This notion implies causality when the data provided doesn't allow us to draw causal inferences. An experiment where all other factors are held constant while allowing unemployment and violence to vary would allow us to draw such a conclusion.
+
+\newpage
+# Theory
+## Problem 1
+![]("Screenshot_Problem_1.jpg")
+
+\begin{enumerate}
+\item 
+\begin{enumerate}
+\item $E[\bar{X}]=E[\frac{1}{N}\sum_{i=1}^{N}X_i]$
+$$=\frac{1}{N}E[\sum_{i=1}^{N}X_i]$$
+$$=\frac{1}{N}\sum_{i=1}^{N}E[X_i]$$
+$$=\frac{1}{N}\sum_{i=1}^{N}E[\mu + \epsilon_i]$$
+$$=\frac{1}{N}\sum_{i=1}^{N}(E[\mu] + E[\epsilon_i])$$
+$$=\frac{1}{N}\sum_{i=1}^{N}(E[\mu] + 0)$$
+$$=\frac{1}{N}\sum_{i=1}^{N}\mu$$
+$$=\frac{1}{N}\cdot N\cdot\mu = \mu$$
+\item $Var(\bar{X})=Var(\frac{1}{N}\sum_{i=1}^{N}X_i)$
+$$=\frac{1}{N^2}Var(\sum_{i=1}^{N}X_i)$$
+$$=\frac{1}{N^2}\cdot N\cdot Var(X)=\frac{\sigma_X^2}{N}$$
+Note: The sum of variances only works here (without the covariance terms) because of the independence of the X's.\\
+\item Since $\bar{X}$ was proven unbiased as an estimator of the population mean, to prove consistency for $\bar{X}$, it suffices to show the variance of $\bar{X}$ tends to zero as $N\to\infty$. In this case, $\lim_{N\to\infty}Var(\bar{X})=\lim_{N\to\infty}\frac{\sigma_X^2}{N}=0$.
+
+\item For the population mean, there exists an estimator, which we will denote as $\hat{\mu}$, that solves $\min  S= \sum_{i=1}^{N}(X_i-\hat{\mu})^2$.
+$$\frac{\partial S}{\partial\hat{\mu}}=\sum_{i=1}^{N}-2(X_i-\hat{\mu})=0$$
+$$\to \sum_{i=1}^{N}(X_i-\hat{\mu})=0$$
+$$\to \sum_{i=1}^{N}X_i= \sum_{i=1}^{N}\hat{\mu}$$
+$$\to N\cdot\bar{X}= N\cdot\hat{\mu}$$
+$$\to \hat{\mu}=\bar{X}$$
+\item Yes, the sample mean $\bar{X}$ is the best linear unbiased estimator (BLUE) of the population mean. In part(a), we proved $E[\bar{X}]=\mu$, and thus the sample mean is an unbiased estimator. Thus, we must show $\bar{X}$ is the variance minimizing estimator for $\mu$. To prove this, take an estimator of $\mu,  \hat{\mu}=\sum_{i=1}^N(\omega_i\cdot X_i)$, where $\sum_{i=1}^{N}\omega_i=1$. The problem then becomes:
+
+$$\min  Var(\hat{\mu}) \: s.t. \: \omega_1+...+\omega_N=1$$
+$$\to \min  Var(\sum_{i=1}^N(\omega_i\cdot X_i)) \: s.t.  \: \omega_1+...+\omega_N=1$$
+$$\to \min  Var(\omega_1\cdot X_1 + ... + \omega_N\cdot X_N) \: s.t.  \: \omega_1+...+\omega_N=1$$
+$$\to \min  Var(\omega_1\cdot X_1) + ... + Var(\omega_N\cdot X_N) \: s.t. \:  \omega_1+...+\omega_N=1$$
+$$\to \min  \omega_1^2Var(X_1) + ... + \omega_N^2Var(X_N) \: s.t. \: \omega_1+...+\omega_N=1$$
+$$\to \min  \omega_1^2\sigma_X^2 + ... + \omega_N^2\sigma_X^2 \: s.t. \: \omega_1+...+\omega_N=1$$
+$$\to \mathscr{L} = \omega_1^2\sigma_X^2 + ... + \omega_N^2\sigma_X^2 - \lambda(\omega_1+...+\omega_N-1)$$
+$$\frac{\partial\mathscr{L}}{\partial\omega_1}=2\sigma_X^2\omega_1-\lambda=0$$
+$$...$$
+$$\frac{\partial\mathscr{L}}{\partial\omega_N}=2\sigma_X^2\omega_N-\lambda=0$$
+$$\to 2\sigma_X^2\omega_1 -\lambda = ... =2\sigma_X^2\omega_N -\lambda$$
+$$\to 2\sigma_X^2\omega_1 = ... =2\sigma_X^2\omega_N$$
+$$ \to \omega_1 = ... = \omega_N$$
+$$ \to \omega_1 + ... + \omega_N = 1 = N\cdot\omega_1$$
+$$ \to \omega_1 = ... = \omega_N = \frac{1}{N}$$
+$$ \to \hat{\mu} = \frac{1}{N}\sum_{i=1}^{N}X_i=\bar{X}$$
+\end{enumerate}
+\end{enumerate}
+
+## Problem 2
+\begin{enumerate}
+\item For each of the following state whether or not the estimator is biased, consistent, both or neither, when used to estimate the population mean:
+\begin{enumerate}
+\item $\tilde{X}=\frac{1}{N-1}\sum_{i=1}^{N}X_i$
+$$E[\tilde{X}] = E[\frac{1}{N-1}\sum_{i=1}^{N}X_i]=\frac{1}{N-1}\sum_{i=1}^{N}E[X_i]=\frac{1}{N-1}\sum_{i=1}^{N}\mu=\frac{1}{N-1}\cdot N \mu\neq \mu$$
+$$\lim_{N\to\infty}Var(\tilde{X})=\lim_{N\to\infty}Var(\frac{1}{N-1}\sum_{i=1}^{N}X_i)=\lim_{N\to\infty} \frac{N}{(N-1)^2}\cdot Var(X) = 0$$
+$\therefore \tilde{X}$ displays consistency but not unbiasedness.\\
+\item $\hat{X}=\frac{2}{N}\sum_{i=1}^{N/2}X_i$
+$$E[\hat{X}]=E[\frac{2}{N}\sum_{i=1}^{N/2}X_i] = \frac{2}{N}\sum_{i=1}^{N/2}E[X_i] = \frac{2}{N}\cdot\frac{N}{2}\cdot\mu=\mu$$
+$$\lim_{N\to\infty}Var(\hat{X})=\lim_{N\to\infty}Var(\frac{2}{N}\sum_{i=1}^{N/2}X_i) = \lim_{N\to\infty}\frac{4}{N^2}\cdot\frac{N}{2}\cdot \sigma_X^2=\lim_{N\to\infty}\frac{2}{N}\cdot\sigma_X^2=0$$
+$\therefore \hat{X}$ displays both consistency and unbiasedness.
+
+\item Assuming N is even, $\bar{X}=\frac{2}{N}\sum_{i=1}^{\frac{N}{2}}(X_i+\mu)+\frac{2}{N}\sum_{i=\frac{N}{2}+1}^{N}(X_i-\mu)=\frac{2}{N}[\frac{N}{2}\mu-\frac{N}{2}\mu + \sum_{i=1}^{N}X_i ]=\frac{2}{N}\sum_{i=1}^{N}X_i $
+$$E[\bar{X}]=E[\frac{2}{N}\sum_{i=1}^{N}X_i]=\frac{2}{N}\sum_{i=1}^{N}E[X_i]=\frac{2}{N}\cdot N \cdot\mu=2\mu$$
+$$\lim_{N\to\infty}Var(\bar{X})=\lim_{N\to\infty}Var(\frac{2}{N}\sum_{i=1}^{N}X_i)=\lim_{N\to\infty}\frac{4}{N^2}\cdot N \cdot Var(X)=\lim_{N\to\infty}\frac{4}{N}\sigma_X^2=0$$
+$\therefore \bar{X}$ displays consistency but not unbiasedness.\\
+
+\item $Y\: \sim \: N(\mu,\sigma^2)$
+$$E[Y]=\mu$$
+$$\lim_{N\to\infty}Var(Y)=\sigma^2$$
+$\therefore$ Y is unbiased but not consistent.
+
+\item $Z=\sum_{i=1}^{N}w_iX_i$ where $\sum_{i=1}^{N}w_i=1$.
+$$E[Z]=E[\sum_{i=1}^{N}w_iX_i]=\sum_{i=1}^{N}E[w_iX_i]=\sum_{i=1}^{N}E[w_i]E[X_i]=\mu\sum_{i=1}^{N}E[w_i]=\mu$$
+$$\lim_{n\to\infty}Var(Z)=\lim_{n\to\infty}Var(\sum_{i=1}^{N}w_iX_i)=\lim_{n\to\infty}\sum_{i=1}^{N}w_i^2Var(X_i)=0$$
+$\therefore Z$ is both consistent and unbiased.
+\end{enumerate}
+\end{enumerate}
+## Problem 3
+![]("Screenshot_Problem_3.jpg")
+\begin{enumerate}
+\setcounter{enumi}{2}
+\item 
+\begin{enumerate}
+\item $\min SSR=\sum_{i=1}^{N}(Y_i-\hat{Y}_i)^2=\sum_{i=1}^{N}(Y_i-(\hat{\alpha} + \hat{\beta}X_i))^2$
+$$\frac{\partial SSR}{\partial\alpha}=-2\sum_{i=1}^{N}(Y_i-\hat{\alpha} - \hat{\beta}X_i)=0$$
+$$\to \sum_{i=1}^{N}Y_i=\sum_{i=1}^{N}(\hat{\alpha} + \hat{\beta}X_i)$$
+$$\to N\bar{Y}=N\hat{\alpha}+N\hat{\beta}\bar{X}$$
+$$\to \bar{Y}=\hat{\alpha}+\hat{\beta}\bar{X}$$
+$$\to \hat{\alpha} = \bar{Y}-\hat{\beta}\bar{X}$$
+$$\frac{\partial SSR}{\partial\beta}=-2\sum_{i=1}^{N}X_i(Y_i-\hat{\alpha} - \hat{\beta}X_i)=0$$
+$$\to \sum_{i=1}^{N}X_iY_i=\sum_{i=1}^{N}(\hat{\alpha}X_i+\hat{\beta}X_i^2)$$
+$$\to \sum_{i=1}^{N}X_iY_i=\hat{\alpha}N\bar{X}+\hat{\beta}\sum_{i=1}^{N}X_i^2$$
+$$\to \sum_{i=1}^{N}X_iY_i=N(\bar{Y}-\hat{\beta}\bar{X})\bar{X}+\hat{\beta}\sum_{i=1}^{N}X_i^2$$
+$$\to \sum_{i=1}^{N}X_iY_i -N\bar{X}\bar{Y}=\hat{\beta}(\sum_{i=1}^{N}X_i^2 - N\bar{X}^2)$$
+$$\to \hat{\beta}=\frac{\sum_{i=1}^{N}X_iY_i -\bar{X}\sum_{i=1}^{N}Y_i}{\sum_{i=1}^{N}X_i^2 - \bar{X}\sum_{i=1}^{N}X_i}$$
+$$\to \hat{\beta}=\frac{\sum_{i=1}^{N}X_iY_i -\bar{X}Y_i}{\sum_{i=1}^{N}X_i^2 - \bar{X}X_i}$$
+$$\to \hat{\beta}=\frac{\sum_{i=1}^{N}Y_i(X_i -\bar{X})}{\sum_{i=1}^{N}X_i(X_i - \bar{X})}$$
+$$\to \hat{\beta}=\frac{\sum_{i=1}^{N}(Y_i-\bar{Y})(X_i -\bar{X})}{\sum_{i=1}^{N}(X_i - \bar{X})(X_i - \bar{X})}$$
+$$\to \hat{\beta}=\frac{\hat{cov}(X,Y)}{\hat{var(X)}}$$
+\item Slope parameter on Y = $\hat{\delta}=\frac{\hat{cov}(Y,X)}{\hat{var}(Y)}$
+
+\item No, $\hat{\delta}\times\hat{\beta}=\frac{\hat{cov}(Y,X)}{\hat{var}(Y)}\times\frac{\hat{cov}(X,Y)}{\hat{var(X)}}=\frac{(\sum_{i=1}^{N}(X_i-\bar{X})(Y_i-\bar{Y}))^2}{\sum_{i=1}^{N}(X_i-\bar{X})^2\sum_{i=1}^{N}(Y_i-\bar{Y})^2}\neq 1$
+
+\item $\hat{\delta}\times\hat{\beta}=\frac{\hat{cov}(X,Y)^2}{\hat{var}(X)\hat{var}(Y)}$
+$$\hat{\rho}=\frac{\hat{cov}(X,Y)}{\hat{\sigma_X}\hat{\sigma_Y}}$$
+$$\to \hat{\rho} = \sqrt{\hat{\delta}\times\hat{\beta}}$$
+\end{enumerate}
+\end{enumerate}
+
+## Problem 4
+![]("Screenshot_Problem_4.jpg")
+\begin{enumerate}
+\setcounter{enumi}{3}
+\item 
+\begin{enumerate}
+\item Yes, $E[\bar{X}]=E[\frac{1}{N}\sum_{i=1}^{N}X_i]=\frac{1}{N}\sum_{i=1}^{N}E[X_i]=\frac{1}{N}\cdot N \cdot\mu_X=\mu_X$
+\item Yes, $E[\bar{Y}]=E[\frac{1}{N}\sum_{i=1}^{N}Y_i]=\frac{1}{N}\sum_{i=1}^{N}E[Y_i]=\frac{1}{N}\cdot N \cdot\mu_Y=\mu_Y$. And $\lim_{N\to\infty}Var(\bar{Y})=\lim_{N\to\infty}Var(\frac{1}{N}\sum_{i=1}^{N}Y_i)=\lim_{N\to\infty}\frac{1}{N^2}\cdot N \cdot \sigma_Y^2=\lim_{N\to\infty}\frac{4\sigma^2}{N}=0$.
+\item $\bar{X}$ is a more efficient estimator for its respective population mean because $Var(\bar{X})=\frac{\sigma^2}{N} \le Var(\bar{Y})$.
+
+\item $E[\frac{\bar{X}+\bar{Y}}{2}]=E[\frac{\bar{X}}{2}] + E[\frac{\bar{Y}}{2}]=\frac{1}{2}E[\bar{X}]+\frac{1}{2}E[\bar{Y}]=\frac{\mu}{2} + \frac{\mu}{2}=\mu$\\
+$\therefore$ the average of the sample means is an unbiased estimator of the population mean.\\
+$$\min Var(a\bar{X}+b\bar{Y}) \: s.t. a + b = 1$$
+\begin{center}
+Since $X_i$ and $Y_i$ are i.i.d.
+\end{center}
+$$Var(a\bar{X}+b\bar{Y})=a^2Var(\bar{X})+b^2Var(\bar{Y})=a^2\sigma^2+4b^2\sigma^2$$
+\begin{center}
+So, the minimization problem becomes $\min a^2\sigma^2+4b^2\sigma^2 \: s.t. a+b=1$
+\end{center}
+$$\mathscr{L}=a^2\sigma^2+4b^2\sigma^2-\lambda(a+b-1)$$
+$$\frac{\partial\mathscr{L}}{\partial a}=2\sigma^2a-\lambda=0$$
+$$\to a=\frac{\lambda}{2\sigma^2}$$
+$$\frac{\partial\mathscr{L}}{\partial b}=8\sigma^2b-\lambda=0$$
+$$\to b=\frac{\lambda}{8\sigma^2}=\frac{a}{4}$$
+$$\frac{\partial{\mathscr{L}}}{\partial\lambda}=a+b-1=0$$
+$$\to a + \frac{a}{4}=1$$
+$$\to a = \frac{4}{5}, \: b=\frac{1}{5}$$
+$\therefore$ No, the average of the sample means is not the best estimator one can construct.
+
+\item Looking at the previous part, the best linear unbiased estimator (BLUE) of the population mean is $\hat{\mu}=\frac{4}{5}\bar{X}+\frac{1}{5}\bar{Y}$
+\end{enumerate}
+\end{enumerate}
