@@ -9,6 +9,6 @@ Econometrics Work Done in R and Jupyter
 - The book can be purchased on Amazon at: https://www.amazon.com/Introductory-Econometrics-Modern-Approach-MindTap-dp-1337558869/dp/1337558869/ref=dp_ob_title_bk
 
 ## Lambert
-- Finished problem set from Dr. Ben Lambert's Econometrics course
+- Finished problem sets from Dr. Ben Lambert's Econometrics course
 - The course can be found at: https://youtube.com/playlist?list=PLwJRxp3blEvZyQBTTOMFRP_TDaSdly3gU
 - His Website and the data used in these problem sets can be found at: https://ben-lambert.com/econometrics-course-problem-sets-and-data/
