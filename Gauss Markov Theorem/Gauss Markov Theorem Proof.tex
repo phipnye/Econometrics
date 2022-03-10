@@ -40,7 +40,7 @@ Assuming a simple bivariate population model in which $$y_i=\alpha+\beta^Px_i+u_
 we've shown, using first order conditions, $$\hat{\beta}_{LS}=\frac{\sum_{i=1}^n (x_i-\bar{x})y_i}{\sum_{i=1}^n(x_i-\bar{x})^2}=\sum_{i=1}^n v_i y_i$$
 where $v_i=\frac{(x_i-\bar{x})}{\sum_{i=1}^n (x_i-\bar{x})^2}$.\\~\\
 Note: $\sum_{i=1}^n v_i=0$ since the numerator of $v_i$ comes out to $\sum_{i=1}^n (x_i-\bar{x})= \sum_{i=1}^n x_i - \sum_{i=1}^n \bar{x}=n\bar{x}-n\bar{x}=0$\\~\\
-However, $\sum_{i=1}^n v_i^2=(\frac{(x_i-\bar{x})}{\sum_{i=1}^n (x_i-\bar{x})^2})^2=\frac{1}{\sum_{i=1}^n (x_i-\bar{x})^2}>0$\\~\\
+However, $\sum_{i=1}^n v_i^2=\sum_{i=1}^n (\frac{(x_i-\bar{x})}{\sum_{i=1}^n (x_i-\bar{x})^2})^2=\frac{1}{\sum_{i=1}^n (x_i-\bar{x})^2}>0$\\~\\
 Using these results, we know $$E[\hat{\beta}_{LS}]=E[\sum_{i=1}^n v_i y_i]=\sum_{i=1}^n E[v_i y_i]=\sum_{i=1}^n E[\alpha v_i + \beta^P x_i v_i+u_i v_i]$$
 $$=\alpha \sum_{i=1}^n E[v_i] + \beta^P \sum_{i=1}^n E[x_i v_i]+\sum_{i=1}^n E[u_i v_i]$$
 $$=\alpha \sum_{i=1}^n 0 + \beta^P \sum_{i=1}^n E[\frac{(x_i-\bar{x})x_i}{\sum_{i=1}^n(x_i-\bar{x})x_i}]+\sum_{i=1}^n E[u_i v_i]$$
