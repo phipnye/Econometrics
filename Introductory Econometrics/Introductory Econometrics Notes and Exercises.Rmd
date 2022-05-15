@@ -5,6 +5,8 @@ header-includes:
   - \pagenumbering{gobble}
   - \usepackage{amsmath}
   - \usepackage{mathrsfs}
+  - \usepackage{xfrac}
+  - \newcommand{\indep}{\perp\!\!\!\!\perp}
 ---
 
 ```{r Setup, echo=FALSE,include=FALSE}
@@ -500,7 +502,7 @@ The \textbf{law of large numbers (LLN)} is a theorem that states the average fro
 
 Let $\{Z_n:n=1,2,\dots\}$ be a sequence of random variables, such that for numbers $z$, $$P(Z_n\leq z)\to\Phi(z)\text{ as }n\to\infty$$ where $\Phi(z)$ is the standard normal cumulative distribution function. Then, $Z_n$ is said to have an \textbf{asymptotic standard normal distribution}. This is sometimes written as $Z_n\overset{\text{a}}{\sim}\mathcal{N}(0,1)$, where the "$a$" stands for “asymptotically” or “approximately.”
 
-The \textbf{central limit theorem (CLT)} states that the average from a random sample (and many other estimates that depend on the sample mean) for any population (with finite variance), when standardized, has an asymptotic standard normal distribution. More formally, for a random sample $\{Y_1,Y_2,\dots,Y_n\}$ with a mean $\mu$ and a variance $\sigma^2$. Then, $$Z_n=\frac{\bar{Y}-\mu}{\sigma/\sqrt{n}}$$ has an asymptotic standard normal distribution. Note that $Z_n$ is the standardized version of $\bar{Y_n}$: $E[\bar{Y_n}]=\mu$ has been subtracted off and divided by $\text{sd}(\bar{Y_n})=\sigma/\sqrt{n}$.
+The \textbf{central limit theorem (CLT)} states that the average from a random sample (and many other estimators that depend on the sample mean) for any population (with finite variance), when standardized, has an asymptotic standard normal distribution. More formally, for a random sample $\{Y_1,Y_2,\dots,Y_n\}$ with a mean $\mu$ and a variance $\sigma^2$. Then, $$Z_n=\frac{\bar{Y}-\mu}{\sigma/\sqrt{n}}$$ has an asymptotic standard normal distribution. Note that $Z_n$ is the standardized version of $\bar{Y_n}$: $E[\bar{Y_n}]=\mu$ has been subtracted off and divided by $\text{sd}(\bar{Y_n})=\sigma/\sqrt{n}$.
 
 ### Maximum Likelihood
 
@@ -513,7 +515,7 @@ squares, method of moments, and maximum likelihood often result in the same esti
 
 ### Confidence Intervals
 A \textbf{condidence interval} is a rule used to construct a random interval so that a certain percentage of all data sets, determined by the confidence level, yields an interval that contains the population value. Thus, a 95% confidence interval of an estimator will contain the true population value 95% of the time. Theoretically, for the sample average the 95% confidence interval can be constructed as follows: $$P\left(-1.96<\frac{\bar{Y}-\mu}{\sigma/\sqrt{n}}<1.96\right)=.95$$
-$$\to CI_{95}=[\bar{y}-1.96(\sigma/\sqrt{n}),\bar{y}+1.96(\sigma/\sqrt{n})]$$where $\mu$ is the hypothesized population mean. In practice, however, $\sigma$ is unknown and must be estimated with $s$. Unfortunately, this does not preserve the 95% level of confidence because $s$ depends on the particular sample. In other words, the random interval $[\bar{Y}\pm 1.96(S/\sqrt{n})]$ no longer contains $\mu$ with probability .95 because the constant $\sigma$ has been replaced with the random variable $S$. Thus, rather than using the standard normal distribution, we must rely on the t distribution. The t distribution arises from the fact that $$\frac{\bar{Y}-\mu}{S/\sqrt{n}}\sim t_{n-1}$$The denominator $S/\sqrt{N}$ is an estimate of the $\text{sd}(\bar{Y})$. In general, these estimates of \textbf{sampling standard deviations} are referred to as \textbf{standard errors}.
+$$\to CI_{95}=[\bar{y}-1.96(\sigma/\sqrt{n}),\bar{y}+1.96(\sigma/\sqrt{n})]$$where $\mu$ is the hypothesized population mean. In practice, however, $\sigma$ is unknown and must be estimated with $s$. Unfortunately, this does not preserve the 95% level of confidence because $s$ depends on the particular sample. In other words, the random interval $[\bar{Y}\pm 1.96(S/\sqrt{n})]$ no longer contains $\mu$ with probability .95 because the constant $\sigma$ has been replaced with the random variable $S$. Thus, rather than using the standard normal distribution, we must rely on the t distribution. The t distribution arises from the fact that $$\frac{\bar{Y}-\mu}{S/\sqrt{n}}\sim t_{n-1}$$The denominator $S/\sqrt{N}$ is an estimate of the $\text{sd}(\bar{Y})$. In general, these estimators of \textbf{sampling standard deviations} are referred to as \textbf{standard errors}.
 
 ### Hypothesis Testing
 
@@ -675,7 +677,7 @@ The difference is statistically greater than zero at the 5\% level but not at th
 
 ### Data Types
 
-\textbf{Nonexperimental data} are not accumulated through controlled experiments on individuals, firms, or segments of the economy. Nonexperimental data are sometimes called \textbf{observational data}, or \textbf{retrospective data}, to emphasize the fact that the researcher is a passive collector of the data.
+\textbf{Nonexperimental data} are not accumulated through controlled experiments on individuals, firms, or segments of the economy. Non-experimental data are sometimes called \textbf{observational data}, or \textbf{retrospective data}, to emphasize the fact that the researcher is a passive collector of the data.
 
 \textbf{Experimental data} are often collected in laboratory environments in the natural sciences, but they are more difficult to obtain in the social sciences. Although some social experiments can be devised, it is often impossible, prohibitively expensive, or morally repugnant to conduct the kinds of controlled experiments that would be needed to address economic issues.
 
@@ -882,7 +884,8 @@ mean(county_murders$execs)
 cor(county_murders$murders,county_murders$execs)
 
 #iv
-#No, I would suspect the positive correlation may be due to executions resulting from murders and other crimes, which I suspect is correlated with the number of murders
+#No, I would suspect the positive correlation may be due to executions resulting from murders
+#and other crimes, which I suspect is correlated with the number of murders
 rm(county_murders)
 gc()
 ```
@@ -925,3 +928,811 @@ mean(econmath$score[econmath$econhs==0])
 #Randomly assigning individuals to two groups (one who does take econ in high school
 #and one that does not), then performing part(ii) can be used to obtain a good causal estimate
 ```
+
+# Chapter 2
+
+## Notes
+
+A \textbf{simple linear regression model} is a model relating a dependent variable to one independent variable and generally takes the form$$y=\beta_0+\beta_1x+u$$It is also called the \textbf{two-variable linear regression model} or \textbf{bivariate linear regression model} because it relates the two variables $x$ and $y$.
+
+The variable $u$, called the \textbf{error term} or \textbf{disturbance} in the relationship, represents factors other than $x$ that affect $y$.
+
+If the other factors in $u$ are held fixed, so that the change in $u$ is zero, $\Delta u = 0$, then $x$ has a linear effect on $y$:$$\Delta y=\beta_1\Delta x\text{ if }\Delta u =0$$
+
+As long as the intercept $\beta_0$ is included in the equation, nothing is lost by assuming that the average value of $u$ in the population is zero. Mathematically, $$E[u]=0$$
+
+One of the most important assumptions in econometrics is the \textbf{zero conditional mean assumption}. This crucial assumption says that the average value of the unobservables ($u$) is the same across all slices of the population determined by the value of $x$ and that the common average \emph{is} necessarily equal to the average of $u$ over the entire population. Thus, under this assumption (and the zero unconditional mean assumption), we write$$E[u|x]=E[u]=0$$
+
+Using the zero conditional mean assumption and taking the expected value of $y$ given $x$ from the simple linear linear regression model gives$$E[y|x]=\beta_0+\beta_1 x,$$This is called the \textbf{population regression function (PRF)} and shows that $E[y|x]$ is a linear function of $x$. The PRF gives us a relationship between the average level of $y$ at different levels of $x$. It is important to understand that the PRF tells us how the average value of $y$ changes with $x$; it does not say that $y$ equals $\beta_0 + \beta_1 x$ for all units in the population.
+\newpage
+
+### OLS Estimators Derivation (SLR)
+
+Let $\{(x_i,y_i):i=1,\dots,n\}$ denote a random sample of size $n$ from the population. Then, we can write$$y_i=\beta_0+\beta_1 x_i+u_i$$for each $i$ where $u_i$ is the error term for each observation $i$ because it contains all factors affecting $y_i$ other than $x_i$. Because there are two unknown parameters to estimate $(\beta_0,\beta_1)$, we might hope to obtain good estimators, which we will denote $\hat{\beta}_0$ and $\hat{\beta}_1$. Thus, we may want to find estimators that minimize the sum of squared residuals$$SSR=\sum_{i=1}^{n}(y_i-\hat{y}_i)^2,$$ where $\hat{y}_i$ represents fitted values from an estimated model using $\hat{\beta}_0$ and $\hat{\beta}_1$. Formally, $$\hat{y}_i=\hat{\beta}_0+\hat{\beta}_1 x_i$$Hence, we can rewrite $$SSR=\sum_{i=1}^{n}(y_i-\hat{\beta}_0-\hat{\beta}_1 x_i)^2$$
+
+To minimize the sum of squared residuals, we take two first order conditions:
+
+\underline{FOC 1:}
+
+$$\frac{\partial SSR}{\partial\beta_0}=\sum_{i=1}^{n}-2(y_i-\hat{\beta}_0-\hat{\beta}_1 x_i)=0$$
+$$\to \sum_{i=1}^{n}(y_i-\hat{\beta}_0-\hat{\beta}_1 x_i)=0$$
+$$\to n\bar{y}-n\hat{\beta}_0-n\hat{\beta}_1\bar{x}=0$$
+$$\to \bar{y}=\hat{\beta}_0+\hat{\beta}_1\bar{x}$$
+$$\to \hat{\beta}_0=\bar{y}-\hat{\beta}_1\bar{x}$$
+\small
+\textit{Note:} The significance of this FOC is that, using least squares criteria, our line of best fit runs through the sample means $\bar{y}$ and $\bar{x}$.
+\normalsize
+
+\underline{FOC 2:}
+
+$$\frac{\partial SSR}{\partial\beta_1}=\sum_{i=1}^{n}-2x_i(y_i-\hat{\beta}_0-\hat{\beta}_1 x_i)=0$$
+$$\to\sum_{i=1}^{n}x_i(y_i-\hat{\beta}_0-\hat{\beta}_1 x_i)=0$$
+$$\to\sum_{i=1}^{n}(x_iy_i-\hat{\beta}_0x_i-\hat{\beta}_1 x_i^2)=0$$
+$$\to\sum_{i=1}^{n}x_iy_i=\sum_{i=1}^{n}\left(\hat{\beta}_0x_i+\hat{\beta}_1 x_i^2\right)$$
+$$\to\sum_{i=1}^{n}x_iy_i=\sum_{i=1}^{n}\left((\bar{y}-\hat{\beta}_1\bar{x})x_i+\hat{\beta}_1 x_i^2\right)$$
+$$\to\sum_{i=1}^{n}x_iy_i=\sum_{i=1}^{n}\left(\bar{y}x_i-\hat{\beta}_1\bar{x}x_i+\hat{\beta}_1 x_i^2\right)$$
+$$\to\sum_{i=1}^{n}x_iy_i=n\bar{x}\bar{y}+\hat{\beta_1}\sum_{i=1}^{n}(x_i^2-\bar{x}x_i)$$
+$$\to\sum_{i=1}^{n}(x_iy_i)-n\bar{x}\bar{y}=\hat{\beta}_1\sum_{i=1}^{n}x_i(x_i-\bar{x})$$
+$$\to\sum_{i=1}^{n}(x_iy_i-\bar{x}y_i)=\hat{\beta}_1\sum_{i=1}^{n}x_i(x_i-\bar{x})$$
+$$\to\hat{\beta}_1=\frac{\sum_{i=1}^{n}y_i(x_i-\bar{x})}{\sum_{i=1}^{n}x_i(x_i-\bar{x})}=\frac{\sum_{i=1}^{n}(y_i-\bar{y})(x_i-\bar{x})}{\sum_{i=1}^{n}(x_i-\bar{x})^2}=\frac{\hat{\sigma}_{xy}}{\hat{\sigma}^2_{x}}=\hat{\rho}_{xy}\cdot\frac{\hat{\sigma}_y}{\hat{\sigma}_x}$$
+
+Note that the FOCs are analogous to the zero mean assumptions (using residuals instead of the error term):
+
+FOC 1 can be restated as
+$$E[\hat{u}]=0\to E[y-\hat{y}]=E[y-\hat{\beta}_0-\hat{\beta}_1x]=n^{-1}\sum_{i=1}^{n}(y-\hat{\beta}_0-\hat{\beta}_1x)=0$$
+
+And FOC 2 can be restated as:
+$$E[\hat{u}|x]=E[\hat{u}]\to \hat{u}\indep x\to \text{Cov}(x,\hat{u})=0\to E[x\hat{u}]-E[x]E[\hat{u}]=E[x\hat{u}]=0$$
+$$\to n^{-1}\sum_{i=1}^{n}x_i(y_i-\hat{\beta}_0-\hat{\beta}_1x_i)=0$$
+
+### OLS Regression
+
+The estimators $(\hat{\beta}_0,\hat{\beta}_1)$ are called the \textbf{ordinary least squares (OLS)} estimators of $\beta_0$ and $\beta_1$. A \textbf{fitted value} for $y$ when $x=x_i$ is defined as $$\hat{y}_i=\hat{\beta}_0+\hat{\beta}_1 x_i$$The \textbf{residual} for observation $i$ is the difference between the actual $y_i$ and its fitted value:$$\hat{u}_i=y_i-\hat{y}_i=y_i-\hat{\beta}_0-\hat{\beta}_1 x_i$$Thus, we defined the \textbf{OLS regression line} or \textbf{sample regression function (SRF)} as$$\hat{y}=\hat{\beta}_0+\hat{\beta}_1 x$$
+
+\underline{Properties of OLS Statistics}
+\begin{enumerate}
+\item The sum, and therefore the sample average of the OLS residuals, is zero, such that$$\sum_{i=1}^{n}\hat{u}_i=0$$This result follows from FOC 1.
+\item The sample covariance between the regressors and the OLS residuals is zero. This follows from FOC2, which can be written in terms of the residuals as$$\sum_{i=1}^{n}x_i\hat{u}_i=0$$
+\item The point $(\bar{x},\bar{y})$ is always on the OLS regression line. In other words, if we take the OLS regression line and plug in $\bar{x}$ for $x$, then the predicted value is $\bar{y}$. This is exactly what the derivation from FOC 1 showed us.
+\end{enumerate}
+
+### Sum of Squares
+
+We can view OLS as decomposing each $y_i$ into two parts, a fitted value and a residual. The fitted values and residuals are uncorrelated in the sample.
+
+The \textbf{total sum of squares (SST)} can be defined as$$SST=\sum_{i=1}^{n}(y_i-\bar{y})^2$$and is a measure of the variation in the $y_i$ of the given sample. If we divided SST by $n-1$, we obtain the sample variance of $y$.
+
+The \textbf{explained sum of squares (SSE)} can be defined as$$SSE=\sum_{i=1}^{n}(\hat{y}_i-\bar{y})^2$$and is a measure of the variation in the $\hat{y}_i$.
+
+The \textbf{residual sum of squares (SSR)} can be defined as$$SSR=\sum_{i=1}^{n}(y_i-\hat{y})^2=\sum_{i=1}^{n}\hat{u}^2$$and measures the sample variation in the $\hat{u}_i$.
+
+In total,$$SST=SSE+SSR$$
+
+\underline{Proof}
+$$SSE+SSR=\sum_{i=1}^{n}(\hat{y}_i-\bar{y})^2+\sum_{i=1}^{n}(y_i-\hat{y}_i)^2$$
+$$=\sum_{i=1}^{n}(\hat{y}_i^2-2\bar{y}\hat{y}_i+\bar{y}^2)+\sum_{i=1}^{n}(y_i^2-2y_i\hat{y}_i+\hat{y}_i^2)$$
+$$=\left[\sum_{i=1}^{n}\hat{y}_i^2-2\bar{y}\sum_{i=1}^{n}\hat{y}_i+\sum_{i=1}^{n}\bar{y}^2\right]+\left[\sum_{i=1}^{n}y_i^2-2\sum_{i=1}^{n}y_i\hat{y}_i+\sum_{i=1}^{n}\hat{y}_i^2\right]$$
+$$=\left[\sum_{i=1}^{n}y_i^2-2n\bar{y}^2+\sum_{i=1}^{n}\bar{y}^2\right]+\left[\sum_{i=1}^{n}\hat{y}_i^2-2\sum_{i=1}^{n}y_i\hat{y}_i+\sum_{i=1}^{n}\hat{y}_i^2\right]$$
+$$=\left[\sum_{i=1}^{n}y_i^2-2\bar{y}\sum_{i=1}^{n}y_i+\sum_{i=1}^{n}\bar{y}^2\right]+\left[\sum_{i=1}^{n}(2\hat{y}_i^2-2y_i\hat{y}_i)\right]$$
+$$=\left[\sum_{i=1}^{n}(y_i^2-2\bar{y}y_i+\bar{y}^2)\right]+\left[\sum_{i=1}^{n}2\hat{y}_i(\hat{y}_i-y_i)\right]$$
+$$=\sum_{i=1}^{n}(y_i-\bar{y})^2-2\sum_{i=1}^{n}\hat{y}_i(\hat{u}_i)$$
+$$=SST-2\sum_{i=1}^{n}\hat{u}_i(\hat{\beta}_0+\hat{\beta_1}x_i)$$
+$$=SST-2\left[\hat{\beta}_0\sum_{i=1}^{n}\hat{u}_i+\hat{\beta_1}\sum_{i=1}^{n}x_iu_i\right]=SST$$
+
+The \textbf{R-squared} of the regression, sometimes called the \textbf{coefficient of determination}, is defined as$$R^2\equiv\frac{SSE}{SST}=1-\frac{SSR}{SST}$$
+$R^2$is the ratio of the explained variation compared to the total variation; thus, it is interpreted as the fraction of the sample variation in $y$ that is explained by $x$. $R^2$ is equal to the square of the sample correlation coefficient between $y_i$ and $\hat{y}_i$.
+
+
+### Nonlinear Models
+
+In a linear regression model, changing the units of the variables has a multiplicative effect on the slope and intercepts but has not effect on the $R^2$.
+
+In a nonlinear regression model that incorporates natural logarithms, changing the units has no effect on the slope but does change the intercept. Take for example, $\ln(y)=\beta_0+\beta_1\ln(x)+u$. If we multiply $y$ by some constant $c_1$ and $x$ by some constant $c_2$, the equation becomes
+$$\ln(c_1y)=\beta_0+\beta_1\ln(c_2 x)+u$$
+$$\to\ln(c_1)+\ln(y)=\beta_0+\beta_1\left[\ln(c_2)+\ln(x)\right]+u$$
+$$\to\ln(y)=\alpha+\beta_1\ln(x)+u$$where $\alpha=\beta_0-\ln(c_1)+\beta_1\ln(c_2)$.
+
+\underline{Summary of Functional Forms Involving Natural Logarithms}
+\begin{tabular}{|lccc|}
+\hline
+Model & Dependent Variable & Independent Variable & Interpretation of $\beta_1$\\
+\hline
+Level-level (linear model) & $y$ & $x$ & $\Delta y=\beta_1 \Delta x$\\
+Level-log & $y$ & $\ln(x)$ & $\Delta y=(\beta_1/100)\%\Delta x$\\
+Log-level (semi-elasticity model) & $\ln(y)$ & $x$ & $\%\Delta y=(100\beta_1)\Delta x$\\
+Log-log (constant elasticity model) & $\ln(y)$ & $\ln(x)$ & $\%\Delta y=\beta_1\%\Delta x$\\
+\hline
+\end{tabular}
+
+### Gauss-Markov Assumptions
+
+\begin{itemize}
+\item Assumption 1: The population model is linear in parameters such that $$y_i=\alpha +\beta_1x_{i,1}+...+\beta_mx_{i,m}+u_i$$
+\item Assumption 2: The sample data $\{x_{i,1},...x_{i,m},y_i\}$ is a random sample.
+\item Assumption 3: The error term has a zero conditional mean such that $$E[u|x_{i,1},...x_{i,m}]=0$$
+For a random sample, this assumption implies that $E[u_i|x_i]=0\ \forall\ i=1,2,\dots,n$
+\item Assumption 4: The error term is homoskedastic such that $$Var(u|x_{i,1},...x_{i,m})=\sigma_u^2$$
+\item Assumption 5: None of the regressors exhibit perfect collinearity with one another.
+\item Assumption 6: There exists no serial correlation between the error terms such that $$cov(u_i,u_j)=0 \: \forall \: i\neq j$$Note: Assumption 2 is sufficient to satisfy assumption 6 in the case of cross-sectional data (see below for proof).
+\end{itemize}
+
+Under this set of assumptions, the \textbf{Gauss-Markov Theorem} states that the OLS estimator is BLUE (conditional on the sample values of the explanatory variable(s)).
+
+\underline{Proof that Random Sampling Implies Zero Serial Correlation with Cross-Sectional Data}
+Under assumption 2, we know the sample data is independent and identically distributed (i.i.d), meaning drawing one observation does not make drawing another observation any more or less likely and that the observations come from the same distribution. Thus, for some observation $i\neq j$,
+$$cov(y_i,y_j)=E[y_i y_j]-E[y_i]E[y_j]=E[y_i]E[y_j]-E[y_i]E[y_j]=0$$
+Similarly, by our first assumption that $y_i=\beta_0+\beta_1x_{i,1}+...+\beta_{i,m}x_{i,m}+u_i$
+$$0=cov(y_i,y_j)=cov(\beta_0+\beta_1x_{i,1}+...+\beta_{i,m}x_{i,m}+u_i,\beta_0+\beta_1x_{j,1}+...+\beta_{j,m}x_{j,m}+u_j)$$
+$$=\sum_{s=1}^m \sum_{t=1}^m \beta_s \beta_t cov(x_{i,s},x_{j,t}) + \sum_{s=1}^m \beta_s cov(x_{i,s},u_j) + \sum_{t=1}^m \beta_t cov(x_{j,t},u_i) + cov(u_i,u_j)$$
+Using the fact that the sample is i.i.d., $$\sum_{s=1}^m \sum_{t=1}^m \beta_s \beta_t cov(x_{i,s},x_{j,t})=0$$ Also, by the exogeneity assumption, $$\sum_{s=1}^{m} \beta_s cov(x_{i,s},u_j) + \sum_{t=1}^m \beta_t cov(x_{j,t},u_i)=0$$ Leaving us with $$cov(u_i,u_j)=0$$
+
+### Unbiasedness of OLS Estimators
+
+$$E\left[\hat{\beta}_{1}\middle|x\right]=E\left[\frac{\sum_{i=1}^{n}y_i(x_i-\bar{x})}{\sum_{i=1}^{n}x_i(x_i-\bar{x})}\middle|x\right]$$
+$$=E\left[\frac{\sum_{i=1}^{n}(\beta_0+\beta_1 x_i + u_i)(x_i-\bar{x})}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\middle|x\right]$$
+$$=E\left[\frac{\beta_0\sum_{i=1}^{n}(x_i-\bar{x})+\beta_1\sum_{i=1}^{n}x_i(x_i-\bar{x}) +\sum_{i=1}^{n} u_i(x_i-\bar{x})}{SST_x}\middle|x\right]$$
+$$=E\left[\frac{\beta_0(n\bar{x}-n\bar{x})+\beta_1\sum_{i=1}^{n}(x_i-\bar{x})^2 +\sum_{i=1}^{n} u_i(x_i-\bar{x})}{SST_x}\middle|x\right]$$
+$$=E\left[\beta_1 + \frac{\sum_{i=1}^{n} u_i(x_i-\bar{x})}{SST_x}\middle|x\right]$$
+$$=\beta_1 + \frac{E\left[\sum_{i=1}^{n} u_i(x_i-\bar{x})\middle|x\right]}{SST_x}$$
+$$=\beta_1 + \frac{\sum_{i=1}^{n} E\left[u_i(x_i-\bar{x})\middle|x\right]}{SST_x}$$
+$$=\beta_1 + \frac{\sum_{i=1}^{n} (x_i-\bar{x})E\left[u_i\middle|x\right]}{SST_x}=\beta_1$$
+where we have used the fact that the expected value of each $u_i$ (conditional on $\{x_1, x_2,\dots, x_n\}$) is zero under the second and third Gauss-Markov assumptions. Because unbiasedness holds for any outcome on $\{x_1, x_2,\dots, x_n\}$, unbiasedness also holds without conditioning on $\{x_1, x_2,\dots, x_n\}$.
+
+$$E\left[\hat{\beta}_0\middle|x\right]=E\left[\bar{y}-\hat{\beta}_1\bar{x}\middle|x\right]$$
+$$=E\left[\bar{y}\middle|x\right]-E\left[\hat{\beta}_1\bar{x}\middle|x\right]$$
+$$=E\left[n^{-1}\sum_{i=1}^{n}(\beta_0+\beta_1x_i+u_i)\middle|x\right]-\bar{x}E\left[\hat{\beta}_1\middle|x\right]$$
+$$=E\left[\beta_0+\beta_1\bar{x}\middle|x\right]-\beta_1\bar{x}$$
+$$=\beta_0+\beta_1\bar{x}-\beta_1\bar{x}=\beta_0$$
+
+Unbiasedness generally fails if any of our first three assumptions fail. This means that it is important to think about the veracity of each assumption for a particular application. The first assumption requires that $y$ and $x$ be linearly related, with an additive disturbance. This can certainly fail. But we also know that $y$ and $x$ can be chosen to yield interesting nonlinear relationships. Random sampling can fail in a cross section when samples are not representative of the underlying population; in fact, some data sets are constructed by intentionally oversampling different parts of the population. Finally, the third assumption is possibly the most important of the Gauss-Markov assumptions. Using simple regression when $u$ contains factors affecting $y$ that are also correlated with $x$ can result in spurious correlation: that is, we find a relationship between $y$ and $x$ that is really due to other unobserved factors that affect $y$ and also happen to be correlated with $x$. In addition to omitted variables, there are other reasons for $x$ to be correlated with $u$ in the simple regression model.
+
+### Sampling Variance of OLS Estimators
+
+Using a previous derivation,
+$$\hat{\beta}_1=\beta_1+\frac{\sum_{i=1}^{n}u_i(x_i-\bar{x})}{SST_x}$$
+
+Thus,
+$$\text{Var}\left(\hat{\beta}_1\middle|x\right)=\text{Var}\left(\beta_1+\frac{\sum_{i=1}^{n}u_i(x_i-\bar{x})}{SST_x}\middle|x\right)$$
+$$=\frac{1}{SST_x^2}\text{Var}\left(\sum_{i=1}^{n}u_i(x_i-\bar{x})\middle|x\right)$$
+$$=\frac{1}{SST_x^2}\sum_{i=1}^{n}\text{Var}\left(u_i(x_i-\bar{x})\middle|x\right)$$
+$$=\frac{1}{SST_x^2}\sum_{i=1}^{n}(x_i-\bar{x})^2\text{Var}\left(u_i\middle|x\right)$$
+$$=\frac{1}{SST_x^2}\sum_{i=1}^{n}(x_i-\bar{x})^2\sigma_u^2$$
+$$=\frac{\sigma_u^2}{SST_x^2}\sum_{i=1}^{n}(x_i-\bar{x})^2$$
+$$=\frac{\sigma_u^2}{SST_x}$$
+
+Again, using a previous derivation,
+
+$$\hat{\beta}_0=\bar{y}-\hat{\beta}_1\bar{x}$$
+$$\to\text{Var}\left(\hat{\beta}_0\middle|x\right)=\text{Var}\left(\bar{y}-\hat{\beta}_1\bar{x}\middle|x\right)$$
+$$=\text{Var}\left(\bar{y}\middle|x\right)+\text{Var}\left(\hat{\beta}_1\bar{x}\middle|x\right)-2\text{Cov}\left(\bar{y},\hat{\beta}_1\bar{x}\middle|x\right)$$
+$$=\text{Var}\left(\beta_0+\beta_1\bar{x}+\bar{u}\middle|x\right)+\bar{x}^2\text{Var}\left(\hat{\beta}_1\middle|x\right)-\frac{2\bar{x}}{n}\text{Cov}\left(\sum_{i=1}^{n}y_i,\hat{\beta}_1\middle|x\right)$$
+$$=\text{Var}\left(\beta_1\bar{x}\middle|x\right)+\text{Var}\left(\bar{u}\middle|x\right)+2\text{Cov}\left(\beta_1\bar{x},\bar{u}\middle|x\right)+\bar{x}^2\frac{\sigma_u^2}{SST_x}-\frac{2\bar{x}}{n}\text{Cov}\left(\sum_{i=1}^{n}y_i,\beta_1+\frac{\sum_{i=1}^{n}u_i(x_i-\bar{x})}{SST_x}\middle|x\right)$$
+$$=0+\frac{1}{n^2}\text{Var}\left(\sum_{i=1}^{n}u_i\middle|x\right)+2\cdot 0+\frac{\sigma_u^2\bar{x}^2}{SST_x}-\frac{2\bar{x}}{nSST_x}\text{Cov}\left(\sum_{i=1}^{n}y_i,\sum_{i=1}^{n}u_i(x_i-\bar{x})\middle|x\right)$$
+$$=\frac{1}{n^2}\sum_{i=1}^{n}\text{Var}\left(u_i\middle|x\right)+\frac{\sigma_u^2\bar{x}^2}{SST_x}-\frac{2\bar{x}\sum_{i=1}^{n}(x_i-\bar{x})}{nSST_x}\text{Cov}\left(\sum_{i=1}^{n}y_i,\sum_{i=1}^{n}u_i\middle|x\right)$$
+$$=\frac{1}{n^2}\sum_{i=1}^{n}\sigma_u^2+\frac{\sigma_u^2\bar{x}^2}{SST_x}-\frac{2\bar{x}(0)}{nSST_x}\text{Cov}\left(\sum_{i=1}^{n}y_i,\sum_{i=1}^{n}u_i\middle|x\right)$$
+$$=\frac{\sigma_u^2}{n}+\frac{\sigma_u^2\bar{x}^2}{SST_x}$$
+$$=\frac{SST_x\sigma_u^2+n\sigma_u^2\bar{x}^2}{nSST_x}$$
+$$=\frac{\sigma_u^2(SST_x+n\bar{x}^2)}{nSST_x}$$
+$$=\frac{\sigma_u^2(\sum_{i=1}^{n}(x_i-\bar{x})^2+n\bar{x}^2)}{nSST_x}$$
+$$=\frac{\sigma_u^2(\sum_{i=1}^{n}(x_i^2+\bar{x}^2-2\bar{x}x_i)+n\bar{x}^2)}{nSST_x}$$
+$$=\frac{\sigma_u^2(\sum_{i=1}^{n}(x_i^2)+n\bar{x}^2-2n\bar{x}^2+n\bar{x}^2)}{nSST_x}$$
+$$=\frac{\sfrac{\sigma_u^2}{n}\sum_{i=1}^{n}x_i^2}{SST_x}$$
+Generally, we are interested in $\text{Var}\left(\hat{\beta}_1\right)$. To summarize how this variance depends on the error variance, $\sigma_u^2$, and the total variation in $\{x_1,x_2,\dots,x_n\}$ $SST_x$: 
+\begin{enumerate}
+\item The larger the error variance, the larger is $\text{Var}\left(\hat{\beta}_1\right)$. This makes sense because more variation in the unobservables affecting $y$ makes it more difficult to precisely estimate $\beta_1$.
+\item More variability in the independent variable is preferred: as the variability in the $x_i$ increases, the variance of $\hat{\beta}_1$ decreases. This also makes intuitive sense because the more spread out the sample of independent variables is, the easier it is to trace out the relationship between $E[y|x]$ and $x$ (i.e., it becomes easier to estimate $\beta_1$). If there is little variation in the $x_i$, then it can be hard to pinpoint how $E[y|x]$ varies with $x$. As the sample size increases, so does the total variation in the $x_i$. Therefore, a larger sample size results in a smaller variance for $\hat{\beta}_1$.
+\end{enumerate}
+
+These formulas allow us to isolate the factors that contribute to $\text{Var}\left(\hat{\beta}_0\right)$ and $\text{Var}\left(\hat{\beta}_1\right)$. But these formulas are unknown, except in the extremely rare case that $\sigma_u^2$ is known. Considering the $u_i$ are unobserved, an unbiased estimator of $\sigma_u^2$ is$$\hat{\sigma}_u^2=\frac{\sum_{i=1}^{n}\hat{u}_i^2}{n-2},$$ where the $n-2$ is the degrees of freedom in the OLS residuals due to the two OLS first order conditions:$$\sum_{i=1}^{n}\hat{u}_i=0,\sum_{i=1}^{n}x_i\hat{u}_i=0$$
+
+Naturally, the estimators of $\text{Var}\left(\hat{\beta}_0\right)$ and $\text{Var}\left(\hat{\beta}_1\right)$ become
+$$\hat{\sigma}_{\beta_0}^2=\frac{\sfrac{\sum_{i=1}^{n}\hat{u}_i^2}{n(n-2)}+\sum_{i=1}^{n}x_i^2}{SST_x}$$
+and
+$$\hat{\sigma}_{\beta_1}^2=\frac{\sfrac{\sum_{i=1}^{n}\hat{u}_i^2}{(n-2)}}{SST_x}$$
+
+Additionally, the natural estimator of $\sigma_u$ is$$\hat{\sigma}_u=\sqrt{\hat{\sigma}_u^2},$$which is called the \textbf{standard error of the regresion (SER)}.
+
+Although $\hat{\sigma}_u^2$ is an unbiased and consistent estimator of $\sigma_u^2$, $\hat{\sigma}_u$ is consistent but biased.
+
+All together the \textbf{standard errors of the coefficients} are
+$$\text{se}_{\beta_0}=\sqrt{\frac{\sfrac{\sum_{i=1}^{n}\hat{u}_i^2}{n(n-2)}+\sum_{i=1}^{n}x_i^2}{SST_x}}$$
+and
+$$\text{se}_{\beta_1}=\sqrt{\frac{\sfrac{\sum_{i=1}^{n}\hat{u}_i^2}{(n-2)}}{SST_x}}$$
+
+\underline{A Note on the Conditioning on x}
+
+In addition to restricting the relationship between $u$ and $x$ in the population, the zero conditional mean assumption—coupled with the random sampling assumption—allows for a convenient technical simplification. In particular, we can derive the statistical properties of the OLS estimators as conditional on the values of the $x_i$ in our sample. Technically, in statistical derivations, conditioning on the sample values of the independent variable is the same as treating the $x_i$ as fixed in repeated samples, which we think of as follows. We first choose $n$ sample values for $\{x_1, x_2,\dots, x_n\}$. Given these values, we then obtain a sample on $y$. Next, another sample of $y$ is obtained, using the same values for $\{x_1, x_2,\dots, x_n\}$. Then another sample of $y$ is obtained, again using the same $\{x_1, x_2,\dots, x_n\}$. And so on. While the fixed-in-repeated-samples scenario is not very realistic in non-experimental contexts, random sampling, where individuals are chosen randomly, is representative of how most data sets are obtained for empirical analysis in social sciences. Once we assume that $E[u|x]=0$, and we have random sampling, nothing is lost in derivations by treating the $x_i$ as nonrandom. The danger is that the fixed-in-repeated-samples assumption always implies that $u_i$ and $x_i$ are independent.
+
+### Regression through the Origin
+
+In some cases, we may wish to impose the restriction that, when $x=0$, $E[y]=0$. In these cases we perform \textbf{regression through the origin}, which takes the form$$\tilde{y}=\tilde{\beta}_1x,$$where the tildes are used to distinguish this problem from the much more common problem of estimating an intercept along with a slope. We still rely on the method of OLS to obtain the slope estimate. Thus, we must solve the for the $\tilde{\beta}_1$ that minimizes$$SSR=\sum_{i=1}^{n}\left(y_i-\tilde{\beta_1}x_i\right)^2$$Taking the partial derivative with respect to $\tilde{\beta}_1$, we obtain$$\frac{\partial SSR}{\partial\tilde{\beta}_1}=-2\sum_{i=1}^{n}x_i\left(y_i-\tilde{\beta}_1x_i\right)=0$$Solving for $\tilde{\beta}_1$:
+$$\sum_{i=1}^{n}x_i\left(y_i-\tilde{\beta}_1x_i\right)=0$$
+$$\to\sum_{i=1}^{n}x_iy_i-\sum_{i=1}^{n}\tilde{\beta}_1x_i^2=0$$
+$$\to\tilde{\beta}_1\sum_{i=1}^{n}x_i^2=\sum_{i=1}^{n}x_iy_i$$
+$$\to\tilde{\beta}_1=\frac{\sum_{i=1}^{n}x_iy_i}{\sum_{i=1}^{n}x_i^2}$$
+Obtaining an estimate of $\beta_1$ using regression through the origin is not done very often in applied work, and for good reason: if the intercept b0 2 0, then $\tilde{\beta}_1$ is a biased estimator of $\beta_1$. In cases where it is appropriate, the $R$-squared is computed as $$1-\frac{\sum_{i=1}^{n}\left(y_i-\tilde{\beta}_1x_i\right)^2}{\sum_{i=1}^{n}y_i^2}=1-\frac{SSR}{SST}$$
+
+Note: If we only regress on a constant, (i.e., we set the slope to zero and estimate an intercept only), the intercept that minimizes the sum of squared deviations is $\bar{y}$.
+
+### Regression on a Binary Explanatory Variable
+
+Simple regression can also be applied to the case where x is a \textbf{binary variable}, often called a \textbf{dummy variable} in the context of regression analysis. When the explanatory variable is binary, the PRF takes two forms (under the exogeneity assumption):$$E[y|x]=E\left[\beta_0+\beta_1x+u|x\right]=\beta_0+\beta_1x$$
+
+\begin{enumerate}
+\item $E[y|x=0]=\beta_0$
+\item $E[y|x=1]=\beta_0+\beta_1$
+\end{enumerate}
+
+It follows that$$\beta_1=E[y|x=1]-E[y|x=0]$$
+
+In cases where we hope to study the effect of an intervention or new policy, the idea of counterfactuals or potential outcomes are used. Define, the \textbf{control group} as those not subject to the intervention or new policy act and the \textbf{treatment group} as those subject to the intervention. Then, the causal (or treatment) effect of the intervention for unit $i$ is$$te_i=y_i(1)-y_i(0),$$the difference between the two potential outcomes. A noteworthy items about $te_i$is it is not observed for any unit $i$ because it depends on both counterfactuals. We cannot hope to estimate tei for each unit i. Instead, the focus is typically on the \textbf{average treatment effect (ATE)}, also called the \textbf{average causal effect (ACE)}. The ATE is simply the average of the treatment effects across the entire population. We can write the ATE parameter as $$\tau_{ate}=E[te_i]=E[y_i(1)-y_i(0)]=E[y_i(1)]-E[y_i(0)]$$
+
+For each unit $i$ let $x_i$ be the program participation status—a binary variable. Then the observed outcome, $y_i$, can be written as$$y_i=(1-x_i)y_i(0)+x_iy_i(1)=y_i(0)+[y_i(1)-y_i(0)]x_i$$
+Imposing a usually unrealistic assumption of a constant treatment effect$$\to y_i=y_i(0)+\tau x_i$$
+Rewriting $y_i(0)$ as $\beta_0+u_i$ and $\tau$ as $\beta_1$,$$\to y_i=\beta_0+\tau x_i+u_i$$
+
+If $x_i \indep u_i$, then $\tau$ is the unbiased estimator of the treatment effect. The assumption that $x_i \indep u_i$ is the same as $x_i \indep y_i(0)$. This assumption can be guaranteed only under \textbf{random assignment}, whereby units are assigned to the treatment and control groups using a randomization mechanism that ignores any features of the individual units. Random assignment is the hallmark of a \textbf{randomized controlled trial (RCT)}, which is considered the gold standard for determining whether medical interventions have causal effects.
+
+## Exercises
+
+### Problems
+
+\begin{enumerate}
+\item 
+\begin{enumerate}
+\item Among the many factors contained in $u$ are marriage status, desire to have kids, health, and wealth. It's likely that at least wealth is correlated with level of education.
+\item No. Since it's likely $u$ is correlated with $kids$ and $educ$, a simple regression analysis will likely give a biased estimate of $\beta_1$.
+\end{enumerate}
+\item Rewriting the model as $y=\beta_0+\beta_1x+u+\alpha_0-\alpha_0$, define a new error term $e=u-\alpha_0$ and a new intercept $\gamma_0=\alpha_0+\beta_0$. The model becomes $y=\gamma_0+\beta_1x+e$. It follows that $E[e]=E[u-\alpha_0]=E[u]-E[\alpha_0]=\alpha_0-\alpha_0-0$.
+\item 
+\end{enumerate}
+```{r Chapter 2 Exercise 3, include=TRUE,comment=NA,warning=FALSE,echo=FALSE}
+GPA <- c(2.8,3.4,3.0,3.5,3.6,3.0,2.7,3.7)
+ACT <- c(21,24,26,27,29,25,25,30)
+lm1 <- lm(GPA ~ ACT)
+cat("a) ")
+summary(lm1)
+cat("The slope tells us there is a positive correlation between GPA and ACT. The intercept gives")
+cat("us an estimate of GPA if a student scores a 0 on the ACT. GPA is predicted to be")
+cat(lm1$coefficients[2]*5, "higher if the ACT score increases by five points.")
+
+cat("b) ")
+cat("Fitted values = (", paste(as.character(round(lm1$fitted.values,4)), collapse=", "),")")
+cat("Residuals = (", paste(as.character(round(lm1$residuals, 4)), collapse=", "),")")
+cat("Sum of residuals = ", sum(lm1$residuals))
+
+cat("c) ")
+cat("Predicted value of GPA when ACT=20: ", lm1$coefficients[1]+lm1$coefficients[2]*20)
+
+cat("d) ")
+cat("The coefficient of determination (R-squared)=", unname(unlist(summary(lm1)["r.squared"])))
+
+rm(lm1,GPA,ACT)
+invisible(gc())
+```
+
+\begin{enumerate}
+\setcounter{enumi}{3}
+\item 
+\begin{enumerate}
+\item The predicted birth weight when $cigs = 0$ is 119.77 ounces. When $cigs=20$, the predicted birth weight is `r 119.77-0.514*20` ounces. This regression analysis suggests a constant loss to birth weight for every additional cigarette smoked. In this case, we would an `r 0.514*20` ounce loss in birth weight for each addition 20 cigarettes smoked.
+\item No. Other factors correlated with $cigs$ and $bwght$ are not controlled for in the model. Such factors may include the health of the mother and genetics. This leads to a biased slope estimate.
+\item Based on this model, $cigs$ must equal `r (125-119.77)/-0.514` for a birth weight of 125 ounces. Obviously, this doesn't have much meaning because you can't smoke a negative number of cigarettes.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item The intercept predicts a -124.84 dollar consumption value for a family with no annual income. The slope predicts an extra 0.853 dollars of consumption for each additional dollar of annual income. The intercept offers little meaning because you can't consume a negative amount. On the other hand, the slope coefficient signifies a positive correlation between consumption and annual income. Personally, the slope coefficient seems to large to me at first glance.
+\item The predicted consumption when family income is \$30,000 = \$`r -124.84 + 0.853*30000`.
+\item 
+\end{enumerate}
+\end{enumerate}
+```{r Chapter 2 Exercise 5 Graph, echo=FALSE,include=TRUE,fig.align='right',fig.height=3}
+inc <- seq(0, 200000, 5000)
+cons <- -124.84 + 0.853 * inc
+mpc <- 0.853
+apc <- cons / inc
+
+ggplot()+
+  geom_line(aes(x = inc, y = mpc, color = "green"))+
+  geom_line(aes(x = inc, y = apc, color = "red"))+
+  scale_color_identity(name = "Propensity to Consume",
+                          breaks = c("green", "red"),
+                          labels = c("MPC", "APC"),
+                          guide = "legend")+
+  theme_classic()+
+  xlab("Annual Income")+
+  ylab("")
+```
+
+\begin{enumerate}
+\setcounter{enumi}{5}
+\item 
+\begin{enumerate}
+\item The slope is an estimated elasticity of $price$ with respect to $dist$. The estimate indicates a 0.312\% increase in $price$ for every percent increase in $dist$. The sign is as we'd expect. As houses move further away from the garbage incinerator, we'd expect housing prices to increase.
+\item No. As the problem suggests, it's likely the city put the incinerator close to cheaper homes. Thus, the elasticity estimate is likely upwardly biased and overstates the impact of $dist$ on $price$.
+\item Other factors include the size of the home, the number of rooms, the quality of the surrounding area (with regards to safety, education, etc.), and the location. As suggested in part(c), these factors are likely correlated with $dist$. 
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item $E\left[u\middle|inc\right]=E\left[\sqrt{inc}\cdot e\middle|inc\right]=\sqrt{inc}\cdot E\left[e\middle|inc\right]=\sqrt{inc}\cdot E\left[e\right]=0$. Recall that $E\left[e\middle|inc\right]=E\left[e\right]$ because we are assuming that $e$ is independent of $inc$.
+\item $\text{Var}\left(u\middle|inc\right)=\text{Var}\left(\sqrt{inc}\cdot e\middle|inc\right)=\left(\sqrt{inc}\right)^2\text{Var}\left(e\middle|inc\right)=inc\text{Var}\left(e\right)=\sigma_e^2inc$. Recall that $\text{Var}\left(e\middle|inc\right)=\text{Var}\left(e\right)$ because we are assuming that $e$ is independent of $inc$.
+\item This notion makes sense because the greater the amount of income, the more options individuals have with that income. Some individuals may choose to spend their income while others will choose to save it. On the other hand, lower earning individuals have fewer options on how to spend their money. It's likely they have to spend a larger portion of their income on necessary consumption items and have a smaller amounts they can save.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item From the notes,$$\tilde{\beta}_1=\frac{\sum_{i=1}^{n}x_iy_i}{\sum_{i=1}^{n}x_i^2}$$
+$$\to E\left[\tilde{\beta}_1\middle|x\right]=E\left[\frac{\sum_{i=1}^{n}x_iy_i}{\sum_{i=1}^{n}x_i^2}\middle|x\right]$$
+$$=\frac{1}{\sum_{i=1}^{n}x_i^2}E\left[\sum_{i=1}^{n}x_iy_i\middle|x\right]$$
+$$=\frac{1}{\sum_{i=1}^{n}x_i^2}\sum_{i=1}^{n}E\left[x_iy_i\middle|x\right]$$
+$$=\frac{1}{\sum_{i=1}^{n}x_i^2}\sum_{i=1}^{n}x_iE\left[\beta_0+\beta_1x_i+u_i\middle|x\right]$$
+$$=\frac{1}{\sum_{i=1}^{n}x_i^2}\sum_{i=1}^{n}\left(\beta_0 x_i+\beta_1x_i^2\right)$$
+$$=\frac{1}{\sum_{i=1}^{n}x_i^2}\left(n\beta_0\bar{x}+\sum_{i=1}^{n}\beta_1x_i^2\right)$$
+$$=\frac{n\beta_0\bar{x}+\beta_1\sum_{i=1}^{n}x_i^2}{\sum_{i=1}^{n}x_i^2}$$
+Thus,$$E\left[\tilde{\beta}_1\middle|x,\beta_0=0\right]=\frac{\beta_1\sum_{i=1}^{n}x_i^2}{\sum_{i=1}^{n}x_i^2}=\beta_1$$
+Another case in which $\tilde{\beta}_1$ is unbiased is when $\bar{x}=\sum_{i=1}^{n}x_i=0$.
+\item 
+$$\text{Var}\left(\tilde{\beta}_1\middle|x\right)=\text{Var}\left(\frac{\sum_{i=1}^{n}x_iy_i}{\sum_{i=1}^{n}x_i^2}\middle|x\right)$$
+$$=\frac{1}{\left(\sum_{i=1}^{n}x_i^2\right)^2}\text{Var}\left(\sum_{i=1}^{n}x_i\left(\beta_0+\beta_1x_i+u_i\right)\middle|x\right)$$
+$$=\frac{1}{\left(\sum_{i=1}^{n}x_i^2\right)^2}\text{Var}\left(\sum_{i=1}^{n}\left(\beta_0x_i+\beta_1x_i^2+x_iu_i\right)\middle|x\right)$$
+$$=\frac{1}{\left(\sum_{i=1}^{n}x_i^2\right)^2}\sum_{i=1}^{n}\text{Var}\left(\beta_0x_i+\beta_1x_i^2+x_iu_i\middle|x\right)$$
+$$=\frac{1}{\left(\sum_{i=1}^{n}x_i^2\right)^2}\sum_{i=1}^{n}x_i^2\text{Var}\left(u_i\middle|x\right)$$
+$$=\frac{\sigma_u^2}{\left(\sum_{i=1}^{n}x_i^2\right)^2}\sum_{i=1}^{n}x_i^2$$
+$$=\frac{\sigma_u^2}{\sum_{i=1}^{n}x_i^2}$$
+\item $$\text{Var}\left(\tilde{\beta}_1\right)\leq\text{Var}\left(\hat{\beta}_1\right)$$
+$$\to \frac{\sigma_u^2}{\sum_{i=1}^{n}x_i^2}\leq\frac{\sigma_u^2}{\sum_{i=1}^{n}\left(x_i-\bar{x}\right)^2}$$
+$$\to \frac{1}{\sum_{i=1}^{n}x_i^2}\leq\frac{1}{\sum_{i=1}^{n}\left(x_i-\bar{x}\right)^2}$$
+$$\to \sum_{i=1}^{n}x_i^2\geq\sum_{i=1}^{n}\left(x_i-\bar{x}\right)^2,$$which is given to us by the hint.
+\item Under the Gauss Markov assumptions, $\hat{\beta}_1$ is always unbiased while $\tilde{\beta}_1$ requires the additional constraint that $y=0$ when $x=0$ to be unbiased. As we just proved, $\tilde{\beta}_1$ is efficient relative to $\hat{\beta}_1$. Thus, in the case that both estimators are unbiased, $\tilde{\beta}_1$ is preferred.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item As the problem suggests, using our previous derivation of $\hat{\beta}_1$,
+$$\tilde{\beta}_1=\frac{\sum_{i=1}^{n}\left((c_2x_i-c_2\bar{x})c_1y_i\right)}{\sum_{i=1}^{n}\left(c_2x_i-c_2\bar{x}\right)^2}=\frac{c_1c_2\sum_{i=1}^{n}\left((x_i-\bar{x})y_i\right)}{c_2^2\sum_{i=1}^{n}\left(x_i-\bar{x}\right)^2}=\frac{c_1}{c_2}\hat{\beta}_1$$
+
+We've previously derived $\hat{\beta}_0=\bar{y}-\hat{\beta}_1\bar{x}$. Plugging in the new values and solving for $\tilde{\beta}_0$,$$\tilde{\beta}_0=c_1\bar{y}-\frac{c_1}{c_2}\hat{\beta}_1(c_2\bar{x})=c_1\left(\bar{y}-\hat{\beta}_1\bar{x}\right)=c_1\hat{\beta}_0$$
+\item Again using our previous derivation of $\hat{\beta}_1$,
+$$\tilde{\beta}_1=\frac{\sum_{i=1}^{n}\left(((c_2+x_i)-(c_2+\bar{x}))(c_1+y_i)\right)}{\sum_{i=1}^{n}\left((c_2+x_i)-(c_2+\bar{x})\right)^2}=\frac{\sum_{i=1}^{n}\left((x_i-\bar{x})(c_1+y_i)\right)}{\sum_{i=1}^{n}\left(x_i-\bar{x}\right)^2}=\frac{c_1\sum_{i=1}^{n}(x_i-\bar{x})+ \sum_{i=1}^{n}(x_i-\bar{x})y_i}{\sum_{i=1}^{n}\left(x_i-\bar{x}\right)^2}=\frac{\sum_{i=1}^{n}(x_i-\bar{x})y_i}{\sum_{i=1}^{n}\left(x_i-\bar{x}\right)^2}=\hat{\beta}_1$$
+
+Using $\hat{\beta}_0=\bar{y}-\hat{\beta}_1\bar{x}$ and plugging in the new values, $$\tilde{\beta}_0=(c_1+\bar{y})-\hat{\beta}_1(c_2+\bar{x})=\left(\bar{y}-\hat{\beta}_1\bar{x}\right)+c_1-c_2\hat{\beta}_1=\hat{\beta}_0+c_1-c_2\hat{\beta}_1$$
+\item Changing the model from $\ln(y_i)=\hat{\beta_0}+\hat{\beta_1}x_i$ to $\ln(c_1y_i)=\tilde{\beta_0}+\tilde{\beta_1}x_i$, the new model can be rewritten as:$$\ln(c_1)+\ln(y_i)=\tilde{\beta_0}+\tilde{\beta_1}x_i$$Trivially, by subtracting $\ln(c_1)$ from both sides, we see $\tilde{\beta}_0=\hat{\beta}_0+\ln(c_1)$ and $\tilde{\beta}_1=\hat{\beta}_1$.
+\item Changing the model from $y_i=\hat{\beta_0}+\hat{\beta_1}\ln(x_i)$ to $y_i=\tilde{\beta_0}+\tilde{\beta_1}\ln(c_2x_i)$, the new model can be rewritten as:$$y_i=\tilde{\beta_0}+\tilde{\beta_1}\left(\ln(c_2)+\ln(x_i)\right)$$Again, it's trivial to see that $\tilde{\beta}_0=\hat{\beta}_0-\tilde{\beta}_1\ln(c_2)=\hat{\beta}_0-\hat{\beta}_1\ln(c_2)$ and $\tilde{\beta}_1=\hat{\beta}_1$.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item $$\hat{\beta}_1=\frac{\sum_{i=1}^{n}(x_i-\bar{x})y_i}{\sum_{i=1}^{n}(x_i-\bar{x})^2}$$
+$$=\frac{1}{SST_x}\sum_{i=1}^{n}(x_i-\bar{x})(\beta_0+\beta_1x_i+u_i)$$
+$$=\frac{1}{SST_x}\left[\beta_0\sum_{i=1}^{n}(x_i-\bar{x})+\beta_1\sum_{i=1}^{n}x_i(x_i-\bar{x})+\sum_{i=1}^{n}u_i(x_i-\bar{x})\right]$$
+$$=\frac{1}{SST_x}\left[\beta_0\left(n\bar{x}-n\bar{x}\right)+\beta_1\sum_{i=1}^{n}(x_i-\bar{x})^2+\sum_{i=1}^{n}u_i(x_i-\bar{x})\right]$$
+$$=\beta_1+\frac{1}{SST_x}\sum_{i=1}^{n}u_i(x_i-\bar{x})$$
+$$=\beta_1+\sum_{i=1}^{n}\frac{d_iu_i}{SST_x}$$
+$$=\beta_1+\sum_{i=1}^{n}w_iu_i$$
+\item $$E\left[\left(\hat{\beta}_1-\beta_1\right)\cdot\bar{u}\middle|x\right]=E\left[\left(\beta_1+\sum_{i=1}^{n}w_iu_i-\beta_1\right)\cdot\bar{u}\middle|x\right]$$
+$$=E\left[\sum_{i=1}^{n}\bar{u}w_iu_i\middle|x\right]$$
+$$=\sum_{i=1}^{n}E\left[\bar{u}w_iu_i\middle|x\right]$$
+$$=\sum_{i=1}^{n}w_iE\left[\bar{u}u_i\middle|x\right]$$
+$$=\sum_{i=1}^{n}w_iE\left[\bar{u}u_i\middle|x\right]$$
+Because $u_i$ and $u_j$ are pairwise uncorrelated for all $i\neq j$, $E[u_iu_j]=E[u_i]E[u_j]=0\cdot0=0$. Thus, $E\left[\bar{u}u_i\middle|x\right]=\frac{1}{n}E\left[u_i^2|x\right]=\frac{1}{n}\bigg\{E\left[u_i^2|x\right]-E\left[u_i|x\right]^2\bigg\}=\frac{1}{n}\bigg\{\text{Var}(u_i|x)\bigg\}=\frac{\sigma_u^2}{n}$. Hence,
+$$\sum_{i=1}^{n}w_iE\left[\bar{u}u_i\middle|x\right]=\frac{\sigma_u^2}{n}\sum_{i=1}^{n}w_i=\frac{\sigma_u^2}{n}\cdot 0=0$$
+\item $$\hat{\beta}_0=\bar{y}-\hat{\beta}_1\bar{x}=\beta_0+\beta_1\bar{x}+\bar{u}-\hat{\beta}_1\bar{x}=\beta_0+\bar{u}-\left(\hat{\beta}_1-\beta_1\right)\bar{x}$$
+\item $$\text{Var}\left(\hat{\beta}_0\middle|x\right)=\text{Var}\left(\beta_0+\bar{u}-\left(\hat{\beta}_1-\beta_1\right)\bar{x}\middle|x\right)$$
+$$=\text{Var}\left(\bar{u}-\hat{\beta}_1\bar{x}\middle|x\right)$$
+$$=\text{Var}\left(\bar{u}\middle|x\right)+\bar{x}^2\text{Var}\left(\hat{\beta}_1\middle|x\right)-2\bar{x}\text{Cov}\left(\bar{u},\hat{\beta}_1\middle|x\right)$$
+$$=\text{Var}\left(\frac{1}{n}\sum_{i=1}^{n}u_i\middle|x\right)+\bar{x}^2\text{Var}\left(\beta_1+\frac{\sum_{i=1}^{n}u_i(x_i-\bar{x})}{SST_x}\middle|x\right)-2\bar{x}\text{Cov}\left(\bar{u},\beta_1+\frac{\sum_{i=1}^{n}u_i(x_i-\bar{x})}{SST_x}\middle|x\right)$$
+$$=\frac{1}{n^2}\text{Var}\left(\sum_{i=1}^{n}u_i\middle|x\right)+\frac{\bar{x}^2}{SST_x^2}\text{Var}\left(\sum_{i=1}^{n}u_i(x_i-\bar{x})\middle|x\right)-\frac{2\bar{x}}{SST_x}\text{Cov}\left(\frac{1}{n}\sum_{i=1}^{n}u_i,\sum_{i=1}^{n}u_i(x_i-\bar{x})\middle|x\right)$$
+$$=\frac{1}{n^2}\sum_{i=1}^{n}\text{Var}\left(u_i\middle|x\right)+\frac{\bar{x}^2}{SST_x^2}\sum_{i=1}^{n}\text{Var}\left(u_i(x_i-\bar{x})\middle|x\right)-\frac{2\bar{x}\sum_{i=1}^{n}(x_i-\bar{x})}{nSST_x}\text{Cov}\left(\sum_{i=1}^{n}u_i,\sum_{i=1}^{n}u_i\middle|x\right)$$
+$$=\frac{1}{n^2}\sum_{i=1}^{n}\sigma_u^2+\frac{\bar{x}^2}{SST_x^2}\sum_{i=1}^{n}(x_i-\bar{x})^2\text{Var}\left(u_i\middle|x\right)-\frac{2\bar{x}(n\bar{x}-n\bar{x})}{nSST_x}\text{Cov}\left(\sum_{i=1}^{n}u_i,\sum_{i=1}^{n}u_i\middle|x\right)$$
+$$=\frac{\sigma_u^2}{n}+\frac{\sigma_u^2\bar{x}^2}{SST_x^2}\sum_{i=1}^{n}(x_i-\bar{x})^2-0$$
+$$=\frac{\sigma_u^2}{n}+\frac{\sigma_u^2\bar{x}^2}{SST_x}$$
+\item $$\frac{\sigma_u^2}{n}+\frac{\sigma_u^2\bar{x}^2}{SST_x}=\frac{\sigma_u^2SST_x}{nSST_x}+\frac{n\sigma_u^2\bar{x}^2}{nSST_x}$$
+$$=\frac{\sigma_u^2SST_x+n\sigma_u^2\bar{x}^2}{nSST_x}$$
+$$=\frac{\sum_{i=1}^{n}\left(\sigma_u^2\left(x_i-\bar{x}\right)^2\right)+n\sigma_u^2\bar{x}^2}{nSST_x}$$
+$$=\frac{\sum_{i=1}^{n}\left(\sigma_u^2x_i^2-2\sigma_u^2x_i\bar{x}+\sigma_u^2\bar{x}^2\right)+n\sigma_u^2\bar{x}^2}{nSST_x}$$
+$$=\frac{\sigma_u^2\sum_{i=1}^{n}x_i^2-2\sigma_u^2\bar{x}\sum_{i=1}^{n}x_i+\sigma_u^2\sum_{i=1}^{n}\bar{x}^2+n\sigma_u^2\bar{x}^2}{nSST_x}$$
+$$=\frac{\sigma_u^2\sum_{i=1}^{n}x_i^2-2n\sigma_u^2\bar{x}^2+n\sigma_u^2\bar{x}^2+n\sigma_u^2\bar{x}^2}{nSST_x}$$
+$$=\frac{\sigma_u^2n^{-1}\sum_{i=1}^{n}x_i^2}{\sum_{i=1}^{n}\left(x_i-\bar{x}\right)^2}$$
+\end{enumerate}
+\item
+\begin{enumerate}
+\item I would randomly assign the students to a wide variety of $hours$ and then measure the SAT results.
+\item Two factors that are likely contained in $u$ are intelligence and cognitive clarity (on the day of the test). It's difficult to say whether intelligence has a positive or negative correlation with $hours$, but it's likely that cognitive clarity is positively correlated with $hours$ because more preparation tends to improve a student's ability to remain focused during the exam.
+\item $\beta_1$ should be positive.
+\item $\beta_0$ is the expected $sat$ for a student that spends 0 hours in the SAT preparation course.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item $$\min_{b_0}SSR = \sum_{i=1}^{n}\left(y_i-b_0\right)^2$$
+$$\frac{\partial{SSR}}{\partial{b_0}} = \sum_{i=1}^{n}-2\left(y_i-b_0\right)=0$$
+$$\to\sum_{i=1}^{n}y_i-\sum_{i=1}^{n}b_0=0$$
+$$\to n\bar{y}=nb_0$$
+$$\to b_0^*=\tilde{\beta}_0=\bar{y}$$
+\item $\sum_{i=1}^{n}\tilde{u_i}=\sum_{i=1}^{n}\left(y_i-\bar{y}\right)=n\bar{y}-n\bar{y}=0$
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item $1-x_i$ equals 1 when $x_i=0$ and equals 0 otherwise. On the other hand, $x_i$ equals one when $x_i=1$ and equals 0 otherwise. Thus, $\sum_{i=1}^{n}(1-x_i)$ equals the number of observations with $x_i=0$ and $\sum_{i=1}^{n}x_i$ equals the number of observations with $x_i=1$.
+$$\bar{x}=\frac{1}{n}\sum_{i=1}^{n}x_i=\frac{n_1}{n}$$$\bar{x}$ is the proportion of observations where $x_i=1$.
+\item $$\bar{y}_0=\frac{1}{n_0}\sum_{i=1}^{n}y_i(0)=n_0^{-1}\sum_{i=1}^{n}(1-x_i)y_i$$
+$$\bar{y}_1=\frac{1}{n_1}\sum_{i=1}^{n}y_i(1)=n_1^{-1}\sum_{i=1}^{n}x_iy_i$$
+\item $\bar{y}=\frac{n_0}{n}\bar{y}_0+\frac{n_1}{n}\bar{y}_1=\bar{y}_0\left[\frac{1}{n}\sum_{i=1}^{n}\left(1-x_i\right)\right]+\bar{y}_1\left[\frac{1}{n}\sum_{i=1}^{n}x_i\right]=\bar{y}_0\left[\frac{1}{n}\left(n-n\bar{x}\right)\right]+\bar{y}_1\left[\frac{1}{n}\left(n\bar{x}\right)\right]=\left(1-\bar{x}\right)\bar{y}_0+\bar{x}\bar{y}_1$
+\item $n^{-1}\sum_{i=1}^{n}x_i^2-\bar{x}^2=n^{-1}\sum_{i=1}^{n}x_i-\bar{x}^2=n^{-1}\left(n\bar{x}\right)-\bar{x}^2=\bar{x}-\bar{x}^2=\bar{x}\left(1-\bar{x}\right)$
+\item $$n^{-1}\sum_{i=1}^{n}x_iy_i-\bar{x}\bar{y}=\frac{n_1}{n}\bar{y}_1-\bar{x}\left((1-\bar{x})\bar{y}_0+\bar{x}\bar{y}_1\right)$$
+$$=\bar{x}\bar{y}_1-\bar{x}\left(\bar{y}_0-\bar{x}\bar{y}_0+\bar{x}\bar{y}_1\right)$$
+$$=\bar{x}\bar{y}_1-\bar{x}\bar{y}_0+\bar{x}^2\bar{y}_0-\bar{x}^2\bar{y}_1$$
+$$=\bar{x}\left(\bar{y}_1-\bar{y}_0+\bar{x}\bar{y}_0-\bar{x}\bar{y}_1\right)$$
+$$=\bar{x}\left(\bar{y}_1(1-\bar{x})-\bar{y}_0(1-\bar{x})\right)$$
+$$=\bar{x}(1-\bar{x})(\bar{y}_1-\bar{y}_0)$$
+\item $$\hat{\beta}_1=\frac{\sum_{i=1}^{n}(x_i-\bar{x})y_i}{\sum_{i=1}^{n}(x_i-\bar{x})^2}$$
+$$=\frac{\sum_{i=1}^{n}x_iy_i-\bar{x}\sum_{i=1}^{n}y_i}{\sum_{i=1}^{n}x_i^2-2\bar{x}\sum_{i=1}^{n}x_i+\sum_{i=1}^{n}\bar{x}^2}$$
+$$=\frac{\sum_{i=1}^{n}x_iy_i-n\bar{x}\bar{y}}{\sum_{i=1}^{n}x_i^2-2n\bar{x}^2+n\bar{x}^2}$$
+$$=\frac{n^{-1}\big\{\sum_{i=1}^{n}x_iy_i-n\bar{x}\bar{y}\big\}}{n^{-1}\big\{\sum_{i=1}^{n}x_i^2-n\bar{x}^2\big\}}$$
+$$=\frac{n^{-1}\sum_{i=1}^{n}x_iy_i-\bar{x}\bar{y}}{n^{-1}\sum_{i=1}^{n}x_i^2-\bar{x}^2}$$
+$$=\frac{\bar{x}(1-\bar{x})(\bar{y}_1-\bar{y}_0)}{\bar{x}(1-\bar{x})}=\bar{y}_1-\bar{y}_0$$
+\item $\bar{\beta}_0=\bar{y}-\hat{\beta}_1\bar{x}=(1-\bar{x})\bar{y}_0+\bar{x}\bar{y}_1-\left(\bar{y}_1-\bar{y}_0\right)\bar{x}=\bar{y}_0-\bar{x}\bar{y}_0+\bar{x}\bar{y}_1-\bar{x}\bar{y}_1+\bar{x}\bar{y}_0=\bar{y}_0$
+\end{enumerate}
+\item As proven in the previous problem, $\hat{\beta}_1=\bar{y}_1-\bar{y}_0$. Thus, it equals the sample average (proportion) of those who were employed and participated in the program minus the sample average (proportion) of those who were unemployed but did not partake in the program. Thus, $\hat{\beta}_1$ is simply the the difference in employment rates between those who participated in the program and those who did not within the given sample.
+\item
+\begin{enumerate}
+\item $E\left[n^{-1}\sum_{i=1}^{n}\left[y_i(1)-y_i(0)\right]\right]=n^{-1}\sum_{i=1}^{n}\left(E\left[y_i(1)\right]-E\left[y_i(0)\right]\right)=n^{-1}\left(nE\left[y_i(1)\right]-nE\left[y_i(0)\right]\right)=E\left[y_i(1)\right]-E\left[y_i(0)\right]=\tau_{ate}$
+\item $\bar{y}_0$ is the sample average of $y$ for the observations where $x_i=0$. $\bar{y}_1$ is the sample average of $y$ for the observations where $x_i=1$. $\bar{y}(1)\text{ and }\bar{y}(0)$ are relative to the entire sample such that $\bar{y}(\cdot)=n_{\cdot}n^{-1}\bar{y}_\cdot$.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item The difference in means estimator is generally no longer unbiased because the ceteris paribus condition is no longer satisfied. More specifically, the decision to participate may be correlated with the independent and dependent variables, which would cause the estimator to be biased.
+\item One example that would cause bias is if wealthier individuals tended to not participate. It's likely wealth is correlated with both $unemployment$ and $program$, which would cause for a biased estimator.
+\end{enumerate}
+\item $$\text{Var}(u_i|x_i)=\text{Var}\left((1-x_i)u_i(0)+x_iu_i(1)\middle|x\right)$$
+$$=\text{Var}\left((1-x_i)u_i(0)\middle|x\right)+\text{Var}\left(x_iu_i(1)\middle|x\right)$$
+$$=(1-x_i)^2\text{Var}\left(u_i(0)\middle|x\right)+x_i^2\text{Var}\left(u_i(1)\middle|x\right)$$
+$$=(1-x_i)^2\sigma_0^2+x_i^2\sigma_1^2$$
+\item 
+\begin{enumerate}
+\item $P(\text{All }x=1 \text{ or all } x=0)=P(\text{All }x=1 \cup\text{ all } x=0)=P(\text{All }x=1)+ P(\text{ All } x=0)-P(\text{All }x=1 \cap\text{ all } x=0)=\rho^n+(1-\rho)^n-P(\emptyset)=\rho^n+(1-\rho)^n$. Because $0<\rho<1$ (and thus $0<(1-\rho)<1$),$$\lim_{n\to\infty}P(\text{All }x=1)=\lim_{n\to\infty}\rho^n=0$$Likewise,$$\lim_{n\to\infty}P(\text{All }x=0)=\lim_{n\to\infty}(1-\rho)^n=0$$
+\item n=10:
+
+$P(\text{All }x=1 \text{ or all } x=0)=P(\text{All }x=1 \cup\text{ all } x=0)=0.5^{10}+(1-0.5)^{10}=2\cdot 0.5^{10}\approx$`r 2*0.5^10`
+
+n=100
+
+$P(\text{All }x=1 \text{ or all } x=0)=P(\text{All }x=1 \cup\text{ all } x=0)=0.5^{100}+(1-0.5)^{100}=2\cdot 0.5^{100}\approx$`r 2*0.5^100`
+\item n=10:
+
+$P(\text{All }x=1 \text{ or all } x=0)=P(\text{All }x=1 \cup\text{ all } x=0)=0.9^{10}+(1-0.9)^{10}\approx$`r 0.9^10*0.1^10`
+
+n=100
+
+$P(\text{All }x=1 \text{ or all } x=0)=P(\text{All }x=1 \cup\text{ all } x=0)=0.9^{100}+(1-0.9)^{100}\approx$`r 0.9^100*0.1^100`
+\end{enumerate}
+\end{enumerate}
+
+
+### Computer Exercises
+
+```{r Chapter 2 Computer Exercise 1,echo=TRUE,include=TRUE,comment=NA}
+#i
+mean(k401k$prate)
+mean(k401k$mrate)
+
+#ii
+lm1 <- lm(prate ~ mrate, data = k401k)
+summary(lm1)
+
+#iii
+#The intercept suggests a participation rate of 83.07546% when the match rate is 0%
+#The coefficient on mrate suggests an additional 5.861079% in participation rate for
+#every additional percentage of prate
+
+#iv
+unname(lm1$coefficients[1])+unname(lm1$coefficients[2])*3.5
+#The percentage exceeds 100% as this is a linear model. Clearly, this is not a reasonable
+#prediction
+
+#v
+summary(lm1)["r.squared"]
+#About 7.5%. Personally, I would consider this a lot for one variable, but I 
+#expected it to be higher
+rm(lm1)
+```
+
+```{r Chapter 2 Computer Exercise 2,echo=TRUE,include=TRUE,comment=NA}
+#i
+mean(ceosal2$salary)
+mean(ceosal2$ceoten)
+
+#ii
+sum(ceosal2$ceoten==0)
+max(ceosal2$ceoten)
+
+#iii
+lm(log(salary) ~ ceoten, data = ceosal2)
+#An additional year as CEO is predicted to increase salary by about 1%.
+```
+
+```{r Chapter 2 Computer Exercise 3,echo=TRUE,include=TRUE,comment=NA}
+#i
+lm1 <- lm(sleep ~ totwrk, data = sleep75)
+summary(lm1)
+#The intercept (3586.37695) is the predicted minutes of sleep for an individual with
+#0 minutes spent in paid work
+
+#ii
+unname(lm1$coefficients[2])*120
+#A loss in 18 minutes of sleep for additional hours of totwrk does not seem large
+rm(lm1)
+```
+
+```{r Chapter 2 Computer Exercise 4,echo=TRUE,include=TRUE,comment=NA}
+#i
+mean(wage2$wage)
+mean(wage2$IQ)
+sd(wage2$IQ)
+
+#ii
+lm1 <- lm(wage ~ IQ, data = wage2)
+unname(lm1$coefficients[2])*15
+summary(lm1)["r.squared"]
+#IQ explains about 9.5% of the variation in wage
+
+#iii
+lm1 <- lm(log(wage) ~ IQ, data = wage2)
+unname(lm1$coefficients[2])*15*100
+rm(lm1)
+```
+
+
+```{r Chapter 2 Computer Exercise 5,echo=TRUE,include=TRUE,comment=NA}
+#i
+#ln(rd) = beta_0+ beta_1 ln(sales) + u
+
+#ii
+lm1 <- lm(lrd ~ lsales, data = rdchem)
+summary(lm1)
+#The estimated elasticity suggests a 1.07573% increase in rd for every percentage
+#increase in sales
+```
+
+```{r Chapter 2 Computer Exercise 6,echo=TRUE,include=TRUE,comment=NA}
+#i
+#I expected a diminishing marginal return in the pass rate for each additional dollar spent.
+#For one, the pass rate cannot exceed 100%. Additionally, only so much can be spent on a student
+#before no additional gains are possible. Thus, a constant marginal return seems unlikely/unreasonable.
+
+#ii
+#The percentage change in math10 for a 1% increase in expend is beta_1/100
+#Thus, beta_1/10 is the percentage point change in math10 given a 10% increase in expend
+
+#iii
+lm1 <- lm(math10 ~ lexpend, data = meap93)
+summary(lm1)
+
+#iv
+unname(lm1$coefficients[2]) / 10
+
+#v
+max(meap93$math10)
+#In this data set, the largest value of math10 is 66.7, which isn't particularly close to 100
+rm(lm1)
+```
+
+```{r Chapter 2 Computer Exercise 7,echo=TRUE,include=TRUE,comment=NA}
+#i
+mean(charity$gift)
+mean(charity$gift > 0)
+
+#ii
+mean(charity$mailsyear)
+max(charity$mailsyear)
+min(charity$mailsyear)
+
+#iii
+lm1 <- lm(gift ~ mailsyear, data = charity)
+summary(lm1)
+
+#iv
+#The slope coefficient predicts about a 2.7 Dutch guilders increase in gift for every additional
+#mailsyear. If each mailing costs on guilder, the charity is expected to make a net gain on each
+#mailing, but this doesn't mean the charity makes a net gain on every mailing
+
+#v
+min(lm1$fitted.values)
+#With this regression result, a negative value for mailsyear would be required to predict 0 for
+#gift, which is unfeasible
+rm(lm1)
+```
+
+```{r Chapter 2 Computer Exercise 8,echo=TRUE,include=TRUE,comment=NA}
+#i
+x <- runif(500, 0, 10)
+mean(x)
+sd(x)
+
+#ii
+u <- runif(500, 0, 36)
+#No, the sample average is not zero because all of the u are positive
+sd(u)
+
+#iii
+y <- 1 + 2 * x + u
+lm1 <- lm(y ~ x)
+summary(lm1)
+#No, they are not equal because the unobserved factors are not included in the regression model
+
+#iv
+sum(lm1$residuals)
+sum(lm1$residuals * x)
+
+#v
+sum(u)
+sum(u * x)
+#The sum of the error terms and the errors terms times x generally won't sum
+#to 0 like the residuals will
+
+#vi
+x <- runif(500, 0, 10)
+mean(x)
+sd(x)
+u <- runif(500, 0, 36)
+sd(u)
+y <- 1 + 2 * x + u
+lm2 <- lm(y ~ x)
+summary(lm2)
+#The results are not the same because the samples are different
+rm(x,y,u,lm1,lm2)
+```
+
+```{r Chapter 2 Computer Exercise 9,echo=TRUE,include=TRUE,comment=NA}
+county_murders <- as_tibble(countymurders) %>%
+  filter(year == 1996)
+
+#i
+sum(county_murders$murders == 0)
+sum(county_murders$execs > 0)
+max(county_murders$execs)
+
+#ii
+lm1 <- lm(murders ~ execs, data = county_murders)
+summary(lm1)
+
+#iii
+#The model predicts an additional 58.555 executions for every additional murder in a county.
+#This does not suggest a deterrent effect of capital punishment
+
+#iv
+min(lm1$fitted.values)
+unname(lm1$residuals[which(county_murders$execs == 0)[1]])
+
+#v
+#A simple regression analysis not well suited for determining whether capital punishment
+#has a deterrent effect on murders because there are many unobserved factors that are likely
+#correlated with both murders and execs, which leads to a biased slope estimate. Also, there's
+#likely reverse causality in which murders causes more execs
+rm(county_murders,lm1)
+```
+
+```{r Chapter 2 Computer Exercise 10 parts i-ii,echo=TRUE,include=TRUE,comment=NA}
+#i
+length(catholic$math12)
+mean(catholic$math12)
+sd(catholic$math12)
+mean(catholic$read12)
+sd(catholic$read12)
+
+#ii
+lm1 <- lm(math12 ~ read12, data = catholic)
+```
+
+$$\widehat{math12} = `r unname(unlist(lm1["coefficients"]))[1]`+`r unname(unlist(lm1["coefficients"]))[2]`read12$$
+$$n = `r length(catholic$math12)`, R^2 = `r unname(unlist(summary(lm1)["r.squared"]))`$$
+
+```{r Chapter 2 Computer Exercise 10 parts iii-v,echo=TRUE,include=TRUE,comment=NA}
+#iii
+#Yes, the intercept suggests prediction of 15.15304 on math12 for a score of 0 on read12
+
+#iv
+#I'm not surprised by the coefficient. I would expect the scores to be positively correlated.
+#I'm somewhat surprised by how large the coefficient of determination is.
+
+#v
+#I would counter their statement by stating it's more correlational rather than causal.
+#Unobserved factors correlated with math12 and read12 are uncontrolled for, which would
+#make the slope coefficient biased (if interpreted as a causal effect)
+```
+
+```{r Chapter 2 Computer Exercise 11,echo=TRUE,include=TRUE,comment=NA}
+#i
+length(gpa1$colGPA)
+mean(gpa1$colGPA)
+max(gpa1$colGPA)
+
+#ii
+sum(gpa1$PC)
+
+#iii
+lm1 <- lm(colGPA ~ PC, data = gpa1)
+summary(lm1)
+#The intercept estimate predicts a colGPA of 2.98941 for a student without a PC.
+#The slope estimate predicts a 0.16952 estimate of the "treatment" effect of having a PC.
+#The slope suggests a positive relationship between colGPA and PC (as one might expect).
+
+#iv
+unname(unlist(summary(lm1)["r.squared"]))
+#The r-squared suggests not much of the variation in colGPA is explained by PC
+
+#v
+#No, unobserved factors that are correlated with colGPA and PC do not allow for beta_1
+#to be interpreted as an unbiased estimate of the causal effect of owning a PC on colGPA.
+
+rm(lm1)
+```
+
+\newpage
+
+# Chapter 3
+
+## Notes
+
+### Multiple Regression Analysis
+
+\textbf{Multiple regression analysis} is generally better fit to predict causal effects over simple regression analysis because it allows us to explicitly control for many factors that are correlated with the singular independent variable (from the simple regression model) and the dependent variable.
+
+In general, the \textbf{multiple linear regression (MLR) model} takes the form$$y=\beta_0+\beta_1x_1+\beta_2x_2+\dots+\beta_kx_k+u$$
+
+### OLS Estimators Derivation (MLR)
+
+Synonymous to the case with simple linear regression analysis, using OLS to obtain estimators of the parameters $\beta_0,\beta_1,\dots,\beta_k$ yields the following:
+$$\min_{\hat{\beta}_0,\hat{\beta}_1,\dots,\hat{\beta}_k}SSR=\sum_{i=1}^{n}\left(y_i-\hat{\beta}_0-\hat{\beta}_1x_{i1}-\dots-\hat{\beta}_kx_{ik}\right)^2$$
+$$\frac{\partial{SSR}}{\partial{\hat{\beta}_0}}=\sum_{i=1}^{n}-2\left(y_i-\hat{\beta}_0-\hat{\beta}_1x_{i1}-\dots-\hat{\beta}_kx_{ik}\right)=0$$
+$$\frac{\partial{SSR}}{\partial{\hat{\beta}_1}}=\sum_{i=1}^{n}-2x_{i1}\left(y_i-\hat{\beta}_0-\hat{\beta}_1x_{i1}-\dots-\hat{\beta}_kx_{ik}\right)=0$$
+$$\dots$$
+$$\frac{\partial{SSR}}{\partial{\hat{\beta}_k}}=\sum_{i=1}^{n}-2x_{ik}\left(y_i-\hat{\beta}_0-\hat{\beta}_1x_{i1}-\dots-\hat{\beta}_kx_{ik}\right)=0$$
+These are often called the OLS \textbf{first order conditions}. As with the simple regression model, the OLS first order conditions can be obtained by the method of moments: under the assumptions that $E[u]=0$ and $E[x_ju]=0\ \forall \ j=1,\dots,k$.
+
+From the first FOC,$$\sum_{i=1}^{n}\left(y_i-\hat{\beta}_0-\hat{\beta}_1x_{i1}-\dots-\hat{\beta}_kx_{ik}\right)=0$$
+$$\to\sum_{i=1}^{n}\hat{\beta}_0=\sum_{i=1}^{n}\left(y_i-\hat{\beta}_1x_{i1}-\dots-\hat{\beta}_kx_{ik}\right)$$
+$$\to n\hat{\beta}_0=n\bar{y}-n\hat{\beta}_1\bar{x_1}-\dots-n\hat{\beta}_k\bar{x_k}$$
+$$\to \hat{\beta}_0=\bar{y}-\hat{\beta}_1\bar{x_1}-\dots-\hat{\beta}_k\bar{x_k}$$
+\small
+\textit{Note:} Like in the simple linear regression case, the significance of this FOC is that, using least squares criteria, our line of best fit runs through the sample means $\bar{y}$ and $\bar{x}_j$ for $j=1,\dots,k$.
+\normalsize
+
+To derive the slope estimators, start by regressing $x_\ell$ on all of the other regressors in the model, which takes the form$$x_\ell=\gamma_0+\gamma_1x_1+\dots+\gamma_{\ell-1}x_{\ell-1}+\gamma_{\ell+1}x_{\ell+1}+\dots+\gamma_{k}x_{k}+r_{i\ell}$$If we denote the residuals of the model as $\hat{r}_{i\ell}$ and the predicted values as $\hat{x}_{i\ell}$, then$$x_{i\ell}=\hat{x}_{i\ell}+\hat{r}_{i\ell}$$Plugging this derivation into the $(\ell+1)^{th}$ first order condition:
+$$\frac{\partial{SSR}}{\partial{\beta_\ell}}=\sum_{i=1}^{n}-2x_{i\ell}\left(y_i-\hat{\beta}_0-\hat{\beta}_1x_{i1}-\dots-\hat{\beta}_kx_{ik}\right)=0$$
+$$\to\sum_{i=1}^{n}\left(\hat{x}_{i\ell}+\hat{r}_{i\ell}\right)\left(y_i-\hat{\beta}_0-\hat{\beta}_1x_{i1}-\dots-\hat{\beta}_kx_{ik}\right)=0$$
+$$\to\sum_{i=1}^{n}\hat{x}_{i\ell}\left(y_i-\hat{\beta}_0-\hat{\beta}_1x_{i1}-\dots-\hat{\beta}_kx_{ik}\right)+\sum_{i=1}^{n}\hat{r}_{i\ell}\left(y_i-\hat{\beta}_0-\hat{\beta}_1x_{i1}-\dots-\hat{\beta}_kx_{ik}\right)=0$$
+$$\to\sum_{i=1}^{n}\hat{x}_{i\ell}\hat{u}_i+\sum_{i=1}^{n}\hat{r}_{i\ell}\left(y_i-\hat{\beta}_0-\hat{\beta}_1x_{i1}-\dots-\hat{\beta}_kx_{ik}\right)=0$$
+Because $\hat{x}_{i\ell}$ is simply a linear combination of all the other regressors in the model (i.e., $\hat{x}_{i\ell}=\hat{\gamma}_0+\hat{\gamma}_1x_{i1}+\dots+\hat{\gamma}_{\ell-1}x_{i\ell-1}+\gamma_{\ell+1}x_{i\ell+1}+\dots+\gamma_{k}x_{ik}$), it follows that $\sum_{i=1}^{n}\hat{x}_{i\ell}\hat{u}_i=0$.
+$$\to\sum_{i=1}^{n}\hat{r}_{i\ell}\left(y_i-\hat{\beta}_0-\hat{\beta}_1x_{i1}-\dots-\hat{\beta}_kx_{ik}\right)=0$$
+$$\to\sum_{i=1}^{n}\hat{r}_{i\ell}\left(y_i-\hat{\beta}_\ell x_{i\ell}\right) +\sum_{i=1}^{n}\hat{r}_{i\ell}\left(-\hat{\beta}_0-\hat{\beta}_1x_{i1}-\dots-\hat{\beta}_{\ell-1}x_{i\ell-1}-\hat{\beta}_{\ell+1}x_{i\ell+1}-\dots-\hat{\beta}_kx_{ik}\right)=0$$
+Because $\hat{r}_{i\ell}$ are the residuals from regressing $x_\ell$ on all the other regressors, $\sum_{i=1}^{n}x_{ij}\hat{r}_{i\ell}=0\ \forall\ j\neq \ell$.
+$$\to\sum_{i=1}^{n}\hat{r}_{i\ell}\left(y_i-\hat{\beta}_\ell x_{i\ell}\right)=0$$
+$$\to\sum_{i=1}^{n}\hat{r}_{i\ell}\left(y_i-\hat{\beta}_\ell\left(\hat{x}_{i\ell}+\hat{r}_{i\ell}\right)\right)=0$$
+$$\to\sum_{i=1}^{n}\hat{r}_{i\ell}\left(y_i-\hat{\beta}_\ell\hat{r}_{i\ell}\right)-\hat{\beta}_\ell\sum_{i=1}^{n}\hat{r}_{i\ell}\hat{x}_{i\ell}=0$$
+Since $\sum_{i=1}^{n}\hat{r}_{i\ell}\hat{x}_{i\ell}=0$ (This can be thought of as $\sum_{i=1}^{n}\hat{r}_{i\ell}\hat{x}_{i\ell}=0\to\sum_{i=1}^{n}\hat{u}_{i}\hat{y}_{i}=0\to\hat{\beta}_0\sum_{i=1}^{n}\hat{u}_{i}+\hat{\beta}_1\sum_{i=1}^{n}x_i\hat{u}_{i}=0+0=0$ in the SLR case),
+$$\to\sum_{i=1}^{n}\hat{r}_{i\ell}\left(y_i-\hat{\beta}_\ell\hat{r}_{i\ell}\right)=0$$
+$$\to\hat{\beta}_\ell\sum_{i=1}^{n}\hat{r}_{i\ell}^2=\sum_{i=1}^{n}\hat{r}_{i\ell}y_i$$
+$$\to\hat{\beta}_\ell=\frac{\sum_{i=1}^{n}\hat{r}_{i\ell}y_i}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}$$
+
+### MLR Interpretation
+
+In MLR analysis, the slope estimates $\hat{\beta}_1,\dots,\hat{\beta}_k$ are interpreted as the \textbf{partial effects} of the corresponding explanatory variables on the dependent variable. In other words, they have a \textbf{ceteris paribus} interpretation.
+
+\newpage
+
+\underline{OLS Fitted Values and Residuals Properties (MLR)}
+
+\textit{Note:} The OLS fitted values and residuals have some important properties that are immediate extensions from the bivariate case:
+
+\begin{enumerate}
+\item The sample average of the residuals is zero and so $\bar{y}=\bar{\hat{y}}$
+\item The sample covariance between each independent variable and the OLS residuals is zero (i.e., $\hat{\sigma}_{x_j\hat{u}}=0\ \forall\ j=1,\dots,k$). Hence,$$\hat{\sigma}_{\hat{y}\hat{u}}=0$$
+\item The point $\left(\bar{x}_1,\dots,\bar{x}_k,\bar{y}\right)$ always lies on the OLS regression line: $\bar{y}=\hat{\beta}_0+\hat{\beta}_1x_1+\dots+\hat{\beta}_kx_k$
+\end{enumerate}
+
+The first two properties are immediate consequences of the OLS first order conditions used to obtain the OLS estimators. Namely,$$\sum_{i=1}^{n}u_i=0;\ \sum_{i=1}^{n}x_{ij}u_i=0,$$where $\sum_{i=1}^{n}x_{ij}u_i=0$ implies that each regressor has a zero sample covariance with $\hat{u}_i$. The third property was derived earlier in the "OLS Estimators Derivation (MLR)" section.
+
+### Partialling Out Interpretation
+
+Earlier, we derived $$\hat{\beta}_{\ell}=\frac{\sum_{i=1}^{n}\hat{r}_{i\ell}y_i}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}$$Let $\ell=1$ in the model $y=\beta_0+\beta_1x_1+\beta_2x_2+u$. Then, $\hat{r}_{i1}$ are the OLS residuals from a simple regression of $x_1$ on $x_2$. The above derivation shows that we can then do a simple regression of $y$ on $\hat{r}_1$ to obtain $\hat{\beta}_1$. (Note that the residuals $\hat{r}_{i1}$ have a zero sample average, and so $\hat{\beta}_1$ is the usual slope estimate from simple regression). The interpretation of this is that the residuals $\hat{r}_{i1}$ are the part of $x_{i1}$ that are uncorrelated with $x_{i2}$. In other words, $\hat{r}_{i1}$ is $x_{i1}$ after the effects of $x_{i2}$ have been partialled out. Thus, $\hat{\beta}_1$ measures the sample relationship between $y$ and $x_1$ after $x_2$ has been partialled out. This result is usually called the \textbf{Frisch-Waugh theorem}.
+
+
+
+
