@@ -1020,7 +1020,7 @@ $$=SST-2\sum_{i=1}^{n}\hat{u}_i(\hat{\beta}_0+\hat{\beta_1}x_i)$$
 $$=SST-2\left[\hat{\beta}_0\sum_{i=1}^{n}\hat{u}_i+\hat{\beta_1}\sum_{i=1}^{n}x_iu_i\right]=SST$$
 
 The \textbf{R-squared} of the regression, sometimes called the \textbf{coefficient of determination}, is defined as$$R^2\equiv\frac{SSE}{SST}=1-\frac{SSR}{SST}$$
-$R^2$is the ratio of the explained variation compared to the total variation; thus, it is interpreted as the fraction of the sample variation in $y$ that is explained by $x$. $R^2$ is equal to the square of the sample correlation coefficient between $y_i$ and $\hat{y}_i$.
+$R^2$is the ratio of the explained variation compared to the total variation; thus, it is interpreted as the fraction of the sample variation in $y$ that is explained by $x$. $R^2$ is equal to the square of the sample correlation coefficient between $y_i$ and $\hat{y}_i$:$$R^2=\frac{\left[\sum_{i=1}^{n}\left(y_i-\bar{y}\right)\left(\hat{y}_i-\bar{\hat{y}}\right)\right]^2}{\sum_{i=1}^{n}\left(y_i-\bar{y}\right)^2\sum_{i=1}^{n}\left(\hat{y}_i-\bar{\hat{y}}\right)^2}$$An important fact about $R^2$ is that it never decreases, and it usually increases, when another independent variable is added to a regression and the same set of observations is used for both regressions. The fact that $R^2$ never decreases when any variable is added to a regression makes it a poor tool for deciding whether particular variables should be added to a model; instead, one should focus on whether an explanatory variable has a nonzero partial effect on $y$ in the \emph{population} to decide whether to include an explanatory variable in a model. 
 
 
 ### Nonlinear Models
@@ -1066,7 +1066,7 @@ $$0=cov(y_i,y_j)=cov(\beta_0+\beta_1x_{i,1}+...+\beta_{i,m}x_{i,m}+u_i,\beta_0+\
 $$=\sum_{s=1}^m \sum_{t=1}^m \beta_s \beta_t cov(x_{i,s},x_{j,t}) + \sum_{s=1}^m \beta_s cov(x_{i,s},u_j) + \sum_{t=1}^m \beta_t cov(x_{j,t},u_i) + cov(u_i,u_j)$$
 Using the fact that the sample is i.i.d., $$\sum_{s=1}^m \sum_{t=1}^m \beta_s \beta_t cov(x_{i,s},x_{j,t})=0$$ Also, by the exogeneity assumption, $$\sum_{s=1}^{m} \beta_s cov(x_{i,s},u_j) + \sum_{t=1}^m \beta_t cov(x_{j,t},u_i)=0$$ Leaving us with $$cov(u_i,u_j)=0$$
 
-### Unbiasedness of OLS Estimators
+### Unbiasedness of OLS Estimators (SLR)
 
 $$E\left[\hat{\beta}_{1}\middle|x\right]=E\left[\frac{\sum_{i=1}^{n}y_i(x_i-\bar{x})}{\sum_{i=1}^{n}x_i(x_i-\bar{x})}\middle|x\right]$$
 $$=E\left[\frac{\sum_{i=1}^{n}(\beta_0+\beta_1 x_i + u_i)(x_i-\bar{x})}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\middle|x\right]$$
@@ -1086,7 +1086,7 @@ $$=\beta_0+\beta_1\bar{x}-\beta_1\bar{x}=\beta_0$$
 
 Unbiasedness generally fails if any of our first three assumptions fail. This means that it is important to think about the veracity of each assumption for a particular application. The first assumption requires that $y$ and $x$ be linearly related, with an additive disturbance. This can certainly fail. But we also know that $y$ and $x$ can be chosen to yield interesting nonlinear relationships. Random sampling can fail in a cross section when samples are not representative of the underlying population; in fact, some data sets are constructed by intentionally oversampling different parts of the population. Finally, the third assumption is possibly the most important of the Gauss-Markov assumptions. Using simple regression when $u$ contains factors affecting $y$ that are also correlated with $x$ can result in spurious correlation: that is, we find a relationship between $y$ and $x$ that is really due to other unobserved factors that affect $y$ and also happen to be correlated with $x$. In addition to omitted variables, there are other reasons for $x$ to be correlated with $u$ in the simple regression model.
 
-### Sampling Variance of OLS Estimators
+### Sampling Variance of OLS Estimators (SLR)
 
 Using a previous derivation,
 $$\hat{\beta}_1=\beta_1+\frac{\sum_{i=1}^{n}u_i(x_i-\bar{x})}{SST_x}$$
@@ -1135,9 +1135,9 @@ Additionally, the natural estimator of $\sigma_u$ is$$\hat{\sigma}_u=\sqrt{\hat{
 Although $\hat{\sigma}_u^2$ is an unbiased and consistent estimator of $\sigma_u^2$, $\hat{\sigma}_u$ is consistent but biased.
 
 All together the \textbf{standard errors of the coefficients} are
-$$\text{se}_{\beta_0}=\sqrt{\frac{\sfrac{\sum_{i=1}^{n}\hat{u}_i^2}{n(n-2)}+\sum_{i=1}^{n}x_i^2}{SST_x}}$$
+$$\text{se}\left(\hat{\beta}_0\right)=\sqrt{\frac{\sfrac{\sum_{i=1}^{n}\hat{u}_i^2}{n(n-2)}+\sum_{i=1}^{n}x_i^2}{SST_x}}$$
 and
-$$\text{se}_{\beta_1}=\sqrt{\frac{\sfrac{\sum_{i=1}^{n}\hat{u}_i^2}{(n-2)}}{SST_x}}$$
+$$\text{se}\left(\hat{\beta}_1\right)=\sqrt{\frac{\sfrac{\sum_{i=1}^{n}\hat{u}_i^2}{(n-2)}}{SST_x}}$$
 
 \underline{A Note on the Conditioning on x}
 
@@ -1248,7 +1248,7 @@ ggplot()+
 \setcounter{enumi}{5}
 \item 
 \begin{enumerate}
-\item The slope is an estimated elasticity of $price$ with respect to $dist$. The estimate indicates a 0.312\% increase in $price$ for every percent increase in $dist$. The sign is as we'd expect. As houses move further away from the garbage incinerator, we'd expect housing prices to increase.
+\item The slope is an estimated elasticity of $price$ with respect to $dist$. The estimate indicates a 0.312 percentage point increase in $price$ for every percent increase in $dist$. The sign is as we'd expect. As houses move further away from the garbage incinerator, we'd expect housing prices to increase.
 \item No. As the problem suggests, it's likely the city put the incinerator close to cheaper homes. Thus, the elasticity estimate is likely upwardly biased and overstates the impact of $dist$ on $price$.
 \item Other factors include the size of the home, the number of rooms, the quality of the surrounding area (with regards to safety, education, etc.), and the location. As suggested in part(c), these factors are likely correlated with $dist$. 
 \end{enumerate}
@@ -1732,6 +1732,501 @@ The first two properties are immediate consequences of the OLS first order condi
 ### Partialling Out Interpretation
 
 Earlier, we derived $$\hat{\beta}_{\ell}=\frac{\sum_{i=1}^{n}\hat{r}_{i\ell}y_i}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}$$Let $\ell=1$ in the model $y=\beta_0+\beta_1x_1+\beta_2x_2+u$. Then, $\hat{r}_{i1}$ are the OLS residuals from a simple regression of $x_1$ on $x_2$. The above derivation shows that we can then do a simple regression of $y$ on $\hat{r}_1$ to obtain $\hat{\beta}_1$. (Note that the residuals $\hat{r}_{i1}$ have a zero sample average, and so $\hat{\beta}_1$ is the usual slope estimate from simple regression). The interpretation of this is that the residuals $\hat{r}_{i1}$ are the part of $x_{i1}$ that are uncorrelated with $x_{i2}$. In other words, $\hat{r}_{i1}$ is $x_{i1}$ after the effects of $x_{i2}$ have been partialled out. Thus, $\hat{\beta}_1$ measures the sample relationship between $y$ and $x_1$ after $x_2$ has been partialled out. This result is usually called the \textbf{Frisch-Waugh theorem}.
+
+### Simple vs. Multiple Regression Estimates
+
+Define a simple regression model $\tilde{y}=\tilde{\beta}_0+\tilde{\beta}_1x_1$ and a multiple regression model $\hat{y}=\hat{\beta}_0+\hat{\beta}_1x_1+\hat{\beta}_2x_2$. Then, it turns out$$\tilde{\beta}_1=\hat{\beta}_1+\hat{\beta}_2\tilde{\delta}_1,$$where $\tilde{\delta}_1$ is the slope coefficient from regressing $x_{i2}$ on $x_{i1}$ and thus the confounding term is the partial effect of $x_2$ on $\hat{y}$ times $\tilde{\delta}_1$. The two cases in which $\tilde{\beta}_1=\hat{\beta}_1$ are
+
+\begin{enumerate}
+\item The partial effect of $x_2$ on $\hat{y}$ is zero in the sample (i.e., $\hat{\beta}_2=0$)
+\item $x_1 \text{ and } x_2$ are uncorrelated in the sample (i.e., $\tilde{\delta}_1=0$)
+\end{enumerate}
+
+More generally, if we define a model $\hat{y}=\hat{\beta}_0+\hat{\beta}_1x_1+\dots+\hat{\beta}_kx_k$ and another model $\tilde{y}=\tilde{\beta}_0+\tilde{\beta}_1x_1+\dots+\tilde{\beta}_{k-1}x_{k-1}$, then$$\tilde{\beta}_j=\hat{\beta}_j+\hat{\beta}_k\tilde{\delta}_j$$for $j=1,\dots,k-1$. Taking the conditional expectation of this value (on $x$):$$E\left[\tilde{\beta}_j\middle|x\right]=E\left[\hat{\beta}_j\middle|x\right]+E\left[\hat{\beta}_k\tilde{\delta}_j\middle|x\right]=\beta_j+\tilde{\delta}_jE\left[\hat{\beta}_k\middle|x\right]=\beta_j+\beta_k\tilde{\delta}_j,$$which shows $\tilde{\beta}_j$ is biased for $\beta_j$ unless $\beta_k=0$ (meaning $x_k$ is uncorrelated with $y$ in the population) or $\tilde{\delta}_j=0$ (meaning $x_k$ is uncorrelated with $x_j$ in the sample).
+
+### Unbiasedness of OLS Estimators (MLR)
+
+Earlier, we derived $$\hat{\beta}_{\ell}=\frac{\sum_{i=1}^{n}\hat{r}_{i\ell}y_i}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}$$
+$$=\frac{\sum_{i=1}^{n}\hat{r}_{i\ell}\left(\beta_0+\beta_1x_{i1}+\dots+\beta_kx_{ik}+u_i\right)}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}$$
+$$=\frac{\beta_0\sum_{i=1}^{n}\hat{r}_{i\ell}+\beta_1\sum_{i=1}^{n}x_{i1}\hat{r}_{i\ell}+\dots+\beta_k\sum_{i=1}^{n}x_{ik}\hat{r}_{i\ell}+\sum_{i=1}^{n}u_i\hat{r}_{i\ell}}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}$$
+$$=\frac{\beta_\ell\sum_{i=1}^{n}x_{i\ell}\hat{r}_{i\ell}+\sum_{i=1}^{n}u_i\hat{r}_{i\ell}}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}$$
+$$=\frac{\beta_\ell\sum_{i=1}^{n}\left(\hat{x}_{i\ell}+\hat{r}_{i\ell}\right)\hat{r}_{i\ell}+\sum_{i=1}^{n}u_i\hat{r}_{i\ell}}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}$$
+$$=\frac{\beta_\ell\sum_{i=1}^{n}\hat{x}_{i\ell}\hat{r}_{i\ell}+\beta_\ell\sum_{i=1}^{n}\hat{r}_{i\ell}^2+\sum_{i=1}^{n}u_i\hat{r}_{i\ell}}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}$$
+$$=\frac{\beta_\ell\sum_{i=1}^{n}\left(\hat{\gamma}_0+\hat{\gamma}_1x_{i1}+\dots+\hat{\gamma}_{\ell-1}x_{i\ell-1}+\gamma_{\ell+1}x_{i\ell+1}+\dots+\gamma_{k}x_{ik}\right)\hat{r}_{i\ell}+\beta_\ell\sum_{i=1}^{n}\hat{r}_{i\ell}^2+\sum_{i=1}^{n}\hat{r}_{i\ell}u_i}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}$$
+$$=\frac{0+\beta_\ell\sum_{i=1}^{n}\hat{r}_{i\ell}^2+\sum_{i=1}^{n}\hat{r}_{i\ell}u_i}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}$$
+$$=\beta_\ell+\frac{\sum_{i=1}^{n}\hat{r}_{i\ell}u_i}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}$$
+Taking the expectation of this value (conditional on $x$):$$E\left[\hat{\beta}_\ell\middle|x\right]=E\left[\beta_\ell+\frac{\sum_{i=1}^{n}\hat{r}_{i\ell}u_i}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}\middle|x\right]$$
+$$=\beta_\ell+\frac{1}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}E\left[\sum_{i=1}^{n}\hat{r}_{i\ell}u_i\middle|x\right]$$
+$$=\beta_\ell+\frac{1}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}\sum_{i=1}^{n}E\left[\hat{r}_{i\ell}u_i\middle|x\right]$$
+$$=\beta_\ell+\frac{1}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}\sum_{i=1}^{n}\hat{r}_{i\ell}E\left[u_i\middle|x\right]$$
+$$=\beta_\ell+\frac{1}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}\sum_{i=1}^{n}\hat{r}_{i\ell}\cdot 0=\beta_\ell$$
+
+An important implication of using OLS is that the \emph{procedure} by which OLS estimates are obtain is unbiased; however, it's almost always not the case that the estimate obtain is unbiased. Thus, if $\hat{\beta}_1$ is the OLS slope parameter estimator and $b_1$ is an OLS estimate from a particular, one may say $\hat{\beta}_1$ is unbiased under the G-M assumptions (i.e., $E\left[\hat{\beta}_1\right]=\beta_1$), but one should refrain from saying $b_1$ is unbiased.
+
+### Specifying a Model
+
+In multiple regression analysis \textbf{inclusion of an irrelevant variable} or \textbf{overspecifying/overfitting the model} is a case in which an explanatory variable is included in a regression model that has a zero population parameter in estimating an equation by OLS. While overspecifying the model does not affect the unbiasedness of the OLS estimators, including irrelevant variables can have undesirable effects on the variances of the OLS estimators.
+
+\newpage
+
+On the other hand, omitting a variable that actually belongs in the true (or population) model is called the problem of \textbf{excluding a relevant variable} or \textbf{underspecifying the model}. Looking back to the "Sample vs. Multiple Regression Estimates" section, define a model $\hat{y}=\hat{\beta}_0+\hat{\beta}_1x_1+\dots+\hat{\beta}_kx_k$ and another model $\tilde{y}=\tilde{\beta}_0+\tilde{\beta}_1x_1+\dots+\tilde{\beta}_{k-1}x_{k-1}$, then$$\tilde{\beta}_j=\hat{\beta}_j+\hat{\beta}_k\tilde{\delta}_j$$for $j=1,\dots,k-1$. Taking the conditional expectation of this value (on $x$):$$E\left[\tilde{\beta}_j\middle|x\right]=E\left[\hat{\beta}_j\middle|x\right]+E\left[\hat{\beta}_k\tilde{\delta}_j\middle|x\right]=\beta_j+\tilde{\delta}_jE\left[\hat{\beta}_k\middle|x\right]=\beta_j+\beta_k\tilde{\delta}_j,$$Thus, we can derive the \textbf{omitted variable bias} as:$$\text{Bias}\left(\tilde{\beta}_j\right)=E\left[\tilde{\beta}_j\middle|x\right]-\beta_j=\beta_j+\beta_k\tilde{\delta}_j-\beta_j=\beta_k\tilde{\delta}_j$$
+
+\underline{Summary of Bias in $\tilde{\beta}_j$ when $x_k$ is Omitted}
+\begin{tabular}{|lll|}
+\hline
+ & $\text{Corr}(x_j,x_k)>0$ & $\text{Corr}(x_j,x_k)<0$ \\
+\hline
+$\beta_k>0$ & Positive Bias & Negative Bias \\
+$\beta_k<0$ & Negative Bias & Positive Bias \\
+\hline
+\end{tabular}
+
+More generally, it's difficult to derive the sign of omitted variable bias with multiple regressors. For example, suppose$$y=\beta_0+\beta_1 x_1+\beta_2 x_2+\beta_3 x_3+u$$satisfies the unbiasedness G-M assumptions, but we estimate the model as $$\tilde{y}=\tilde{\beta}_0+\tilde{\beta}_1x_1+\tilde{\beta}_2x_2$$If $x_1$ is correlated with $x_3$ but $x_2$ and $x_3$ are uncorrelated, both $\tilde{\beta}_1$ and $\tilde{\beta}_2$ will both be biased unless both $x_1$ and $x_2$ are also uncorrelated. In general, we commonly will assume $x_1$ and $x_2$ are uncorrelated to derive a likely direction of biasedness; however, it should be noted that this assumption generally doesn't hold.
+
+In estimating parameters, we say an estimator has an \textbf{upward bias} if it has positive bias and a \textbf{downward bias} if it has a negative bias. In general, we say an estimator is \textbf{biased toward zero} if the estimator is closer to zero than the true parameter.  
+
+### Sampling Variance of OLS Estimators (MLR)
+
+Using a previous derivation,$$\hat{\beta}_\ell=\beta_\ell+\frac{\sum_{i=1}^{n}\hat{r}_{i\ell}u_i}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}$$
+Thus,
+$$\text{Var}\left(\hat{\beta}_\ell\middle|x\right)=\text{Var}\left(\beta_\ell+\frac{\sum_{i=1}^{n}\hat{r}_{i\ell}u_i}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}\middle|x\right)$$
+$$=\frac{1}{\left(\sum_{i=1}^{n}\hat{r}_{i\ell}^2\right)^2}\text{Var}\left(\sum_{i=1}^{n}\hat{r}_{i\ell}u_i\middle|x\right)$$
+$$=\frac{1}{\left(\sum_{i=1}^{n}\hat{r}_{i\ell}^2\right)^2}\sum_{i=1}^{n}\text{Var}\left(\hat{r}_{i\ell}u_i\middle|x\right)$$
+$$=\frac{1}{\left(\sum_{i=1}^{n}\hat{r}_{i\ell}^2\right)^2}\sum_{i=1}^{n}\hat{r}_{i\ell}^2\text{Var}\left(u_i\middle|x\right)$$
+$$=\frac{1}{\left(\sum_{i=1}^{n}\hat{r}_{i\ell}^2\right)^2}\sum_{i=1}^{n}\hat{r}_{i\ell}^2\sigma_u^2$$
+$$=\frac{\sigma_u^2\sum_{i=1}^{n}\hat{r}_{i\ell}^2}{\left(\sum_{i=1}^{n}\hat{r}_{i\ell}^2\right)^2}$$
+$$=\frac{\sigma_u^2}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}$$
+$$=\frac{\sigma_u^2}{SST_{x_\ell}-SSE_{x_\ell}}$$
+$$=\frac{\sigma_u^2}{SST_{x_\ell}\left(1-R_\ell^2\right)}$$where $R_\ell^2$ is the $R$-squared from regressing $x_\ell$ on all other independent variables.
+
+High but imperfect correlation between two or more independent variables is called \textbf{multicollinearity}. Multicollinearity leads to large values of $R_\ell^2$, which in turn, leads to large values for $\text{Var}\left(\hat{\beta}_\ell\right)$. Worrying about high degrees of correlation among the independent variables in the sample is really no different from worrying about a small sample size as both work to increase $\text{Var}(\hat{\beta}_\ell)$. Thus, ideas surrounding small values for $R_\ell^2$ and $SST_{x_\ell}$ pertain to \textbf{micronumerosity}, or the problem of small sample size. While multicollinearity can pose an issue in statistical inference, it needn't always be cause for stress for two reasons. First, multicollinearity can point out "improper" questions in which we are asking questions that may be too subtle for the available data to answer with any precision. Additionally, regression analysis where there is a high degree of correlation between certain independent variables can be irrelevant as to how well we can estimate parameters of interest in a model. For example, suppose we hope to estimate$$y=\beta_0+\beta_1x_1+\beta_2x_2+\beta_3x_3+u$$where $x_2$ and $x_3$ are highly correlated by $x_1$ is not highly correlated with either. It turns out that the high level of correlation between $x_2$ and $x_3$ has no direct effect on $\text{Var}\left(\hat{\beta}_1\right)$. Thus, if $\beta_1$ is the parameter of interest, including $x_2$ and $x_3$ maintains the unbiasedness of $\hat{\beta}_1$ while imposing little to no additional variance in $\hat{\beta}_1$. The most common statistic for detecting multicollinearity for a particular coefficient is the \textbf{variance inflation factor (VIF)}, which equals $\frac{1}{1-R_\ell^2}$. Hence, $\text{Var}\left(\hat{\beta}_\ell\right)$ can be rewritten as$$\text{Var}\left(\hat{\beta}_\ell\right)=\frac{\sigma_u^2}{SST_\ell}\cdot \text{VIF}_\ell,$$which shows that $\text{VIF}_\ell$ is the factor by which $\text{Var}\left(\hat{\beta}_\ell\right)$ is higher because $x_\ell$ is not uncorrelated with the other explanatory variables.
+
+Similar to the SLR case, these formulas allow us to isolate the factors that contribute to $\text{Var}\left(\hat{\beta}_\ell\right)$. But these formulas are unknown, except in the extremely rare case that $\sigma_u^2$ is known. Considering the $u_i$ are unobserved, an unbiased estimator of $\sigma_u^2$ is$$\hat{\sigma}_u^2=\frac{\sum_{i=1}^{n}\hat{u}_i^2}{n-k-1},$$ where the $n-k-1$ is the degrees of freedom in the OLS residuals due to the $k+1$ OLS first order conditions:$$\sum_{i=1}^{n}\hat{u}_i=0,\sum_{i=1}^{n}x_1\hat{u}_i=0,\dots,\sum_{i=1}^{n}x_k\hat{u}_i=0$$
+
+Naturally, the estimators of $\text{Var}\left(\hat{\beta}_\ell\right)$ is
+$$\hat{\sigma}_{\beta_\ell}^2=\frac{\sfrac{\sum_{i=1}^{n}\hat{u}_i^2}{(n-k-1)}}{SST_{x_\ell}\left(1-R_\ell^2\right)}$$
+
+Additionally, the natural estimator of $\sigma_u$ is$$\hat{\sigma}_u=\sqrt{\hat{\sigma}_u^2},$$which is called the \textbf{standard error of the regresion (SER)}.
+
+Although $\hat{\sigma}_u^2$ is an unbiased and consistent estimator of $\sigma_u^2$, $\hat{\sigma}_u$ is consistent but biased.
+
+All together the \textbf{standard errors of the coefficients} equal $$\text{se}\left(\hat{\beta}_\ell\right)=\sqrt{\frac{\sfrac{\sum_{i=1}^{n}\hat{u}_i^2}{(n-k-1)}}{SST_{x_\ell}\left(1-R_\ell^2\right)}}$$
+
+### Gauss-Markov Theorem
+
+Under the Gauss-Markov assumptions, using least squares criteria to estimate the parameters yields the \textbf{best linear unbiased estimators (BLUE)} of the of parameters, a result known as the \textbf{Guass-Markov Theorem}. Restricting the scope to linear unbiased estimators, we can define an estimator$$\tilde{\beta}_\ell=\sum_{i=1}^{n}w_{i\ell}y_i$$where each $w_{i\ell}$ can be a function of the sample values of all the independent variables and
+$$E\left[\tilde{\beta}_\ell\middle|x\right]=\beta_\ell$$
+$$E\left[\sum_{i=1}^{n}w_{i\ell}y_i\middle|x\right]=\beta_\ell$$
+$$E\left[\sum_{i=1}^{n}w_{i\ell}\left(\beta_0+\beta_1x_{i1}+\dots+\beta_kx_{ik}+u_i\right)\middle|x\right]=\beta_\ell$$
+$$\beta_0\sum_{i=1}^{n}w_{i\ell}+\beta_1\sum_{i=1}^{n}x_{i1}w_{i\ell}+\dots+\beta_k\sum_{i=1}^{n}x_{ik}w_{i\ell}+\sum_{i=1}^{n}w_{i\ell}E\left[u_i\middle|x\right]=\beta_\ell$$
+$$E\left[\beta_0\sum_{i=1}^{n}w_{i\ell}+\beta_1\sum_{i=1}^{n}x_{i1}w_{i\ell}+\dots+\beta_{\ell}\sum_{i=1}^{n}x_{i\ell}w_{i\ell}+\dots+\beta_k\sum_{i=1}^{n}x_{ik}w_{i\ell}+\sum_{i=1}^{n}u_iw_{i\ell}\middle|x\right]=\beta_\ell$$where $\sum_{i=1}^{n}w_{i\ell}E\left[u_i\middle|x\right]=0$ by the zero conditional mean assumption. Thus, it must be the case that
+$$\sum_{i=1}^{n}w_{i\ell}=0$$
+$$\sum_{i=1}^{n}w_{i\ell}x_{ij}=0\ \forall \ j\neq\ell$$
+$$\sum_{i=1}^{n}w_{i\ell}x_{i\ell}=1$$
+Using this fact, we can derive the variance of $\tilde{\beta}_\ell$ as
+$$\text{Var}\left(\tilde{\beta}_\ell\middle|x\right)=\text{Var}\left(\beta_0\sum_{i=1}^{n}w_{i\ell}+\beta_1\sum_{i=1}^{n}x_{i1}w_{i\ell}+\dots+\beta_{\ell}\sum_{i=1}^{n}x_{i\ell}w_{i\ell}+\dots+\beta_k\sum_{i=1}^{n}x_{ik}w_{i\ell}+\sum_{i=1}^{n}u_iw_{i\ell}\middle|x\right)$$
+$$=\text{Var}\left(\beta_{\ell}+\sum_{i=1}^{n}u_iw_{i\ell}\middle|x\right)$$
+$$=\sum_{i=1}^{n}\text{Var}\left(u_iw_{i\ell}\middle|x\right)$$
+$$=\sum_{i=1}^{n}w_{i\ell}^2\text{Var}\left(u_i\middle|x\right)$$
+$$=\sigma_u^2\sum_{i=1}^{n}w_{i\ell}^2$$
+Suppose $w_{i\ell}=v_{i\ell}+c_{i\ell}$ where $v_{i\ell}=\frac{\hat{r}_{i\ell}}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}$ (the OLS weights) and $c_{i\ell}$ is some arbitrary difference from the least squares weights, then
+$$\text{Var}\left(\tilde{\beta}_\ell\middle|x\right)=\sigma_u^2\sum_{i=1}^{n}w_{i\ell}^2=\sigma_u^2\sum_{i=1}^{n}\left(v_{i\ell}+c_{i\ell}\right)^2$$
+$$=\sigma_u^2\sum_{i=1}^{n}v_{i\ell}^2+\sigma_u^2\sum_{i=1}^{n}c_{i\ell}^2+2\sigma_u^2\sum_{i=1}^{n}v_{i\ell}c_{i\ell}$$
+$$=\sigma_u^2\sum_{i=1}^{n}\left(\frac{\hat{r}_{i\ell}}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}\right)^2+\sigma_u^2\sum_{i=1}^{n}c_{i\ell}^2+2\sigma_u^2\sum_{i=1}^{n}v_{i\ell}c_{i\ell}$$
+$$=\sigma_u^2\frac{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}{\left(\sum_{i=1}^{n}\hat{r}_{i\ell}^2\right)^2}+\sigma_u^2\sum_{i=1}^{n}c_{i\ell}^2+2\sigma_u^2\sum_{i=1}^{n}v_{i\ell}c_{i\ell}$$
+$$=\frac{\sigma_u^2}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}+\sigma_u^2\sum_{i=1}^{n}c_{i\ell}^2+2\sigma_u^2\sum_{i=1}^{n}v_{i\ell}c_{i\ell}$$
+$$=\text{Var}\left(\hat{\beta}_\ell\right)+\sigma_u^2\sum_{i=1}^{n}c_{i\ell}^2+2\sigma_u^2\sum_{i=1}^{n}v_{i\ell}c_{i\ell}$$
+Hence, to show OLS estimators are BLUE under the G-M assumptions, it remains to show that
+$$\text{Var}\left(\hat{\beta}_\ell\right)\leq\text{Var}\left(\hat{\beta}_\ell\right)+\sigma_u^2\sum_{i=1}^{n}c_{i\ell}^2+2\sigma_u^2\sum_{i=1}^{n}v_{i\ell}c_{i\ell}$$
+$$\to 0\leq\sigma_u^2\sum_{i=1}^{n}c_{i\ell}^2+2\sigma_u^2\sum_{i=1}^{n}v_{i\ell}c_{i\ell},$$ which just requires showing $2\sigma_u^2\sum_{i=1}^{n}v_{i\ell}c_{i\ell}\geq 0$ since $\sigma_u^2\sum_{i=1}^{n}c_{i\ell}^2\geq 0$. Finalizing the proof,
+$$2\sigma_u^2\sum_{i=1}^{n}v_{i\ell}c_{i\ell}\geq 0$$
+$$\to\sum_{i=1}^{n}v_{i\ell}c_{i\ell}\geq 0$$
+Returning to the previous derivations that $\sum_{i=1}^{n}w_{i\ell}=0$, $\sum_{i=1}^{n}w_{i\ell}x_{ij}=0\ \forall \ j\neq\ell$, and $\sum_{i=1}^{n}w_{i\ell}x_{i\ell}=1$,
+$$0=\sum_{i=1}^{n}w_{i\ell}=\sum_{i=1}^{n}\left(v_{i\ell}+c_{i\ell}\right)=\sum_{i=1}^{n}v_{i\ell}+\sum_{i=1}^{n}c_{i\ell}=0+\sum_{i=1}^{n}c_{i\ell}$$
+$$\to \sum_{i=1}^{n}c_{i\ell}=0$$
+$$0=\sum_{i=1}^{n}w_{i\ell}x_{ij}=\sum_{i=1}^{n}\left(v_{i\ell}+c_{i\ell}\right)x_{ij}=\sum_{i=1}^{n}v_{i\ell}x_{ij}+\sum_{i=1}^{n}c_{i\ell}x_{ij}=0+\sum_{i=1}^{n}c_{i\ell}x_{ij}$$
+$$\to\sum_{i=1}^{n}c_{i\ell}x_{ij}=0 \ \forall\  j\neq\ell$$
+$$1=\sum_{i=1}^{n}w_{i\ell}x_{i\ell}=\sum_{i=1}^{n}\left(v_{i\ell}+c_{i\ell}\right)x_{i\ell}=\sum_{i=1}^{n}v_{i\ell}x_{i\ell}+\sum_{i=1}^{n}c_{i\ell}x_{i\ell}=1+\sum_{i=1}^{n}c_{i\ell}x_{i\ell}$$
+$$\to\sum_{i=1}^{n}c_{i\ell}x_{i\ell}=0$$
+Thus, $$\sum_{i=1}^{n}v_{i\ell}c_{i\ell}=\sum_{i=1}^{n}\frac{\hat{r}_{i\ell}c_{i\ell}}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}=\frac{\sum_{i=1}^{n}\hat{r}_{i\ell}c_{i\ell}}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}$$
+$$=\frac{\sum_{i=1}^{n}\left(x_{i\ell}-\hat{x}_{i\ell}\right)c_{i\ell}}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}$$
+$$=\frac{\sum_{i=1}^{n}x_{i\ell}c_{i\ell}-\sum_{i=1}^{n}\hat{x}_{i\ell}c_{i\ell}}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}$$
+$$=\frac{0-\sum_{i=1}^{n}\left(\hat{\gamma}_0+\hat{\gamma}_1x_{i1}+\dots+\hat{\gamma}_{\ell-1}x_{i\ell-1}+\hat{\gamma}_{\ell+1}x_{i\ell+1}+\dots+\hat{\gamma}_kx_{ik}\right)c_{i\ell}}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}$$
+$$=-\frac{\hat{\gamma}_0\sum_{i=1}^{n}c_{i\ell}+\hat{\gamma}_1\sum_{i=1}^{n}x_{i1}c_{i\ell}+\dots+\hat{\gamma}_{\ell-1}\sum_{i=1}^{n}x_{i\ell-1}c_{i\ell}+\hat{\gamma}_{\ell+1}\sum_{i=1}^{n}x_{i\ell+1}c_{i\ell}+\dots+\hat{\gamma}_k\sum_{i=1}^{n}x_{ik}c_{i\ell}}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}$$
+$$=-\frac{\hat{\gamma}_0\cdot 0+\hat{\gamma}_1\cdot 0+\dots+\hat{\gamma}_{\ell-1}\cdot 0+\hat{\gamma}_{\ell+1}\cdot 0+\dots+\hat{\gamma}_k\cdot 0}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}=0$$
+$\therefore \hat{\beta}_\ell$ is the best linear unbiased estimator of the population parameter $\beta_\ell$ because any other linear unbiased estimator has at least as much variance as the OLS estimator under the Gauss-Markov assumptions.
+
+## Exercises
+
+### Problems
+
+\begin{enumerate}
+\item 
+\begin{enumerate}
+\item We would expect a negative coefficient on $hsperc$ because we would expect those who do better in high school to do better in college as well. The better an individual does in college the larger is $colgpa$ and the better one does in high school the smaller is $hsperc$.
+\item `r 1.392-.0135*20+.00148*1050`
+\item The predicted difference in $colgpa$ is `r .00148*140`. In my opinion the difference is fairly large. To others, the difference may seem insignificant.
+\item Holding $hsperc$ fixed, a difference in SAT scores of `r .5/.00148` leads to a predicted $colgpa$ difference of .50.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item Yes, we would expect $educ$ and $sibs$ to be negatively correlated because more siblings may restrict the amount of education an individual can receive. To reduce predicted years of education by one year, $sibs$ must increase by `r 1/.094`.
+\item The coefficient on $meduc$ indicates a predicted increase of 0.131 years of schooling for every additional year of schooling the individual's mother received.
+\item The predicted difference in schooling is `r 4*.131+4*.210` years.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item If adults trade off sleep for work, $\beta_1$ is negative.
+\item I would guess that $\beta_2$ is positive and $\beta_3$ is negative.
+\item If someone works five more hours per week, $sleep$ is predicted to fall by `r .148*5*60` minutes.
+\item The coefficient on $educ$ indicates a predicted loss of 11.13 minutes in sleep per week for every additional year of education an individual receives. This tradeoff appears small.
+\item Not particularly, the $R^2$ indicates $totwrk$, $educ$, and $age$ explain about 11.3\% of the variation in $sleep$. Some other factors that might affect time spent sleeping are an individual's health, occupation, and stress levels. It goes without saying that $totwrk$ is likely correlated with these other factors. 
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item We would expect $\beta_5\leq0$ because we would expect those who attend better schools to earn a higher wage.
+\item I expect the other slope parameters to be positive. Each of the corresponding dependent variables are indicators of the quality of a school or the quality of a given class, and I would expect those graduating from among more "talented" peers to earn higher wages.
+\item The predicted ceteris paribus difference in salaries for schools with a median GPA different by one point is 24.8\%.
+\item The coefficient on $\ln(libvol)$ is an estimate of the elasticity of $salary$ with respect $libvol$ (or the number of volumes in the law school library). The coefficient indicates a predicted 0.095\% increase in $salary$ for a 1\% increase in the number of volumes in the law school library.
+\item Yes, I would say it's better to attend higher ranked schools. A difference in ranking of 20 is predicted to impact salary by `r .0033*100*20`\%.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item No. Because the time spent on these activities must sum to 168 hours, changing $study$ must change the time spent on at least one of the other activities.
+\item This model violates the no perfect collinearity assumption because the variables can be expressed perfectly as a linear combination of the other independent variables. For example, $study$ can be expressed as $168-sleep-work-leisure$. This same concept applies to all of the explanatory variables.
+\item Dropping one of the explanatory variables would alleviate the perfect collinearity issue and allow for a useful interpretation.
+\end{enumerate}
+\item Conditioning on $x$:
+\begin{enumerate}
+\item $E\left[\hat{\theta}_1\right]=E\left[\hat{\beta_1}+\hat{\beta}_2\right]=E\left[\hat{\beta_1}\right]+E\left[\hat{\beta}_2\right]=\beta_1+\beta_2=\theta_1$
+\item $$\text{Var}\left(\hat{\theta}_1\right)=\text{Var}\left(\hat{\beta}_1+\hat{\beta}_2\right)$$
+$$=\text{Var}\left(\hat{\beta}_1\right)+2\text{Cov}\left(\hat{\beta}_1,\hat{\beta}_2\right)+\text{Var}\left(\hat{\beta}_2\right)$$
+$$=\text{Var}\left(\hat{\beta}_1\right)+2\text{Corr}\left(\hat{\beta}_1,\hat{\beta}_2\right)\cdot\sqrt{\text{Var}\left(\hat{\beta}_1\right)\text{Var}\left(\hat{\beta}_2\right)}+\text{Var}\left(\hat{\beta}_2\right)$$
+\end{enumerate}
+\item Of the provided options, only "(ii) Omitting an important variable" can cause OLS estimators to be biased. Heteroskedasticity and multicollinearity have "negative" implications on the variance of the OLS estimators but do not cause OLS estimators to be biased.
+\item Using intuition, $\beta_1$ and $\beta_2$ are likely positive as one would expect more trained and able workers are more productive. If $avgtrain$ and $avgabil$ are negatively correlated, we can derive the bias in $\tilde{\beta}_1$ as$$\text{Bias}\left(\tilde{\beta}_1\right)=\beta_1+\tilde{\delta}_1\beta_2-\beta_1=\tilde{\delta}_1\beta_2,$$which we would expect to be negative since $avgtrain$ and $avgabil$ are negatively correlated (i.e., $\tilde{\delta}_1<0$) and $\beta_2$ is likely positive.
+\item 
+\begin{enumerate}
+\item $\beta_1$ is likely negative because more pollution in a community should lead to lower house prices on average. $\beta_2$ is likely positive as more rooms in a house commands higher house prices on average. $\beta_1$ is the elasticity of the median housing price in a community with respect to the amount of pollution in a community.
+\item $\ln(nox)$ and $rooms$ may be negatively correlated because people may choose to build homes with more rooms where there is less pollution. For example, families with children need more rooms and would prefer to be in an area with cleaner air. If there is negative correlation between $\ln(nox)$ and $rooms$, then $\text{Bias}\left(\tilde{\beta}_1\right)=\beta_1+\tilde{\delta}_1\beta_2-\beta_1=\tilde{\delta}_1\beta_2<0$, meaning the simple regression estimator of $\beta_1$ will produce a downward biased estimator.
+\item Yes, this is what we would have expected since the estimated elasticity in the simple regression model is less than that of the multiple regression model. However, this does not necessarily mean that -.718 is definitely closer to the true elasticity than -1.043. It simply means that we expect the method by which the multiple regression coefficient was produced to be closer to the true elasticity.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item If $x_1$ is highly correlated with $x_2$ and $x_3$ in the sample, and $x_2$ and $x_3$ have large partial effects on $y$, I would expect $\tilde{\beta}_1$ and $\hat{\beta}_1$ to be very different. Solely looking at the case of omitting $x_2$, we can derived the bias in $\tilde{\beta}_1$ as $\text{Bias}\left(\tilde{\beta}_1\right)=\beta_1+\tilde{\delta}_1\beta_2-\beta_1=\tilde{\delta}_1\beta_2$. A large correlation between $x_1$ and $x_2$ indicate $\tilde{\delta}_1$ should be relatively large, and $x_2$ having a large partial effect on $y$ indicates $\beta_2$ is large. Thus, we can conclude the bias in $\tilde{\beta}_1$ should be large. Since we know (under the G-M assumptions) that $\hat{\beta}_1$ is unbiased, I would expect the estimates produced by the separate estimators to be very different.
+\item If $x_1$ is almost uncorrelated with $x_2$ and $x_3$ but $x_2$ and $x_3$ are highly correlated, I would expect $\tilde{\beta}_1$ to be very similar to $\hat{\beta}_1$. A large correlation between $x_2$ and $x_3$ doesn't massively impact the bias in $\tilde{\beta}_1$. Looking at part (a), we derived the bias in $\tilde{\beta}_1$ as $\tilde{\delta}_1\beta_2$ when the bias from omitting $x_3$ is ignored. If $x_1$ is almost uncorrelated with $x_2$ in the population, it's likely $x_1$ is almost uncorrelated with $x_2$ in the sample and thus $\tilde{\delta}_1$ should be quite small and hence the bias in $\tilde{\beta}_1$ should be quite small. Again, since we know (under the G-M assumptions) that $\hat{\beta}_1$ is unbiased, I would expect the estimates produced by the separate estimators to be very similar.
+\item A large correlation between $x_2$ and $x_3$ means we're likely to experience a "high" level of multicollinearity in our model. Additionally, since $x_2$ and $x_3$ have small partial effects on $y$, omitting these variables from the model should not lead to a large increase in the sum of squared residuals. Altogether, we would expect $\text{se}\left(\tilde{\beta}_1\right)$ to be smaller than $\text{se}\left(\hat{\beta}_1\right)$.
+\item A small correlation between $x_2$ and $x_3$ means we're likely to experience a "low" level of multicollinearity in our model. Additionally, since $x_2$ and $x_3$ have large partial effects on $y$, omitting these variables from the model will likely lead to a large increase in the sum of squared residuals. Altogether, we would expect $\text{se}\left(\hat{\beta}_1\right)$ to be smaller than $\text{se}\left(\tilde{\beta}_1\right)$.
+\end{enumerate}
+\item $$\tilde{\beta}_1=\frac{\sum_{i=1}^{n}\hat{r}_{i1}y_i}{\sum_{i=1}^{n}\hat{r}_{i1}^2}$$
+$$=\frac{\sum_{i=1}^{n}\hat{r}_{i1}\left(\beta_0+\beta_1x_{i1}+\beta_2x_{i2}+\beta_3x_{i3}+u_i\right)}{\sum_{i=1}^{n}\hat{r}_{i1}^2}$$
+$$=\frac{\beta_0\sum_{i=1}^{n}\hat{r}_{i1}+\beta_1\sum_{i=1}^{n}\hat{r}_{i1}x_{i1}+\beta_2\sum_{i=1}^{n}\hat{r}_{i1}x_{i2}+\beta_3\sum_{i=1}^{n}\hat{r}_{i1}x_{i3}+\sum_{i=1}^{n}\hat{r}_{i1}u_i}{\sum_{i=1}^{n}\hat{r}_{i1}^2}$$
+$$=\frac{\beta_0\cdot 0+\beta_1\sum_{i=1}^{n}\hat{r}_{i1}\left(\hat{r}_{i1}+\hat{x}_{i1}\right)+\beta_2\cdot 0+\beta_3\sum_{i=1}^{n}\hat{r}_{i1}x_{i3}+\sum_{i=1}^{n}\hat{r}_{i1}u_i}{\sum_{i=1}^{n}\hat{r}_{i1}^2}$$
+$$=\frac{\beta_1\sum_{i=1}^{n}\hat{r}_{i1}^2+\beta_1\sum_{i=1}^{n}\hat{r}_{i1}\hat{x}_{i1}+\beta_3\sum_{i=1}^{n}\hat{r}_{i1}x_{i3}+\sum_{i=1}^{n}\hat{r}_{i1}u_i}{\sum_{i=1}^{n}\hat{r}_{i1}^2}$$
+$$=\beta_1+\frac{\beta_1\sum_{i=1}^{n}\hat{r}_{i1}\left(\hat{\gamma}_0+\hat{\gamma}_1x_{i2}\right)+\beta_3\sum_{i=1}^{n}\hat{r}_{i1}x_{i3}+\sum_{i=1}^{n}\hat{r}_{i1}u_i}{\sum_{i=1}^{n}\hat{r}_{i1}^2}$$
+$$=\beta_1+\frac{\beta_1\cdot 0+\beta_3\sum_{i=1}^{n}\hat{r}_{i1}x_{i3}+\sum_{i=1}^{n}\hat{r}_{i1}u_i}{\sum_{i=1}^{n}\hat{r}_{i1}^2}$$
+$$=\beta_1+\frac{\beta_3\sum_{i=1}^{n}\hat{r}_{i1}x_{i3}+\sum_{i=1}^{n}\hat{r}_{i1}u_i}{\sum_{i=1}^{n}\hat{r}_{i1}^2}$$
+Thus,$$E\left[\tilde{\beta}_1\middle|x\right]=E\left[\beta_1+\frac{\beta_3\sum_{i=1}^{n}\hat{r}_{i1}x_{i3}+\sum_{i=1}^{n}\hat{r}_{i1}u_i}{\sum_{i=1}^{n}\hat{r}_{i1}^2}\middle|x\right]$$
+$$=\beta_1+\frac{1}{\sum_{i=1}^{n}\hat{r}_{i1}^2}E\left[\beta_3\sum_{i=1}^{n}\hat{r}_{i1}x_{i3}+\sum_{i=1}^{n}\hat{r}_{i1}u_i\middle|x\right]$$
+$$=\beta_1+\frac{1}{\sum_{i=1}^{n}\hat{r}_{i1}^2}\Bigg\{\beta_3\sum_{i=1}^{n}E\left[\hat{r}_{i1}x_{i3}\middle|x\right]+\sum_{i=1}^{n}E\left[\hat{r}_{i1}u_i\middle|x\right]\Bigg\}$$
+$$=\beta_1+\frac{1}{\sum_{i=1}^{n}\hat{r}_{i1}^2}\Bigg\{\beta_3\sum_{i=1}^{n}\hat{r}_{i1}x_{i3}+\sum_{i=1}^{n}\hat{r}_{i1}E\left[u_i\middle|x\right]\Bigg\}$$
+$$=\beta_1+\beta_3\frac{\sum_{i=1}^{n}\hat{r}_{i1}x_{i3}}{\sum_{i=1}^{n}\hat{r}_{i1}^2}$$
+\item 
+\begin{enumerate}
+\item We must omit one of the tax share variables from the equation to avoid violating the no perfect collinearity assumption since the four shares add up to one.
+\item $\beta_1$ is the constant partial effect of $share_P$ on $growth$. By itself, $\beta_1$ doesn't have much meaning because increasing a non-zero proportion by one has no meaning; however, $\beta_1/100$ can be interpreted as the partial effect of increasing the share of property taxes in total tax revenue by 1 percentage point on $growth$.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item $\tilde{\beta}_1$ is linear because it can be expressed in the form $\tilde{\beta}_1=\sum_{i=1}^{n}w_{i1}y_i$, where $w_{i1}=\frac{z_i-\bar{z}}{\sum_{i=1}^{n}\left(z_i-\bar{z}\right)x_i}$. $\tilde{\beta}_1$ can be narrowed down to
+$$\tilde{\beta}_1=\frac{\sum_{i=1}^{n}\left(z_i-\bar{z}\right)y_i}{\sum_{i=1}^{n}\left(z_i-\bar{z}\right)x_i}$$
+$$=\frac{\sum_{i=1}^{n}\left(z_i-\bar{z}\right)\left(\beta_0+\beta_1x_i+u_i\right)}{\sum_{i=1}^{n}\left(z_i-\bar{z}\right)x_i}$$
+$$=\frac{\beta_0\sum_{i=1}^{n}\left(z_i-\bar{z}\right)+\beta_1\sum_{i=1}^{n}\left(z_i-\bar{z}\right)x_i+\sum_{i=1}^{n}\left(z_i-\bar{z}\right)u_i}{\sum_{i=1}^{n}\left(z_i-\bar{z}\right)x_i}$$
+$$=\beta_1+\frac{\sum_{i=1}^{n}\left(z_i-\bar{z}\right)u_i}{\sum_{i=1}^{n}\left(z_i-\bar{z}\right)x_i}$$
+Taking the conditional expectation:
+$$E\left[\tilde{\beta}_1\middle|x\right]=E\left[\beta_1+\frac{\sum_{i=1}^{n}\left(z_i-\bar{z}\right)u_i}{\sum_{i=1}^{n}\left(z_i-\bar{z}\right)x_i}\middle|x\right]$$
+$$=\beta_1+\frac{1}{\sum_{i=1}^{n}\left(z_i-\bar{z}\right)x_i}\sum_{i=1}^{n}E\left[\left(z_i-\bar{z}\right)u_i\middle|x\right]$$
+$$=\beta_1+\frac{1}{\sum_{i=1}^{n}\left(z_i-\bar{z}\right)x_i}\sum_{i=1}^{n}\left(z_i-\bar{z}\right)E\left[u_i\middle|x\right]$$
+$$=\beta_1+\frac{1}{\sum_{i=1}^{n}\left(z_i-\bar{z}\right)x_i}\sum_{i=1}^{n}\left(z_i-\bar{z}\right)\cdot 0=\beta_1$$
+\item Using the previous derivation,
+$$\text{Var}\left(\tilde{\beta}_1\middle|x\right)=\text{Var}\left(\beta_1+\frac{\sum_{i=1}^{n}\left(z_i-\bar{z}\right)u_i}{\sum_{i=1}^{n}\left(z_i-\bar{z}\right)x_i}\middle|x\right)$$
+$$=\frac{1}{\left(\sum_{i=1}^{n}\left(z_i-\bar{z}\right)x_i\right)^2}\text{Var}\left(\sum_{i=1}^{n}\left(z_i-\bar{z}\right)u_i\middle|x\right)$$
+$$=\frac{1}{\left(\sum_{i=1}^{n}\left(z_i-\bar{z}\right)x_i\right)^2}\sum_{i=1}^{n}\text{Var}\left(\left(z_i-\bar{z}\right)u_i\middle|x\right)$$
+$$=\frac{1}{\left(\sum_{i=1}^{n}\left(z_i-\bar{z}\right)x_i\right)^2}\sum_{i=1}^{n}\left(z_i-\bar{z}\right)^2\text{Var}\left(u_i\middle|x\right)$$
+$$=\frac{\sigma^2\left(\sum_{i=1}^{n}\left(z_i-\bar{z}\right)^2\right)}{\left(\sum_{i=1}^{n}\left(z_i-\bar{z}\right)x_i\right)^2}$$
+\item Under the G-M assumptions,$$\text{Var}\left(\hat{\beta}_1\middle|x\right)=\frac{\sigma^2}{SST_x}$$Thus, we must show
+$$\frac{\sigma^2}{SST_x}\leq \frac{\sigma^2\left(\sum_{i=1}^{n}\left(z_i-\bar{z}\right)^2\right)}{\left(\sum_{i=1}^{n}\left(z_i-\bar{z}\right)x_i\right)^2}$$
+$$\to\frac{1}{SST_x}\leq \frac{\sum_{i=1}^{n}\left(z_i-\bar{z}\right)^2}{\left(\sum_{i=1}^{n}\left(z_i-\bar{z}\right)x_i\right)^2}$$
+$$\to\frac{1}{SST_x}\leq \frac{\sum_{i=1}^{n}\left(z_i-\bar{z}\right)^2}{\left(\sum_{i=1}^{n}\left(z_i-\bar{z}\right)\left(x_i-\bar{x}\right)\right)^2}$$
+From the Cauchy-Schwartz inequality, we know that $\left(\sum_{i=1}^{n}\left(z_i-\bar{z}\right)\left(x_i-\bar{x}\right)\right)^2\leq\sum_{i=1}^{n}\left(z_i-\bar{z}\right)^2\sum_{i=1}^{n}\left(x_i-\bar{x}\right)^2$
+
+$$\to\frac{1}{SST_x}\leq \frac{\sum_{i=1}^{n}\left(z_i-\bar{z}\right)^2}{\sum_{i=1}^{n}\left(z_i-\bar{z}\right)^2\sum_{i=1}^{n}\left(x_i-\bar{x}\right)^2}$$
+$$\to\frac{1}{SST_x}\leq \frac{1}{SST_x}\blacksquare$$
+
+\end{enumerate}
+\item The standard error of $\tilde{\beta}_1$ can be rewritten as:
+$$\text{se}\left(\tilde{\beta}_1\right)=\frac{\tilde{\sigma}}{\sqrt{SST_1}}=\sqrt{\frac{\sfrac{\sum_{i=1}^{n}\tilde{u}_i^2}{n-2}}{\sum_{i=1}^{n}\left(x_{i1}-\bar{x}_1\right)^2}}$$
+Similarly the standard error of $\hat{\beta}_1$ can be rewritten as:
+$$\text{se}\left(\hat{\beta}_1\right)=\frac{\hat{\sigma}}{\sqrt{SST_1}}\cdot\sqrt{\text{VIF}_1}=\sqrt{\frac{\sfrac{\sum_{i=1}^{n}\hat{u}_i^2}{n-3}}{\left(1-R_1^2\right)\sum_{i=1}^{n}\left(x_{i1}-\bar{x}_1^2\right)}}$$
+Thus, for a large sample size, the two important factors in determining the size of one standard error to the other is the sums of the squared residuals and the magnitude of $R_1^2$. If $x_2$ does not have a large partial effect on $y$ but is highly correlated with $x_1$, we would expect $\text{se}\left(\tilde{\beta}_1\right)<\text{se}\left(\hat{\beta}_1\right)$. On the other hand, if $x_2$ has a large partial effect on $y$ but has a small correlation with $x_1$, we would expect $\text{se}\left(\tilde{\beta}_1\right)>\text{se}\left(\hat{\beta}_1\right)$.
+\item 
+\begin{enumerate}
+\item There are 351 degrees of freedom in the first regression and 350 in the second regression. The SER is smaller in the second regression because the SSR is `r 326.196-198.475` smaller than that of the first regression, which outweighs the loss of an extra degree of freedom.
+\item A sample correlation coefficient of about 0.487 between $years$ and $rbisyr$ makes sense because those who bat more runs in tend to better players, and better players tend to play in the major leagues longer. The variance inflation factor for the slope coefficients in the multiple regression is $\frac{1}{1-0.487^2}\approx$`r 1/(1-.487^2)`. Personally, I would say there is a moderate level of collinearity between $years$ and $rbisyr$.
+\item The additional SSR in the first regression to that of the second regression is `r 326.196-198.475`, which outweighs the "cost" induced from the collinearity between $years$ and $rbisyr$.
+\end{enumerate}
+\item The sample size is smaller when $age$ is added to the equation, which means it's no longer guaranteed that the $R^2$ increases by adding an additional explanatory variable to the equation.
+\item The estimated percentage change in $wage$ from getting one more year of schooling is 9.4\%.
+\end{enumerate}
+
+### Computer Exercises
+
+```{r Chapter 3 Computer Exercise 1,echo=TRUE,include=TRUE,comment=NA}
+#i
+#beta 2 is likely positive
+
+#ii
+#Yes, cigs and faminc are likely correlated
+#They may be negatively correlated because one may expect
+#families who smoke more to earn less
+#On the other hand, they may be positively correlated
+#since wealthier families can afford more cigarettes
+
+#iii
+summary(lm(bwght ~ cigs + faminc, data = bwght))
+summary(lm(bwght ~ cigs, data = bwght))
+```
+
+```{r Chapter 3 Computer Exercise 2,echo=TRUE,include=TRUE,comment=NA}
+lm1 <- lm(price ~ sqrft + bdrms, data = hprice1)
+#i
+lm1
+
+#ii
+lm1$coefficients[3]*1000
+
+#iii
+(lm1$coefficients[3] + lm1$coefficients[2]*140)*1000
+
+#iv
+100*summary(lm1)$r.squared
+
+#v
+lm1$fitted.values[1]*1000
+
+#vi
+lm1$residuals[1]*1000
+#This suggests the buyer underpaid for the house
+
+rm(lm1)
+```
+
+```{r Chapter 3 Computer Exercise 3,echo=TRUE,include=TRUE,comment=NA}
+#i
+lm(lsalary ~ lsales + lmktval, data = ceosal2)
+
+#ii
+lm2 <- lm(lsalary ~ lsales + lmktval + profits, data = ceosal2)
+#profits cannot be in logarithmic form because of negative profits
+lm2
+summary(lm2)$r.squared
+
+#iii
+lm3 <- lm(lsalary ~ lsales + lmktval + profits + ceoten, data = ceosal2)
+lm3$coefficients[5] * 100
+
+#iv
+cor(ceosal2$lmktval, ceosal2$profits)
+#This tells us the OLS estimators may have large variances
+
+rm(lm2,lm3)
+```
+
+```{r Chapter 3 Computer Exercise 4,echo=TRUE,include=TRUE,comment=NA}
+#i
+#atndrte
+min(attend$atndrte)
+max(attend$atndrte)
+mean(attend$atndrte)
+#priGPA
+min(attend$priGPA)
+max(attend$priGPA)
+mean(attend$priGPA)
+#ACT
+min(attend$ACT)
+max(attend$ACT)
+mean(attend$ACT)
+
+#ii
+lm1 <- lm(atndrte ~ priGPA + ACT, data = attend)
+lm1
+#The intercept indicates a predicted attendance rate of 75.7%
+#for a student whose prior GPA is zero and ACT score is zero
+#This clearly doesn't have much meaning
+
+#iii
+#The coefficient on priGPA indicates a predicted 17.3 percentage
+#points higher attendance rate for every point increase in prior GPA
+#The coefficient on ACT indicates a predicted 1.7 percentage
+#points lower attendance rate for every additional point on the ACT
+#The negative slope coefficient on ACT is a little surprising
+
+
+#iv
+unname(lm1$coefficients[1]+lm1$coefficients[2]*3.65+lm1$coefficients[3]*20)
+sum(near(attend$priGPA,3.65,.001) & attend$ACT==20)
+
+#v
+unname(lm1$coefficients[2]+lm1$coefficients[3]*-5)
+
+rm(lm1)
+```
+
+```{r Chapter 3 Computer Exercise 5,echo=TRUE,include=TRUE,comment=NA}
+lm1 <- lm(educ ~ exper + tenure, data = wage1)
+lm(lwage ~ lm1$residuals, data = wage1)
+
+lm(lwage ~ educ + exper + tenure, data = wage1)
+
+rm(lm1)
+```
+
+```{r Chapter 3 Computer Exercise 6,echo=TRUE,include=TRUE,comment=NA}
+#i
+lm1 <- lm(IQ ~ educ, data = wage2)
+lm1$coefficients[2]
+
+#ii
+lm2 <- lm(lwage ~ educ, data = wage2)
+lm2$coefficients[2]
+
+#iii
+lm3 <- lm(lwage ~ educ + IQ, data = wage2)
+lm3$coefficients[2]
+lm3$coefficients[3]
+
+#iv
+unname(near(lm2$coefficients[2],lm3$coefficients[2] + lm3$coefficients[3] * lm1$coefficients[2], .001))
+
+rm(lm1,lm2,lm3)
+```
+
+```{r Chapter 3 Computer Exercise 7,echo=TRUE,include=TRUE,comment=NA}
+#i
+summary(lm(math10 ~ lexpend + lnchprg, data = meap93))
+
+#ii
+#The intercept predicts a pass rate when log(expend) and lnchprg=0
+#This doesn't make sense though because setting log(expend)=0
+#is the same as setting expend=1
+
+#iii
+lm(math10 ~ lexpend, data = meap93)
+#The estimated spending effect is now larger
+
+#iv
+cor(meap93$lexpend, meap93$lnchprg)
+
+#v
+#The result in part iv indicates a negative correlation between
+#spending and the lunch program. Additionally, part (i) shows a
+#negative correlation between the lunch program and the pass rate
+#Thus, the simple regression coefficient likely overstates the
+#spending effect as shown by the difference in the coefficient estimates
+```
+
+```{r Chapter 3 Computer Exercise 8,echo=TRUE,include=TRUE,comment=NA}
+#i
+#prpblck
+mean(discrim$prpblck, na.rm = T)
+sd(discrim$prpblck, na.rm = T)
+#income
+mean(discrim$income, na.rm = T)
+sd(discrim$income, na.rm = T)
+#prpblck is a proportion
+#income is measured in dollars
+
+#ii
+summary(lm(psoda ~ prpblck + income, data = discrim))
+#The coefficient on prpblck indicates a predicted increase
+#in the price of soda by about 11 cents for a 100 percentage
+#point increase in the proportion of black citizens
+
+#iii
+lm(psoda ~ prpblck, data = discrim)
+#The discrimination effect is larger when you control for income
+
+#iv
+lm(lpsoda ~ prpblck + lincome, data = discrim)
+#If prpblck increases by .20, the estimated percentage change in
+#psoda is 2.4316%
+
+#v
+lm(lpsoda ~ prpblck + lincome + prppov, data = discrim)
+#The coefficent on prpblck falls
+
+#vi
+cor(discrim$lincome, discrim$prppov, use = "pairwise.complete.obs")
+#Yes, I would expect a strong negative correlation between income
+#and the proportion of impoverished citizens
+
+#vii
+#The statement displays a misunderstanding of multicollinearity
+#Adding both to the regression may cause the variances of the estimators
+#to be large, but it may also cause the variances to fall. On the other
+#hand, including both reduces the amount of bias in the estimators
+```
+
+```{r Chapter 3 Computer Exercise 9,echo=TRUE,include=TRUE,comment=NA}
+#i
+summary(lm(gift ~ mailsyear + giftlast + propresp, data = charity))
+summary(lm(gift ~ mailsyear, data = charity))
+#The R-squared increases from about .01 to about .08
+
+#ii
+#The multiple regression equation predicts one more mailing per year
+#increases gifts by 2.17 guilders.
+#The simple regression equation predicts one more mailing per year
+#increases gifts by 2.65 guilders, a larger prediction.
+
+#iii
+#Because propresp is a proportion and thus a 100 percentage point
+#increase offers little meaning (unless starting at zero), we can
+#instead interpret the coefficient as a predicted increase in gifts
+#by .15358605 guilders for every percentage point increase in propresp
+
+#iv
+lm(gift ~ mailsyear + giftlast + propresp + avggift, data = charity)
+#The coefficient on mailsyear falls from 2.166259 to 1.2012
+
+#v
+#The coefficient on giftlast falls from 0.005927 to -0.2609
+#Clearly, controlling for the average gift size, it's apparent that
+#the current gift amount and the most recent gift amount are negatively
+#correlated
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
