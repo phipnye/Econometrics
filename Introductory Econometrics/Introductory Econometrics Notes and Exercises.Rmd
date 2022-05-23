@@ -59,7 +59,7 @@ The \textbf{elasticity} of $y$ with respect to $x$ equals
 $$\frac{\%\Delta y}{\%\Delta x}=\frac{(y_1-y_0)/y_0}{(x_1-x_0)/x_0}=\frac{\Delta y/y_0}{\Delta x /x_0}=\frac{\Delta y}{\Delta x}\cdot\frac{x_0}{y_0}$$
 Defining a linear model $y=\beta_0+\beta_1 x$, the elasticity of $y$ with respect to $x$ equals
 $$\frac{\%\Delta y}{\%\Delta x}=\frac{\Delta y/y}{\Delta x /x}=\frac{\Delta y}{\Delta x}\cdot\frac{x}{y}=\frac{\beta_1 \Delta x}{\Delta x}\cdot\frac{x}{\beta_0+\beta_1 x}=\beta_1\cdot\frac{x}{\beta_0+\beta_1 x}\approx\frac{\Delta\ln(y)}{\Delta\ln(x)}$$
-If we use the above approximation for both $x$ and $y$, then the elasticity is approximately equal to $\frac{\ln(y)}{\ln(x)}$. Thus, a \textbf{constant elasticity model} is approximated by
+If we use the above approximation for both $x$ and $y$, then the elasticity is approximately equal to $\frac{\Delta\ln(y)}{\Delta\ln(x)}$. Thus, a \textbf{constant elasticity model} is approximated by
 $$\ln(y)=\beta_0+\beta_1\ln(x)$$ where $\beta_1$ is the approximate elasticity of $y$ with respect to $x$.
 
 A \textbf{semi-elasticity model} approximates the percentage change in $y$ with respect to a unit change in $x$ and takes the form $$\ln(y)=\beta_0+\beta_1 x$$ where $\beta_1$ is the semi-elasticity of $y$ with respect to $x$. In other words, $\%\Delta y = 100\beta_1\Delta x \to \beta_1\approx\frac{\%\Delta y}{100\Delta x}$.
@@ -120,10 +120,10 @@ ggplot(mapping = aes(x=distance,y=missed))+
 \end{enumerate}
 \item 
 \begin{enumerate}
-\item \$`r round(exp(10.6 + .027 * 0),2)`
+\item \$ `r round(exp(10.6 + .027 * 0),2)`
 
-\$`r format(round(exp(10.6 + .027 * 5),2), nsmall=2L)`
-\item $\%\Delta\text{salary}=100(.027)(5)=$`r .027 * 500`\%
+\$ `r format(round(exp(10.6 + .027 * 5),2), nsmall=2L)`
+\item $\%\Delta\text{salary}=100(.027)(5)=$ `r .027 * 500`\%
 \item `r ((exp(10.6 + .027 * 5)-exp(10.6))/(exp(10.6))-.135)/.135 * 100`\% error
 \end{enumerate}
 \item The intercept indicates that, with no sales tax, the proportionate growth in employment would be .043 units. The slope indicates that for every unit increase in sales tax, we would expect the proportionate growth in employment to decrease by .78 units.
@@ -177,7 +177,7 @@ $$=\frac{2\beta_0+ \beta_1 (x_1+x_2)}{2}$$
 $$=\beta_0+\beta_1 \frac{(x_1+x_2)}{2}=\beta_0+\beta_1 \bar{x}$$
 \item $$\bar{y}=\frac{\sum_{i=1}^{n}y_i}{n}=\frac{\sum_{i=1}^{n}\beta_0+\beta_1 x_i}{n}$$
 $$=\frac{n\beta_0+ \beta_1 \sum_{i=1}^{n}x_i}{n}$$
-$$=\beta_0+\beta_1 \frac{\sum_{i=1}^{n}x_i}{n}=\beta_0+\beta_1 \bar{x}$$
+$$=\beta_0+\beta_1 \frac{n\bar{x}}{n}=\beta_0+\beta_1 \bar{x}$$
 \end{enumerate}
 \item 
 \begin{enumerate}
@@ -190,7 +190,7 @@ $$=w_1\bar{x_1}+=w_2\bar{x_2}$$
 \end{enumerate}
 \item 
 \begin{enumerate}
-\item No, take the sample $\{x_1,x_2\}=\{1,2\}$. Then,
+\item No, take the sample $\{x_1,x_2\}=\{2,2\}$. Then,
 $$\sum_{i=1}^{n}\frac{1}{x_i}=\frac{1}{2}+\frac{1}{2}=1$$ while $$\frac{1}{\sum_{i=1}^{n}x_i}=\frac{1}{2+2}=\frac{1}{4}$$
 \item No, see part (a) where $x_i = 2\ \forall\ i$.
 \end{enumerate}
@@ -310,7 +310,7 @@ The fact that the covariance depends on units of measurement is a deficiency tha
 
 ### Conditional Expectation
 
-The \textbf{conditional expectation} of a random variable is the expected or average value of one random variable, called the dependent or explained variable, that depends on the values of one or more other variables, called the independent or explanatory variables. When $Y$ is a discrete random variable $$E[Y|x]=\sum_{i=1}^{n}y_i f_{Y|x}(y_i|x)$$When $Y$ is a continuous random variable $$E[Y|x]=\int_{-\infty}^{\infty}y_i f_{Y|x}(y_i|x)dy$$
+The \textbf{conditional expectation} of a random variable is the expected or average value of one random variable, called the dependent or explained variable, that depends on the values of one or more other variables, called the independent or explanatory variables. When $Y$ is a discrete random variable $$E[Y|x]=\sum_{i=1}^{n}y_i f_{Y|X}(y_i|x)$$When $Y$ is a continuous random variable $$E[Y|x]=\int_{-\infty}^{\infty}y_i f_{Y|X}(y_i|x)dy$$
 \newpage
 \underline{Conditional Expecation Properties}
 \begin{enumerate}
@@ -324,7 +324,7 @@ The \textbf{conditional expectation} of a random variable is the expected or ave
 \end{enumerate}
 
 ### Conditional Variance
-Given random variables $X$ and $Y$, the variance of $Y$, conditional on $X = x$, is simply the variance associated with the conditional distribution of $Y$, given $X = x:E[[Y-E[Y|x]]^2|x]$. The formula can be rewritten as $$\text{Var}(Y|X=x)=E[Y^2|x]-E[Y|x]^2$$
+Given random variables $X$ and $Y$, the variance of $Y$, conditional on $X = x$, is simply the variance associated with the conditional distribution of $Y$, given $X = x:E[\left(Y-E[Y|x]\right)^2|x]$. The formula can be rewritten as $$\text{Var}(Y|X=x)=E[Y^2|x]-E[Y|x]^2$$
 
 \underline{Conditional Variance Properties}
 \begin{enumerate}
@@ -333,7 +333,7 @@ Given random variables $X$ and $Y$, the variance of $Y$, conditional on $X = x$,
 
 ### Normal Distribution
 
-A \textbf{normal random variable} is a continuous random variable that can take on any value. Its probability density function has the familiar bell-shaped graph and can be written as $$f(x)=\frac{1}{\sigma\sqrt{2\pi}}exp[-(x-\mu)^2/2\sigma^2],\ -\infty<x<\infty$$ We say that $X$ has a \textbf{normal distribution} with expected value $\mu$ and variance $\sigma^2$, written as $X\sim\mathcal{N}(\mu,\sigma^2)$.Because the normal distribution is symmetric about $\mu$, $\mu$ is also the median of X. The normal distribution is also sometimes called the Gaussian distribution after Carl Friedrich Gauss.
+A \textbf{normal random variable} is a continuous random variable that can take on any value. Its probability density function has the familiar bell-shaped graph and can be written as $$f(x)=\frac{1}{\sigma\sqrt{2\pi}}exp[-(x-\mu)^2/2\sigma^2],\ -\infty<x<\infty$$ We say that $X$ has a \textbf{normal distribution} with expected value $\mu$ and variance $\sigma^2$, written as $X\sim\mathcal{N}(\mu,\sigma^2)$.  Because the normal distribution is symmetric about $\mu$, $\mu$ is also the median of X. The normal distribution is also sometimes called the Gaussian distribution after Carl Friedrich Gauss.
 
 One special case of the normal distribution is the \textbf{standard normal distribution} where the mean is zero and the variance is unity. If a random variable $Z$ has a Normal(0,1) distribution, then we say it has a standard normal distribution, and its pdf is given by $$\phi(z)=\frac{1}{\sqrt{2\pi}}exp(-z^2/2),\ -\infty<z<\infty$$
 
@@ -351,7 +351,7 @@ The chi-square distribution is obtained directly from independent, standard norm
 
 ### t Distribution
 
-A \textbf{t distribution} is obtained from a standard normal and a chi-square random variable. Let Z have a standard normal distribution and let X have a chi-square distribution with $n$ degrees of freedom. Further, assume that $Z$ and $X$ are independent. Then, the random variable $$T=\frac{Z}{\sqrt{X/n}}$$has a t distribution with $n$ degrees of freedom. This is denoted by $T\sim t_n$ where $n$ comes from the degrees of freedom of the chi-square random variable in the denominator. The pdf of the t distribution has a shape similar to that of the standard normal distribution (maintaining a zero expected value), except that it is more spread out (with a variance of $n/(n-2)$ and therefore has more area in the tails. As the degrees of freedom gets large, the t distribution approaches the standard normal distribution.
+A \textbf{t distribution} is obtained from a standard normal and a chi-square random variable. Let $Z$ have a standard normal distribution and let $X$ have a chi-square distribution with $n$ degrees of freedom. Further, assume that $Z$ and $X$ are independent. Then, the random variable $$T=\frac{Z}{\sqrt{X/n}}$$has a $t$ distribution with $n$ degrees of freedom. This is denoted by $T\sim t_n$ where $n$ comes from the degrees of freedom of the chi-square random variable in the denominator. The pdf of the t distribution has a shape similar to that of the standard normal distribution (maintaining a zero expected value), except that it is more spread out (with a variance of $n/(n-2)$ and therefore has more area in the tails. As the degrees of freedom gets large, the $t$ distribution approaches the standard normal distribution.
 
 ### F Distribution
 To define an F random variable, let $X_1\sim\chi_{k_1}^2$, and $X_2\sim\chi_{k_2}^2$ and assume that $X_1$ and $X_2$ are independent. Then, the random variable $$F=\frac{X_1/k_1}{X_2/k_2}$$ has an \textbf{F distribution} with $(k_1,k_2)$ degrees of freedom. This is denoted as $F\sim F_{k_1,k_2}$
@@ -361,38 +361,38 @@ To define an F random variable, let $X_1\sim\chi_{k_1}^2$, and $X_2\sim\chi_{k_2
 \item His or her eventual SAT score is viewed as a random variable because his or her score is a variable that takes on numerical values and has an outcome determined by an experiment (the test). The test score is stochastic as it can change from day-to-day or depending on other various circumstances/conditions.
 \item 
 \begin{enumerate}
-\item $P(X\leq 6)=$`r pnorm(6, mean = 5, sd=2)`
-\item $P(X>4)=1-P(X\leq 4)=$`r 1-pnorm(4, mean = 5, sd=2)`
-\item $P(|X-5|>1)=P([X-5>1] \text{ or }[X-5<-1])=1-P(4<X<6)=1-(P(X<6)-P(X<4))=$`r 1-(pnorm(6, mean = 5, sd=2)-pnorm(4, mean = 5, sd=2))`
+\item $P(X\leq 6)=$ `r pnorm(6, mean = 5, sd=2)`
+\item $P(X>4)=1-P(X\leq 4)= $ `r 1-pnorm(4, mean = 5, sd=2)`
+\item $P(|X-5|>1)=P([X-5>1] \text{ or }[X-5<-1])=1-P(4<X<6)=1-(P(X<6)-P(X<4))=$ `r 1-(pnorm(6, mean = 5, sd=2)-pnorm(4, mean = 5, sd=2))`
 \end{enumerate}
 \item 
 \begin{enumerate}
 \item `r .5^10` or `r 100 * .5^10`\%
 \item `r .5^10 * 4170` mutual funds
-\item $P(\text{At Least One})=1-P(\text{None})=1-(1-.5^{10})^{4170}=$`r 1-(1-.5^10)^4170`
+\item $P(\text{At Least One})=1-P(\text{None})=1-(1-.5^{10})^{4170}=$ `r 1-(1-.5^10)^4170`
 
-Similarly, this equals $1-\binom{4170}{0}(.5^{10})^0(1-.5^{10})^{4170}=$`r 1-pbinom(0, 4170, .5**10)`
-\item $P(X\geq5) = 1-P(X<4)=$`r 1-pbinom(4, 4170, .5**10)`
+Similarly, this equals $1-\binom{4170}{0}(.5^{10})^0(1-.5^{10})^{4170}=$ `r 1-pbinom(0, 4170, .5**10)`
+\item $P(X\geq5) = 1-P(X<4)=$ `r 1-pbinom(4, 4170, .5**10)`
 \end{enumerate}
-\item $P(X\geq.6)=1-P(X<.6)=F(.6)=$`r 3*.6^2+2*.6^3`
+\item $P(X\geq.6)=1-P(X<.6)=F(.6)=$ `r 3*.6^2+2*.6^3`
 \item 
 \begin{enumerate}
-\item $P(\text{At least one})=1-P(\text{None})=1-\binom{12}{0}(.2)^0(.8)^{12}=$`r 1-pbinom(0,12,.2)`
-\item $P(X\geq 2)=1-P(X<1)=1-\binom{12}{1}(.2)^1(.8)^{11}=$`r 1-pbinom(1,12,.2)`
+\item $P(\text{At least one})=1-P(\text{None})=1-\binom{12}{0}(.2)^0(.8)^{12}=$ `r 1-pbinom(0,12,.2)`
+\item $P(X\geq 2)=1-P(X<1)=1-\binom{12}{1}(.2)^1(.8)^{11}=$ `r 1-pbinom(1,12,.2)`
 \end{enumerate}
 \item $E[X]=\int_{0}^{3}\frac{x^2}{9}xdx=\frac{1}{9}\int_{0}^{3}x^3dx=\frac{1}{9}\left[\frac{x^4}{4}\right]_{0}^{3}=\frac{81}{36}=\frac{9}{4}$
-\item $E[\text{Made FTs}]=.74*8$=`r .74*8`
-\item $E[GPA]=3.5(\frac{2}{9})+3(\frac{7}{9})=\frac{28}{9}\approx$`r round(28/9,2)`
-\item $E[\text{salary}]=52.3\times1000=$\$`r 52.3*1000`
+\item $E[\text{Made FTs}]=.74*8=$ `r .74*8`
+\item $E[GPA]=3.5(\frac{2}{9})+3(\frac{7}{9})=\frac{28}{9}\approx$ `r round(28/9,2)`
+\item $E[\text{salary}]=52.3\times 1000=$ \$`r 52.3*1000`
 
-$\sigma_{\text{salary}}=|1000|\times14.6$\$`r 1000*14.6`
+$\sigma_{\text{salary}}=|1000|\times14.6=$ \$`r 1000*14.6`
 \item 
 \begin{enumerate}
-\item $E[GPA|SAT=800]=.70+.002(800)=$`r .70+.002*(800)`
+\item $E[GPA|SAT=800]=.70+.002(800)=$ `r .70+.002*(800)`
 
-$E[GPA|SAT=1400]=.70+.002(800)=$`r .70+.002*(1400)`
+$E[GPA|SAT=1400]=.70+.002(800)=$ `r .70+.002*(1400)`
 The difference in expected GPAs is fairly large, but the difference in SAT scores is also rather large. I don't feel these estimates are entirely unreasonable.
-\item $E[GPA]=E[E[GPA|SAT]]=E[.70+.002(1100)]=.70+.002(1100)=$`r .70+.002*(1100)`
+\item $E[GPA]=E[E[GPA|SAT]]=E[.70+.002(1100)]=.70+.002(1100)=$ `r .70+.002*(1100)`
 \item No, we don't know any particular student's GPA given his or her SAT score. The provided formula only allows us to derive an expected GPA given an SAT score.
 \end{enumerate}
 \item 
@@ -435,7 +435,7 @@ An estimator, $W$ of $\theta$, is an \textbf{unbiased estimator} if $$E[W]=\thet
 
 The distribution of an estimator is often called its \textbf{sampling distribution}, because this distribution describes the likelihood of various outcomes of $W$ across different random samples.
 
-If $W$ is a \textbf{biased estimator} of $\theta$, its bias is defined $$\text{Bias}(W)\equiv E[W]-\theta$$
+If $W$ is an estimator of $\theta$, its \textbf{bias} is defined $$\text{Bias}(W)\equiv E[W]-\theta$$
 
 The \textbf{sample average} is an unbiased estimator of the population variance and is defined as  $$\bar{Y}=\frac{1}{n}\sum_{i=1}^{n}Y_i$$
 
@@ -453,10 +453,10 @@ $$=\frac{1}{n-1}E\left[\sum_{i=1}^{n}Y_i^2-2\sum_{i=1}^{n}Y_i\bar{Y}+\sum_{i=1}^
 $$=\frac{1}{n-1}E\left[\sum_{i=1}^{n}Y_i^2-2\bar{Y}\sum_{i=1}^{n}Y_i+\bar{Y}\sum_{i=1}^{n}\bar{Y}\right]$$
 $$=\frac{1}{n-1}E\left[\sum_{i=1}^{n}Y_i^2-2n\bar{Y}^2+n\bar{Y}^2\right]$$
 $$=\frac{1}{n-1}\Bigg\{\sum_{i=1}^{n}E[Y_i^2]-nE[\bar{Y}^2]\Bigg\}$$
-Using the facts that $\text{Var}(\bar{Y})=\frac{\sigma_Y}{n}$ and $\sigma_Y=E[Y_i^2]-E[Y_i]^2$,
-$$=\frac{1}{n-1}\Bigg\{\sum_{i=1}^{n}\left(\sigma_Y+E[Y_i]^2\right)-n\left(\frac{\sigma_Y}{n}+E[\bar{Y}]^2\right)\Bigg\}$$
-$$=\frac{1}{n-1}\Bigg\{n\sigma_Y+n\mu_Y^2-\sigma_Y-n\mu_Y^2\Bigg\}$$
-$$=\frac{1}{n-1}\left[(n-1)\sigma_Y\right]=\sigma_Y$$
+Using the facts that $\text{Var}(\bar{Y})=\frac{\sigma_Y^2}{n}$ and $\sigma_Y^2=E[Y_i^2]-E[Y_i]^2$,
+$$=\frac{1}{n-1}\Bigg\{\sum_{i=1}^{n}\left(\sigma_Y^2+E[Y_i]^2\right)-n\left(\frac{\sigma_Y^2}{n}+E[\bar{Y}]^2\right)\Bigg\}$$
+$$=\frac{1}{n-1}\Bigg\{n\sigma_Y^2+n\mu_Y^2-\sigma_Y^2-n\mu_Y^2\Bigg\}$$
+$$=\frac{1}{n-1}\left[(n-1)\sigma_Y^2\right]=\sigma_Y^2$$
 
 The \textbf{sample covariance} is defined as $$S_{XY}=\frac{1}{n-1}\sum_{i=1}^{n}(X_i-\bar{X})(Y_i-\bar{Y})$$ and is an unbiased and consistent estimator of $\sigma_{XY}$
 
@@ -466,7 +466,7 @@ The \textbf{sample correlation coefficient} is defined as $$R_{XY}=\frac{S_{XY}}
 
 The variance of an estimator is often called its \textbf{sampling variance} because it is the variance associated with a sampling distribution. Remember, the sampling variance is not a random variable; it is a constant, but it might be unknown.
 
-An estimator, $W_1$ is \textbf{efficient} relative to $W_2$ when $\text{Var}(W_1)\leq\text{Var}(W_2)$ for all $\theta$, with strict inequality for at least one value of $\theta$.
+An estimator, $W_1$, is \textbf{efficient} relative to another estimator, $W_2$, when $\text{Var}(W_1)\leq\text{Var}(W_2)$ for all $\theta$, with strict inequality for at least one value of $\theta$.
 
 One way to compare estimators that are not necessarily unbiased is to compute the \textbf{mean squared error (MSE)} of the estimators. If $W$ is an estimator of $\theta$, then the MSE of $W$ is defined as$$\text{MSE}(W)=E[(W-\theta)^2]$$The MSE measures how far, on average, the estimator is away from $\theta$. It can be shown that $\text{MSE}(W)=\text{Var}(W)+[\text{Bias}(W)]^2$, so that $\text{MSE}(W)$ depends on the variance and bias (if any is present). This allows us to compare two estimators when one or both are biased.
 
@@ -515,7 +515,7 @@ squares, method of moments, and maximum likelihood often result in the same esti
 
 ### Confidence Intervals
 A \textbf{condidence interval} is a rule used to construct a random interval so that a certain percentage of all data sets, determined by the confidence level, yields an interval that contains the population value. Thus, a 95% confidence interval of an estimator will contain the true population value 95% of the time. Theoretically, for the sample average the 95% confidence interval can be constructed as follows: $$P\left(-1.96<\frac{\bar{Y}-\mu}{\sigma/\sqrt{n}}<1.96\right)=.95$$
-$$\to CI_{95}=[\bar{y}-1.96(\sigma/\sqrt{n}),\bar{y}+1.96(\sigma/\sqrt{n})]$$where $\mu$ is the hypothesized population mean. In practice, however, $\sigma$ is unknown and must be estimated with $s$. Unfortunately, this does not preserve the 95% level of confidence because $s$ depends on the particular sample. In other words, the random interval $[\bar{Y}\pm 1.96(S/\sqrt{n})]$ no longer contains $\mu$ with probability .95 because the constant $\sigma$ has been replaced with the random variable $S$. Thus, rather than using the standard normal distribution, we must rely on the t distribution. The t distribution arises from the fact that $$\frac{\bar{Y}-\mu}{S/\sqrt{n}}\sim t_{n-1}$$The denominator $S/\sqrt{N}$ is an estimate of the $\text{sd}(\bar{Y})$. In general, these estimators of \textbf{sampling standard deviations} are referred to as \textbf{standard errors}.
+$$\to CI_{95}=[\bar{y}-1.96(\sigma/\sqrt{n}),\bar{y}+1.96(\sigma/\sqrt{n})]$$where $\mu$ is the hypothesized population mean. In practice, however, $\sigma$ is unknown and must be estimated with $s$. Unfortunately, this does not preserve the 95% level of confidence because $s$ depends on the particular sample. In other words, the random interval $[\bar{Y}\pm 1.96(S/\sqrt{n})]$ no longer contains $\mu$ with probability .95 because the constant $\sigma$ has been replaced with the random variable $S$. Thus, rather than using the standard normal distribution, we must rely on the $t$ distribution. The $t$ distribution arises from the fact that $$\frac{\bar{Y}-\mu}{S/\sqrt{n}}\sim t_{n-1}$$The denominator $S/\sqrt{N}$ is an estimate of the $\text{sd}(\bar{Y})$. In general, these estimators of \textbf{sampling standard deviations} are referred to as \textbf{standard errors}.
 
 ### Hypothesis Testing
 
@@ -523,7 +523,7 @@ A \textbf{Type I error} is an error in which a true null hypothesis is rejected.
 
 A \textbf{Type II error} is an error in which one fails to reject a false null hypothesis.
 
-A \textbf{significance level} is the probability of Type I error, which is generally denoted $$\alpha=P(\text{Reject }H_0|H_0)$$
+A \textbf{significance level} is the probability of committing a Type I error, which is generally denoted $$\alpha=P(\text{Reject }H_0|H_0)$$
 
 A \textbf{$p$-value} is the \emph{largest} significance level at which we could carry out a test and still fail to reject the null hypothesis. Formally,$$p-\text{value}=P(T>t|H_0)=1-\Phi(t)$$where $\Phi(\cdot)$ is the standard normal cdf.
 
@@ -545,7 +545,7 @@ wage_dif <- wage_after-wage_before
 \begin{enumerate}
 \item 
 \begin{enumerate}
-\item $$E[\bar{Y}]=E[\frac{1}{4}(Y_1+Y_2+Y_3+Y_4)]=\frac{1}{4}\big\{E[Y_1]+E[Y_2]+E[Y_3]+E[Y_4]\big\}=\frac{1}{4}(4\mu)=\mu$$
+\item $$E[\bar{Y}]=E\left[\frac{1}{4}(Y_1+Y_2+Y_3+Y_4)\right]=\frac{1}{4}\big\{E[Y_1]+E[Y_2]+E[Y_3]+E[Y_4]\big\}=\frac{1}{4}(4\mu)=\mu$$
 
 $$\text{Var}(\bar{Y})=\text{Var}\left(\frac{1}{4}(Y_1+Y_2+Y_3+Y_4)\right)=\frac{1}{16}\sum_{i=1}^{4}Var(Y_i)=\frac{1}{16}\sum_{i=1}^{4}\sigma^2=\frac{\sigma^2}{4}$$
 \item $$E[W]=E\left[\frac{1}{8}Y_1+\frac{1}{8}Y_2+\frac{1}{4}Y_3+\frac{1}{2}Y_4\right]$$
@@ -586,6 +586,7 @@ $\text{bias}(W_2)=E[W_2]-\mu=\frac{\mu}{2}-\mu=\frac{-\mu}{2}$
 
 One important difference is that the bias of $W_1$ converges to 0 as $n\to\infty$, while the bias of $W_2$ is constant.
 \item $\text{plim}(W_1)=\text{plim}\left(\frac{n-1}{n}(\bar{Y})\right)=\text{plim}\left(\frac{n-1}{n}\right)\text{plim}(\bar{Y})=1\cdot\mu=\mu$
+
 $\text{plim}(W_2)=\text{plim}\left(\frac{\bar{Y}}{2}\right)=\text{plim}(\bar{Y})/\text{plim}(2)=\frac{\mu}{2}$
 
 $W_1$ is consistent.
@@ -607,9 +608,9 @@ $$=\frac{1}{\bar{X}}E[\bar{Y}|X_1,\dots,X_n]$$
 $$=\frac{1}{\bar{X}}E\left[n^{-1}\sum_{i=1}^{n}Y_i|X_1,\dots,X_n\right]$$
 $$=\frac{1}{n\bar{X}}\sum_{i=1}^{n}E[Y_i|X_1,\dots,X_n]$$
 $$=\frac{1}{n\bar{X}}\left(n\theta \bar{X}\right)=\theta$$
-\item $W_1=n^{-1}\sum_{i=1}^{n}(Y_i/X_i)=$`r W_1`
+\item $W_1=n^{-1}\sum_{i=1}^{n}(Y_i/X_i)=$ `r W_1`
 
-$W_2=\frac{\bar{Y}}{\bar{X}}=$`r W_2`
+$W_2=\frac{\bar{Y}}{\bar{X}}=$ `r W_2`
 
 Yes, they are similar.
 \end{enumerate}
@@ -622,9 +623,9 @@ Yes, they are similar.
 \begin{enumerate}
 \item $$H_0:\mu=0$$
 \item $$H_1:\mu<0$$
-\item $t=\frac{\bar{y}-\mu}{s/\sqrt{n}}=\frac{-32.8-0}{466.4/\sqrt{900}}\approx$`r -32.8/(466.4/30)`
+\item $t=\frac{\bar{y}-\mu}{s/\sqrt{n}}=\frac{-32.8-0}{466.4/\sqrt{900}}\approx$ `r -32.8/(466.4/30)`
 
-$p\approx$`r pt(-32.8/(466.4/30),899)`
+$p\approx$ `r pt(-32.8/(466.4/30),899)`
 
 We reject the null hypothesis at the 5\% level but fail to reject $H_0$ at the 1\% level.
 
@@ -634,39 +635,39 @@ We reject the null hypothesis at the 5\% level but fail to reject $H_0$ at the 1
 \end{enumerate}
 \item 
 \begin{enumerate}
-\item $CI_{95}=[$`r mean(wage_dif)-qt(.025,length(wage_dif)-1,lower.tail = F)*sd(wage_dif)/sqrt(length(wage_dif))`,`r mean(wage_dif)+qt(.025,length(wage_dif)-1,lower.tail = F)*sd(wage_dif)/sqrt(length(wage_dif))`$]$
+\item $CI_{95}=[$ `r mean(wage_dif)-qt(.025,length(wage_dif)-1,lower.tail = F)*sd(wage_dif)/sqrt(length(wage_dif))`,`r mean(wage_dif)+qt(.025,length(wage_dif)-1,lower.tail = F)*sd(wage_dif)/sqrt(length(wage_dif))`$]$
 \item $$H_0:\mu=0$$
 $$H_1:\mu>0$$
-\item $t=\frac{\bar{d}-0}{s_d/\sqrt{n}}=$`r (mean(wage_dif))/(sd(wage_dif)/sqrt(length(wage_dif)))`
+\item $t=\frac{\bar{d}-0}{s_d/\sqrt{n}}=$ `r (mean(wage_dif))/(sd(wage_dif)/sqrt(length(wage_dif)))`
 
 For a one-sided test, we would reject $H_0$ at the 5\% level but fail to reject $H_0$ at the 1\% level.
-\item $p=$`r pt((mean(wage_dif))/(sd(wage_dif)/sqrt(length(wage_dif))), length(wage_dif)-1,lower.tail=F)`
+\item $p=$ `r pt((mean(wage_dif))/(sd(wage_dif)/sqrt(length(wage_dif))), length(wage_dif)-1,lower.tail=F)`
 \end{enumerate}
 \item 
 \begin{enumerate}
-\item $\bar{Y}=\frac{188}{429}\approx$`r 188/429`
+\item $\bar{Y}=\frac{188}{429}\approx$ `r 188/429`
 \item $$\text{sd}(\bar{Y})=\frac{\sigma_\theta}{\sqrt{n}}=\sqrt{\frac{\theta(1-\theta)}{n}}$$
-\item $t=\frac{\bar{Y}-.5}{\text{se}(\bar{Y})}=\frac{\bar{Y}-.5}{\sqrt{\bar{Y}(1-\bar{Y})/n}}=$`r (188/429 - .5) / (sqrt(188/429 * (1-188/429)/429))`
+\item $t=\frac{\bar{Y}-.5}{\text{se}(\bar{Y})}=\frac{\bar{Y}-.5}{\sqrt{\bar{Y}(1-\bar{Y})/n}}=$ `r (188/429 - .5) / (sqrt(188/429 * (1-188/429)/429))`
 
-$p=$`r pt((188/429 - .5) / (sqrt(188/429 * (1-188/429)/429)),428)`
+$p=$ `r pt((188/429 - .5) / (sqrt(188/429 * (1-188/429)/429)),428)`
 
 Thus, we reject $H_0$ at the 1\% level.
 \end{enumerate}
 \item 
 \begin{enumerate}
 \item $E[X]=200(.65)=130$
-\item $\text{sd}(X)=\sqrt{|200|\times.65(1-.65)}=$`r sqrt(200*.65*.35)`
+\item $\text{sd}(X)=\sqrt{|200|\times.65(1-.65)}=$ `r sqrt(200*.65*.35)`
 \item $t=\frac{(115/200)-.65}{\sqrt{(.65)(.35)/200}}$=`r (115/200 - .65)/(sqrt(.65*.35/200))`
 
-$p=$`r pt((115/200 - .65)/(sqrt(.65*.35/200)),199)`
+$p=$ `r pt((115/200 - .65)/(sqrt(.65*.35/200)),199)`
 
 \item The value calculated in part(c) is a $p$-value which is the probability of rejecting a true null hypothesis. In the previous part, we would reject the dictator's claim at the 5% level but fail to reject the claim at the 1% level.
 \end{enumerate}
-\item $CI_{95}=\left[.394-1.96\sqrt{(.394)(1-.394)/419},.394+1.96\sqrt{(.394)(1-.394)/419}\right]=[$`r .394-1.96*sqrt(.394*(1-.394)/419)`,`r .394+1.96*sqrt(.394*(1-.394)/419)`$]$
+\item $CI_{95}=\left[.394-1.96\sqrt{(.394)(1-.394)/419},.394+1.96\sqrt{(.394)(1-.394)/419}\right]=[$ `r .394-1.96*sqrt(.394*(1-.394)/419)`,`r .394+1.96*sqrt(.394*(1-.394)/419)`$]$
 
 Based on his average up to the strike, there is not very strong evidence against $\theta = .400$, as this value is well within the 95\% confidence interval.
 
-\item $t=\frac{\bar{y}-0}{s/\sqrt{n}}=\frac{.132-0}{1.27/20}\approx$`r .132 / (1.27/20)`
+\item $t=\frac{\bar{y}-0}{s/\sqrt{n}}=\frac{.132-0}{1.27/20}\approx$ `r .132 / (1.27/20)`
 
 The difference is statistically greater than zero at the 5\% level but not at the 1\% level.
 \end{enumerate}
@@ -683,7 +684,7 @@ The difference is statistically greater than zero at the 5\% level but not at th
 
 An \textbf{empirical analysis} uses data to test a theory or to estimate a relationship.
 
-A \textbf{cross-sectional data set} consists of a sample of individuals, households, firms, cities, states, countries, or a variety of other units, taken at a given point in time. An important feature of cross-sectional data is that we can often assume that they have been obtained by \textbf{random sampling} from the underlying population. Sometimes, however, the random sampling assumption is not appropriate for a variety of reasons such as respondents' willingness to answer or sampling from units that are large relative to the population. Nevertheless, random sampling is often assumed with cross-sectional data. The analysis of cross-sectional data is closely aligned with the applied microeconomics fields, such as labor economics, state and local public finance, industrial organization, urban economics, demography, and health economics
+A \textbf{cross-sectional data set} consists of a sample of individuals, households, firms, cities, states, countries, or a variety of other units, taken at a given point in time. An important feature of cross-sectional data is that we can often assume that they have been obtained by \textbf{random sampling} from the underlying population. Sometimes, however, the random sampling assumption is not appropriate for a variety of reasons such as respondents' willingness to answer or sampling from units that are large relative to the population. Nevertheless, random sampling is often assumed with cross-sectional data. The analysis of cross-sectional data is closely aligned with the applied microeconomics fields, such as labor economics, state and local public finance, industrial organization, urban economics, demography, and health economics.
 
 A \textbf{time series data set} consists of observations on a variable or several variables over time. Unlike the arrangement of cross-sectional data, the chronological ordering of observations in a time series conveys potentially important information. A key feature of time series data that makes them more difficult to analyze than cross-sectional data is that economic observations can rarely, if ever, be assumed to be independent across time.
 
@@ -981,7 +982,7 @@ Note that the FOCs are analogous to the zero mean assumptions (using residuals i
 FOC 1 can be restated as
 $$E[\hat{u}]=0\to E[y-\hat{y}]=E[y-\hat{\beta}_0-\hat{\beta}_1x]=n^{-1}\sum_{i=1}^{n}(y-\hat{\beta}_0-\hat{\beta}_1x)=0$$
 
-And FOC 2 can be restated as:
+And FOC 2 can be restated as
 $$E[\hat{u}|x]=E[\hat{u}]\to \hat{u}\indep x\to \text{Cov}(x,\hat{u})=0\to E[x\hat{u}]-E[x]E[\hat{u}]=E[x\hat{u}]=0$$
 $$\to n^{-1}\sum_{i=1}^{n}x_i(y_i-\hat{\beta}_0-\hat{\beta}_1x_i)=0$$
 
@@ -1222,7 +1223,7 @@ invisible(gc())
 \item 
 \begin{enumerate}
 \item The intercept predicts a -124.84 dollar consumption value for a family with no annual income. The slope predicts an extra 0.853 dollars of consumption for each additional dollar of annual income. The intercept offers little meaning because you can't consume a negative amount. On the other hand, the slope coefficient signifies a positive correlation between consumption and annual income. Personally, the slope coefficient seems to large to me at first glance.
-\item The predicted consumption when family income is \$30,000 = \$`r -124.84 + 0.853*30000`.
+\item The predicted consumption when family income is \$30,000 = \$ `r -124.84 + 0.853*30000`.
 \item 
 \end{enumerate}
 \end{enumerate}
@@ -1294,8 +1295,8 @@ We've previously derived $\hat{\beta}_0=\bar{y}-\hat{\beta}_1\bar{x}$. Plugging 
 $$\tilde{\beta}_1=\frac{\sum_{i=1}^{n}\left(((c_2+x_i)-(c_2+\bar{x}))(c_1+y_i)\right)}{\sum_{i=1}^{n}\left((c_2+x_i)-(c_2+\bar{x})\right)^2}=\frac{\sum_{i=1}^{n}\left((x_i-\bar{x})(c_1+y_i)\right)}{\sum_{i=1}^{n}\left(x_i-\bar{x}\right)^2}=\frac{c_1\sum_{i=1}^{n}(x_i-\bar{x})+ \sum_{i=1}^{n}(x_i-\bar{x})y_i}{\sum_{i=1}^{n}\left(x_i-\bar{x}\right)^2}=\frac{\sum_{i=1}^{n}(x_i-\bar{x})y_i}{\sum_{i=1}^{n}\left(x_i-\bar{x}\right)^2}=\hat{\beta}_1$$
 
 Using $\hat{\beta}_0=\bar{y}-\hat{\beta}_1\bar{x}$ and plugging in the new values, $$\tilde{\beta}_0=(c_1+\bar{y})-\hat{\beta}_1(c_2+\bar{x})=\left(\bar{y}-\hat{\beta}_1\bar{x}\right)+c_1-c_2\hat{\beta}_1=\hat{\beta}_0+c_1-c_2\hat{\beta}_1$$
-\item Changing the model from $\ln(y_i)=\hat{\beta_0}+\hat{\beta_1}x_i$ to $\ln(c_1y_i)=\tilde{\beta_0}+\tilde{\beta_1}x_i$, the new model can be rewritten as:$$\ln(c_1)+\ln(y_i)=\tilde{\beta_0}+\tilde{\beta_1}x_i$$Trivially, by subtracting $\ln(c_1)$ from both sides, we see $\tilde{\beta}_0=\hat{\beta}_0+\ln(c_1)$ and $\tilde{\beta}_1=\hat{\beta}_1$.
-\item Changing the model from $y_i=\hat{\beta_0}+\hat{\beta_1}\ln(x_i)$ to $y_i=\tilde{\beta_0}+\tilde{\beta_1}\ln(c_2x_i)$, the new model can be rewritten as:$$y_i=\tilde{\beta_0}+\tilde{\beta_1}\left(\ln(c_2)+\ln(x_i)\right)$$Again, it's trivial to see that $\tilde{\beta}_0=\hat{\beta}_0-\tilde{\beta}_1\ln(c_2)=\hat{\beta}_0-\hat{\beta}_1\ln(c_2)$ and $\tilde{\beta}_1=\hat{\beta}_1$.
+\item Changing the model from $\ln(y_i)=\hat{\beta_0}+\hat{\beta_1}x_i$ to $\ln(c_1y_i)=\tilde{\beta_0}+\tilde{\beta_1}x_i$, the new model can be rewritten as$$\ln(c_1)+\ln(y_i)=\tilde{\beta_0}+\tilde{\beta_1}x_i$$Trivially, by subtracting $\ln(c_1)$ from both sides, we see $\tilde{\beta}_0=\hat{\beta}_0+\ln(c_1)$ and $\tilde{\beta}_1=\hat{\beta}_1$.
+\item Changing the model from $y_i=\hat{\beta_0}+\hat{\beta_1}\ln(x_i)$ to $y_i=\tilde{\beta_0}+\tilde{\beta_1}\ln(c_2x_i)$, the new model can be rewritten as$$y_i=\tilde{\beta_0}+\tilde{\beta_1}\left(\ln(c_2)+\ln(x_i)\right)$$Again, it's trivial to see that $\tilde{\beta}_0=\hat{\beta}_0-\tilde{\beta}_1\ln(c_2)=\hat{\beta}_0-\hat{\beta}_1\ln(c_2)$ and $\tilde{\beta}_1=\hat{\beta}_1$.
 \end{enumerate}
 \item 
 \begin{enumerate}
@@ -1389,18 +1390,18 @@ $$=(1-x_i)^2\sigma_0^2+x_i^2\sigma_1^2$$
 \item $P(\text{All }x=1 \text{ or all } x=0)=P(\text{All }x=1 \cup\text{ all } x=0)=P(\text{All }x=1)+ P(\text{ All } x=0)-P(\text{All }x=1 \cap\text{ all } x=0)=\rho^n+(1-\rho)^n-P(\emptyset)=\rho^n+(1-\rho)^n$. Because $0<\rho<1$ (and thus $0<(1-\rho)<1$),$$\lim_{n\to\infty}P(\text{All }x=1)=\lim_{n\to\infty}\rho^n=0$$Likewise,$$\lim_{n\to\infty}P(\text{All }x=0)=\lim_{n\to\infty}(1-\rho)^n=0$$
 \item n=10:
 
-$P(\text{All }x=1 \text{ or all } x=0)=P(\text{All }x=1 \cup\text{ all } x=0)=0.5^{10}+(1-0.5)^{10}=2\cdot 0.5^{10}\approx$`r 2*0.5^10`
+$P(\text{All }x=1 \text{ or all } x=0)=P(\text{All }x=1 \cup\text{ all } x=0)=0.5^{10}+(1-0.5)^{10}=2\cdot 0.5^{10}\approx$ `r 2*0.5^10`
 
 n=100
 
-$P(\text{All }x=1 \text{ or all } x=0)=P(\text{All }x=1 \cup\text{ all } x=0)=0.5^{100}+(1-0.5)^{100}=2\cdot 0.5^{100}\approx$`r 2*0.5^100`
+$P(\text{All }x=1 \text{ or all } x=0)=P(\text{All }x=1 \cup\text{ all } x=0)=0.5^{100}+(1-0.5)^{100}=2\cdot 0.5^{100}\approx$ `r 2*0.5^100`
 \item n=10:
 
-$P(\text{All }x=1 \text{ or all } x=0)=P(\text{All }x=1 \cup\text{ all } x=0)=0.9^{10}+(1-0.9)^{10}\approx$`r 0.9^10*0.1^10`
+$P(\text{All }x=1 \text{ or all } x=0)=P(\text{All }x=1 \cup\text{ all } x=0)=0.9^{10}+(1-0.9)^{10}\approx$ `r 0.9^10*0.1^10`
 
 n=100
 
-$P(\text{All }x=1 \text{ or all } x=0)=P(\text{All }x=1 \cup\text{ all } x=0)=0.9^{100}+(1-0.9)^{100}\approx$`r 0.9^100*0.1^100`
+$P(\text{All }x=1 \text{ or all } x=0)=P(\text{All }x=1 \cup\text{ all } x=0)=0.9^{100}+(1-0.9)^{100}\approx$ `r 0.9^100*0.1^100`
 \end{enumerate}
 \end{enumerate}
 
@@ -1769,7 +1770,7 @@ In multiple regression analysis \textbf{inclusion of an irrelevant variable} or 
 
 \newpage
 
-On the other hand, omitting a variable that actually belongs in the true (or population) model is called the problem of \textbf{excluding a relevant variable} or \textbf{underspecifying the model}. Looking back to the "Sample vs. Multiple Regression Estimates" section, define a model $\hat{y}=\hat{\beta}_0+\hat{\beta}_1x_1+\dots+\hat{\beta}_kx_k$ and another model $\tilde{y}=\tilde{\beta}_0+\tilde{\beta}_1x_1+\dots+\tilde{\beta}_{k-1}x_{k-1}$, then$$\tilde{\beta}_j=\hat{\beta}_j+\hat{\beta}_k\tilde{\delta}_j$$for $j=1,\dots,k-1$. Taking the conditional expectation of this value (on $x$):$$E\left[\tilde{\beta}_j\middle|x\right]=E\left[\hat{\beta}_j\middle|x\right]+E\left[\hat{\beta}_k\tilde{\delta}_j\middle|x\right]=\beta_j+\tilde{\delta}_jE\left[\hat{\beta}_k\middle|x\right]=\beta_j+\beta_k\tilde{\delta}_j,$$Thus, we can derive the \textbf{omitted variable bias} as:$$\text{Bias}\left(\tilde{\beta}_j\right)=E\left[\tilde{\beta}_j\middle|x\right]-\beta_j=\beta_j+\beta_k\tilde{\delta}_j-\beta_j=\beta_k\tilde{\delta}_j$$
+On the other hand, omitting a variable that actually belongs in the true (or population) model is called the problem of \textbf{excluding a relevant variable} or \textbf{underspecifying the model}. Looking back to the "Sample vs. Multiple Regression Estimates" section, define a model $\hat{y}=\hat{\beta}_0+\hat{\beta}_1x_1+\dots+\hat{\beta}_kx_k$ and another model $\tilde{y}=\tilde{\beta}_0+\tilde{\beta}_1x_1+\dots+\tilde{\beta}_{k-1}x_{k-1}$, then$$\tilde{\beta}_j=\hat{\beta}_j+\hat{\beta}_k\tilde{\delta}_j$$for $j=1,\dots,k-1$. Taking the conditional expectation of this value (on $x$):$$E\left[\tilde{\beta}_j\middle|x\right]=E\left[\hat{\beta}_j\middle|x\right]+E\left[\hat{\beta}_k\tilde{\delta}_j\middle|x\right]=\beta_j+\tilde{\delta}_jE\left[\hat{\beta}_k\middle|x\right]=\beta_j+\beta_k\tilde{\delta}_j,$$Thus, we can derive the \textbf{omitted variable bias} as$$\text{Bias}\left(\tilde{\beta}_j\right)=E\left[\tilde{\beta}_j\middle|x\right]-\beta_j=\beta_j+\beta_k\tilde{\delta}_j-\beta_j=\beta_k\tilde{\delta}_j$$
 
 \underline{Summary of Bias in $\tilde{\beta}_j$ when $x_k$ is Omitted}
 \begin{tabular}{|lll|}
@@ -1964,15 +1965,15 @@ $$\to\frac{1}{SST_x}\leq \frac{\sum_{i=1}^{n}\left(z_i-\bar{z}\right)^2}{\sum_{i
 $$\to\frac{1}{SST_x}\leq \frac{1}{SST_x}\blacksquare$$
 
 \end{enumerate}
-\item The standard error of $\tilde{\beta}_1$ can be rewritten as:
+\item The standard error of $\tilde{\beta}_1$ can be rewritten as
 $$\text{se}\left(\tilde{\beta}_1\right)=\frac{\tilde{\sigma}}{\sqrt{SST_1}}=\sqrt{\frac{\sfrac{\sum_{i=1}^{n}\tilde{u}_i^2}{n-2}}{\sum_{i=1}^{n}\left(x_{i1}-\bar{x}_1\right)^2}}$$
-Similarly the standard error of $\hat{\beta}_1$ can be rewritten as:
+Similarly the standard error of $\hat{\beta}_1$ can be rewritten as
 $$\text{se}\left(\hat{\beta}_1\right)=\frac{\hat{\sigma}}{\sqrt{SST_1}}\cdot\sqrt{\text{VIF}_1}=\sqrt{\frac{\sfrac{\sum_{i=1}^{n}\hat{u}_i^2}{n-3}}{\left(1-R_1^2\right)\sum_{i=1}^{n}\left(x_{i1}-\bar{x}_1^2\right)}}$$
 Thus, for a large sample size, the two important factors in determining the size of one standard error to the other is the sums of the squared residuals and the magnitude of $R_1^2$. If $x_2$ does not have a large partial effect on $y$ but is highly correlated with $x_1$, we would expect $\text{se}\left(\tilde{\beta}_1\right)<\text{se}\left(\hat{\beta}_1\right)$. On the other hand, if $x_2$ has a large partial effect on $y$ but has a small correlation with $x_1$, we would expect $\text{se}\left(\tilde{\beta}_1\right)>\text{se}\left(\hat{\beta}_1\right)$.
 \item 
 \begin{enumerate}
 \item There are 351 degrees of freedom in the first regression and 350 in the second regression. The SER is smaller in the second regression because the SSR is `r 326.196-198.475` smaller than that of the first regression, which outweighs the loss of an extra degree of freedom.
-\item A sample correlation coefficient of about 0.487 between $years$ and $rbisyr$ makes sense because those who bat more runs in tend to better players, and better players tend to play in the major leagues longer. The variance inflation factor for the slope coefficients in the multiple regression is $\frac{1}{1-0.487^2}\approx$`r 1/(1-.487^2)`. Personally, I would say there is a moderate level of collinearity between $years$ and $rbisyr$.
+\item A sample correlation coefficient of about 0.487 between $years$ and $rbisyr$ makes sense because those who bat more runs in tend to better players, and better players tend to play in the major leagues longer. The variance inflation factor for the slope coefficients in the multiple regression is $\frac{1}{1-0.487^2}\approx$ `r 1/(1-.487^2)`. Personally, I would say there is a moderate level of collinearity between $years$ and $rbisyr$.
 \item The additional SSR in the first regression to that of the second regression is `r 326.196-198.475`, which outweighs the "cost" induced from the collinearity between $years$ and $rbisyr$.
 \end{enumerate}
 \item The sample size is smaller when $age$ is added to the equation, which means it's no longer guaranteed that the $R^2$ increases by adding an additional explanatory variable to the equation.
@@ -2207,11 +2208,98 @@ lm(gift ~ mailsyear + giftlast + propresp + avggift, data = charity)
 ```
 
 
+# Chapter 4
 
+## Notes
 
+### Classical Linear Model
 
+In addition to the Gauss-Markov assumptions, there is an additional assumption commonly made called the \textbf{normality assumption}. Under the normality assumption, we assume the population error $u$ is \emph{independent} of the explanatory variables $x_1,x_2,\dots,x_k$ and is normally-distributed with zero mean and variance $\sigma_u^2$: $u\sim\mathcal{N}\left(0,\sigma_u^2\right)$. It should be obvious that this assumption is stronger than any of the previous assumptions and that the exogeneity and homoskedasticity assumptions hold by the independence assumptions.
 
+All together, the normality and Gauss-Markov assumptions are called the \textbf{classical linear model (CLM) assumptions}. Additionally, a model under these six assumptions are referred to as the \textbf{classical linear model}. Under the CLM assumptions, the OLS estimators $\hat{\beta}_0,\dots\hat{\beta}_k$ are the \textbf{minimum variance unbiased estimators}, meaning OLS estimators have the smallest variance among all unbiased estimators (not just linear unbiased estimators as in the G-M theorem). More succinctly, the population assumptions of CLM can be summarized by$$y|x\sim\mathcal{N}\left(\beta_0+\beta_1x_1+\dots+\beta_kx_k,\sigma_u^2\right)$$
 
+The argument justifying the normal distribution for the errors usually invokes the CLT (because $u$ is the sum of many different unobserved factors affecting y) to suggest that $u$ has an approximate normal distribution. This argument has some merit, but it is not without weaknesses. The two main weaknesses are that the factors in $u$ can have very different distributions in the population, which may lead to "poor" normal distributions depending on how many factors appear in $u$ and how different their distributions are, and if $u$ is a complicated function of the unobserved factors, then the CLT argument doesn't really apply. Sometimes, using a transformation, such as taking the $\ln$, yields a distribution that is closer to normal, but in other cases, normality cannot be reasonably assumed. In any application, whether normality of u can be assumed is really an empirical matter. Nevertheless, we'll see later that nonnormality of the errors is not a serious problem with large sample sizes.
+
+The important implication of the CLM assumptions is the following theorem: Under the CLM assumptions,
+$$\hat{\beta}_j\sim\mathcal{N}\left(\beta_j,\sigma_u^2\right)$$
+Therefore, standardizing $\hat{\beta}_j$,
+$$\frac{\hat{\beta}_j-\beta_j}{\text{sd}\left(\hat{\beta}_j\right)}\sim\mathcal{N}\left(0,1\right)$$
+
+### Hypothesis Testing about a Single Population Parameter: The $t$ Test
+
+Directly following the previous theorem, under the CLM assumptions:
+$$\frac{\hat{\beta}_j-\beta_j}{\text{se}\left(\hat{\beta}_j\right)}\sim t_{n-k-1}$$
+
+This theorem ultimately allows for testing hypotheses about population parameters. In econometrics, if we are interested in whether an explanatory variable has an effect on the dependent variable, we state the \textbf{null hypothesis} as
+$$\text{H}_0:\beta_j=0$$
+and the corresponding \textbf{t statistic} or \textbf{t ratio} of $\hat{\beta}_j$ as
+$$t_{\hat{\beta}_j}=\frac{\hat{\beta}_j}{\text{se}\left(\hat{\beta}_j\right)}$$
+
+In hypothesis testing, one must also come up with a relevant \textbf{alternative hypothesis}. A \textbf{one-sided alternative} to $B_j=0$ takes the form
+$$\text{H}_1:\beta_j>0$$
+or
+$$\text{H}_1:\beta_j<0$$
+To decide on a \textbf{rejection rule}, one must decide on a \textbf{significance level} or a probability of committing a type I error (rejecting a true null hypothesis). After deciding on a rejection rule, one can obtain a \textbf{critical value}, $c$, from the $t$ distribution (or the standard normal distribution for a sufficiently large sample size). For example, if our alternative hypothesis is $\beta_j>0$, we reject the null hypothesis if$$t_{\hat{\beta}_j}>c$$ and \emph{fail to reject} the null hypothesis if $$t_{\hat{\beta}_j}\leq c$$
+
+Similarly, a \textbf{two-sided alternative} to $B_j=0$ takes the form
+$$\text{H}_1:\beta_j\neq 0$$
+in which case we reject the null in favor of the alternative hypothesis if
+$$|t_{\hat{\beta}_j}|>c$$
+Generally, if we reject the null in favor of the alternative hypothesis (for testing against $\beta_j=0$) we say that $x_j$ is \textbf{statistically significant} or \textbf{statistically different from 0} at the specified significance level. Otherwise, we say $x_j$ is \textbf{statistically insignificant}.
+
+Often, it's useful to compute a \textbf{p-value}, which provides the \emph{smallest} significance level at which the null hypothesis would be rejected. In other words, the p-value is the probability of observing a t statistic as extreme as we did if the null hypothesis is true and is equal to
+$$P\left(|T|>|t|\right),$$
+where $T$ denotes a t distributed random variable with $n-k-1$ degrees of freedom and $t$ denotes the numerical value of the test statistic. It's important to note that these statements for the p-value hold for two-sided tests. For one-sided tests the p-value equals
+$$P\left(T>|t|\right)=P\left(|T|>|t|\right)/2$$
+
+The CLM assumptions also make it simple to construct a \textbf{confidence interval}, which is a rule used to construct a random interval so that confidence level percentage of all data sets yields an interval that contains the population value. Confidence intervals are still dependent on the underlying assumptions, and, if these assumptions hold, take the form
+$$\text{CI}=\left[\hat{\beta}_j-c\cdot\text{se}\left(\hat{\beta}_j\right),\hat{\beta}_j+c\cdot\text{se}\left(\hat{\beta}_j\right)\right]$$
+
+###  Hypothesis Testing about a Single Linear Combination of the Parameters
+
+It's often the case where we want to compare the coefficients on the explanatory variables. In this case, we can write the hypotheses
+$$\text{H}_0: \beta_j=\beta_\ell$$
+$$\text{H}_1: \beta_j\neq\beta_\ell$$
+Thus, we can construct the t statistic as
+$$t=\frac{\hat{\beta}_j-\hat{\beta}_\ell}{\text{se}\left(\hat{\beta}_j-\hat{\beta}_\ell\right)}$$
+The numerator is trivial to compute; however, the standard error in the denominator is somewhat difficult to compute. We know
+$$\text{Var}\left(\hat{\beta}_j-\hat{\beta}_\ell\right)=\text{Var}\left(\hat{\beta}_j\right)+\text{Var}\left(\hat{\beta}_\ell\right)-2\text{Cov}\left(\hat{\beta}_j,\hat{\beta}_\ell\right)$$
+The standard deviation of $\hat{\beta}_j-\hat{\beta}_\ell$ is just the square root of the above equation and $\left[\text{se}\left(\hat{\beta}_j\right)\right]^2$ and $\left[\text{se}\left(\hat{\beta}_\ell\right)\right]^2$ are unbiased estimators of $\text{Var}\left(\hat{\beta}_j\right)$ and $\text{Var}\left(\hat{\beta}_\ell\right)$. Thus we have,
+$$\text{se}\left(\hat{\beta}_j-\hat{\beta}_\ell\right)=\sqrt{\left[\text{se}\left(\hat{\beta}_j\right)\right]^2+\left[\text{se}\left(\hat{\beta}_\ell\right)\right]^2-2\hat{\sigma}_{\hat{\beta}_j,\hat{\beta}_\ell}}$$
+An alternative to the approach involves rewriting the model. If our model starts as
+$$y=\beta_0+\beta_1 x_1+\dots+\beta_j x_j+\dots+\beta_\ell x_\ell+\dots+\beta_k x_k+u$$
+$$\to y=\beta_0+\beta_1 x_1+\dots+\beta_j x_j+\dots+\beta_\ell x_\ell+\dots+\beta_k x_k+u+\beta_\ell x_j-\beta_\ell x_j$$
+$$\to y=\beta_0+\beta_1 x_1+\dots+\beta_j x_j-\beta_\ell x_j+\dots+\beta_\ell x_\ell+\beta_\ell x_j+\dots+\beta_k x_k+u$$
+$$\to y=\beta_0+\beta_1 x_1+\dots+\left(\beta_j-\beta_\ell\right) x_j+\dots+\beta_\ell\left(x_\ell+x_j\right)+\dots+\beta_k x_k+u$$
+$$\to y=\beta_0+\beta_1 x_1+\dots+\left(\beta_j-\beta_\ell\right) x_j+\dots+\beta_\ell\left(x_j+x_\ell\right)+\dots+\beta_k x_k+u$$
+Creating a new variable $x_j+x_\ell$, it's easy to estimate the coefficient on $x_j$ and evaluate the desired t statistic.
+
+### Hypothesis Testing Multiple Linear Restrictions: The $F$ Test
+
+In many cases, we are interested in whether a group of variables has no effect on the dependent variable. In these cases, we state the hypotheses as
+$$\text{H}_0:\beta_{k-q+1}=0,\dots,\beta_k=0$$
+$$\text{H}_1:\text{H}_0\text{ is not true}$$
+The null hypothesis consists of $q$ \textbf{exclusion restrictions}. This exemplifies \textbf{multiple restrictions} because we are putting more than one restriction on the parameters. Thus, such a test in which multiple restrictions are tested is called a \textbf{multiple hypotheses test} or a \textbf{joint hypotheses test}. In multiple hypotheses tests, the alternative holds if at least one of $\beta_{k-q+1},\dots,\beta_k$ is different from zero.
+
+In the context of multiple hypothesis testing, we define two models. One model is the \textbf{restricted model}, which takes the form
+$$y=\beta_0+\beta_1 x_1+\dots+\beta_{k-q}x_{k-q}+u$$
+And the other model is the \textbf{unrestricted model}, which takes the form
+$$y=\beta_0+\beta_1 x_1+\dots+\beta_{k}x_{k}+u$$
+Using these two models, we can construct the \textbf{F statistic}, which is defined by
+$$F\equiv\frac{\sfrac{\left(\text{SSR}_r-\text{SSR}_{ur}\right)}{q}}{\sfrac{\text{SSR}_{ur}}{n-k-1}}=\frac{\sfrac{\left(R^2_{ur}-R^2_r\right)}{q}}{\sfrac{\left(1-R^2_{ur}\right)}{n-k-1}},$$
+where the $ur$ denotes the unrestricted model and the $r$ denotes the restricted model. The second equality is called the \textbf{R-squared form of the F statistic}.
+
+It should immediately be obvious that $F\geq 0$ because $\text{SSR}_{ur}\leq\text{SSR}_r$. The easiest way to remember where the SSRs appear is to think of $F$ as measuring the relative increase in SSR when moving from the unrestricted to the restricted model.
+
+The difference in SSRs in the numerator of $F$ is divided by $q$, which is the number of restrictions imposed in moving from the unrestricted to the  restricted model (q independent variables are dropped). Thus, $q=\text{numerator df}=df_r-df_{ur}$
+
+The SSR in the denominator of $F$ is divided by the degrees of freedom in the unrestricted model which equals $n-k-1=\text{denominator df}=df_{ur}$. It should be noted that the denominator of $F$ is simply the unbiased estimator of $\sigma_u^2$ in the unrestricted model.
+
+Under the null hypothesis and the CLM assumptions, $F$ is distributed as an $F$ random variable with $(q,n-k-1)$ degrees of freedom. This can be written as
+$$F\sim F_{q,n-k-1}$$
+Similar to the case of the $t$ test, after a significance level is decided on, we reject $\text{H}_0$ in favor of $\text{H}_1$ if $$F>c$$ and fail to reject $\text{H}_0$ otherwise. If $\text{H}_0$ is rejected, then we say that $x_{k-q+1},\dots,x_k$ are \textbf{jointly statistically significant} at the appropriate significance level. If the null is not rejected, then the variables are \textbf{jointly insignificant}, which often justifies dropping them from the model.
+
+One should be careful in interpreting joint hypotheses using $t$ statistics on individual parameters. In many cases, using the $F$ statistic and individually evaluating $t$ statistics yields different results. This generally happens when there is multicollinearity that prevents uncovering statistically significant partial effects of individual explanatory variables. The $F$ statistic tests whether explanatory variables are \emph{jointly} significant, and multicollinearity between explanatory variables is much less relevant for testing this hypothesis. Conversely, it is also possible that, in a group of several explanatory variables, one variable has a significant $t$ statistic but the group of variables is jointly insignificant at the usual significance levels. Generally, such cases occur when a bunch of insignificant variables are grouped with a significant variable, leading to joint insignificance. 
 
 
 
