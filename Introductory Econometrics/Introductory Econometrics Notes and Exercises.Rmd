@@ -333,9 +333,9 @@ Given random variables $X$ and $Y$, the variance of $Y$, conditional on $X = x$,
 
 ### Normal Distribution
 
-A \textbf{normal random variable} is a continuous random variable that can take on any value. Its probability density function has the familiar bell-shaped graph and can be written as $$f(x)=\frac{1}{\sigma\sqrt{2\pi}}exp[-(x-\mu)^2/2\sigma^2],\ -\infty<x<\infty$$ We say that $X$ has a \textbf{normal distribution} with expected value $\mu$ and variance $\sigma^2$, written as $X\sim\mathcal{N}(\mu,\sigma^2)$.  Because the normal distribution is symmetric about $\mu$, $\mu$ is also the median of X. The normal distribution is also sometimes called the Gaussian distribution after Carl Friedrich Gauss.
+A \textbf{normal random variable} is a continuous random variable that can take on any value. Its probability density function has the familiar bell-shaped graph and can be written as $$f(x)=\frac{1}{\sigma\sqrt{2\pi}}\exp[-(x-\mu)^2/2\sigma^2],\ -\infty<x<\infty$$ We say that $X$ has a \textbf{normal distribution} with expected value $\mu$ and variance $\sigma^2$, written as $X\sim\mathcal{N}(\mu,\sigma^2)$.  Because the normal distribution is symmetric about $\mu$, $\mu$ is also the median of X. The normal distribution is also sometimes called the Gaussian distribution after Carl Friedrich Gauss.
 
-One special case of the normal distribution is the \textbf{standard normal distribution} where the mean is zero and the variance is unity. If a random variable $Z$ has a Normal(0,1) distribution, then we say it has a standard normal distribution, and its pdf is given by $$\phi(z)=\frac{1}{\sqrt{2\pi}}exp(-z^2/2),\ -\infty<z<\infty$$
+One special case of the normal distribution is the \textbf{standard normal distribution} where the mean is zero and the variance is unity. If a random variable $Z$ has a Normal(0,1) distribution, then we say it has a standard normal distribution, and its pdf is given by $$\phi(z)=\frac{1}{\sqrt{2\pi}}\exp(-z^2/2),\ -\infty<z<\infty$$
 
 \underline{Normal Distribution Properties}
 \begin{enumerate}
@@ -1283,7 +1283,7 @@ $$=\frac{\sigma_u^2}{\sum_{i=1}^{n}x_i^2}$$
 $$\to \frac{\sigma_u^2}{\sum_{i=1}^{n}x_i^2}\leq\frac{\sigma_u^2}{\sum_{i=1}^{n}\left(x_i-\bar{x}\right)^2}$$
 $$\to \frac{1}{\sum_{i=1}^{n}x_i^2}\leq\frac{1}{\sum_{i=1}^{n}\left(x_i-\bar{x}\right)^2}$$
 $$\to \sum_{i=1}^{n}x_i^2\geq\sum_{i=1}^{n}\left(x_i-\bar{x}\right)^2,$$which is given to us by the hint.
-\item Under the Gauss Markov assumptions, $\hat{\beta}_1$ is always unbiased while $\tilde{\beta}_1$ requires the additional constraint that $y=0$ when $x=0$ to be unbiased. As we just proved, $\tilde{\beta}_1$ is efficient relative to $\hat{\beta}_1$. Thus, in the case that both estimators are unbiased, $\tilde{\beta}_1$ is preferred.
+\item Under the Gauss-Markov assumptions, $\hat{\beta}_1$ is always unbiased while $\tilde{\beta}_1$ requires the additional constraint that $y=0$ when $x=0$ to be unbiased. As we just proved, $\tilde{\beta}_1$ is efficient relative to $\hat{\beta}_1$. Thus, in the case that both estimators are unbiased, $\tilde{\beta}_1$ is preferred.
 \end{enumerate}
 \item 
 \begin{enumerate}
@@ -2299,7 +2299,349 @@ Under the null hypothesis and the CLM assumptions, $F$ is distributed as an $F$ 
 $$F\sim F_{q,n-k-1}$$
 Similar to the case of the $t$ test, after a significance level is decided on, we reject $\text{H}_0$ in favor of $\text{H}_1$ if $$F>c$$ and fail to reject $\text{H}_0$ otherwise. If $\text{H}_0$ is rejected, then we say that $x_{k-q+1},\dots,x_k$ are \textbf{jointly statistically significant} at the appropriate significance level. If the null is not rejected, then the variables are \textbf{jointly insignificant}, which often justifies dropping them from the model.
 
-One should be careful in interpreting joint hypotheses using $t$ statistics on individual parameters. In many cases, using the $F$ statistic and individually evaluating $t$ statistics yields different results. This generally happens when there is multicollinearity that prevents uncovering statistically significant partial effects of individual explanatory variables. The $F$ statistic tests whether explanatory variables are \emph{jointly} significant, and multicollinearity between explanatory variables is much less relevant for testing this hypothesis. Conversely, it is also possible that, in a group of several explanatory variables, one variable has a significant $t$ statistic but the group of variables is jointly insignificant at the usual significance levels. Generally, such cases occur when a bunch of insignificant variables are grouped with a significant variable, leading to joint insignificance. 
+One should be careful in interpreting joint hypotheses using $t$ statistics on individual parameters. In many cases, using the $F$ statistic and individually evaluating $t$ statistics yields different results. This generally happens when there is multicollinearity that prevents uncovering statistically significant partial effects of individual explanatory variables. The $F$ statistic tests whether explanatory variables are \emph{jointly} significant, and multicollinearity between explanatory variables is much less relevant for testing this hypothesis. Conversely, it is also possible that, in a group of several explanatory variables, one variable has a significant $t$ statistic but the group of variables is jointly insignificant at the usual significance levels. Generally, such cases occur when a bunch of insignificant variables are grouped with a significant variable, leading to joint insignificance. Another caution to take when using the $F$ statistic is making sure the same observations are used across the restricted and unrestricted models. When estimating the restricted model to compute an $F$ test, we must use the same observations to estimate the unrestricted model; otherwise, the test is not valid. Obviously, when there are no missing data, this is not an issue.
+
+In the context of $F$ tests, the p-value is defined as
+$$p=P(\mathscr{F}>F),$$
+where $\mathscr{F}$ denotes an $F$ random variable with $(q,n-k-1)$ degrees of freedom and $F$ is the actual value of the test statistic. As with the case for the $t$ test, the p-value is the probability of observing a value of $F$ at least as large as we did, given that the null hypothesis is true.
+
+In some cases, we're interested in testing whether \emph{none} of the explanatory variables has an effect on the dependent variable. In such cases the null takes the form
+$$\text{H}_0:\beta_1=\beta_2=\dots=\beta_k=0$$
+and the alternative is that at least one of the slope coefficients is different from zero. Thus, there are $k$ restriction imposed and the restricted model becomes
+$$y=\beta_0+u$$
+Since all of the explanatory variables have been dropped, $R_r^2=0$, and the $F$ statistic can be written as
+$$F=\frac{R_{ur}^2/k}{\left(1-R_{ur}^2\right)/ \left(n-k-1\right)}$$
+This process of testing joint exclusion of all the explanatory variables is sometimes called determining the \textbf{overall significance of the regression}.
+
+Finally, we can extend the use of the $F$ statistic to test general linear restrictions. Suppose we are interested in testing the null
+$$\text{H}_0: \beta_1=1,\beta_2=\dots=\beta_k=0$$
+Then the unrestricted model is simply
+$$y=\beta_0+\beta_1x_1+\dots+\beta_kx_k+u$$
+and the restricted model is
+$$y=\beta_0+1\cdot x_1+u,$$
+which can be rewritten as
+$$y-x_1=\beta_0+u$$
+The process of computing the $F$ statistic is the same as in previous problems with one point of caution. Since the dependent variable in the restricted model is different than that of the unrestricted model, we can no longer use the $R^2$ form of the $F$ statistic and must refer to the SSR form. As a general rule, the SSR form of the $F$ statistic should be used if a different dependent variable is needed in running the restricted regression.
+
+## Exercises
+
+### Problems
+
+### Computer Exercises
+
+# Chapter 5
+
+## Notes
+
+### Consistency of OLS Estimators
+
+\textbf{Asymptotic} or \textbf{large sample properties} of estimators and test statistics are properties that are undefined for a particular sample size but are defined as the sample size grows without bound. Among the most important of the asymptotic properties for an estimator is \textbf{consistency}. Partially because we cannot always obtain unbiased estimators, not all useful estimators are unbiased. However, virtually all economists agree that consistency is a minimal requirement for an estimator. Luckily, under the same set of assumptions that allow OLS estimators to be unbiased also allow OLS estimators to be consistent.
+
+\underline{Consistency of OLS Estimators (SLR)}
+
+Previously, we've derived
+$$\hat{\beta}_1=\beta_1+\frac{\sum_{i=1}^{n}\left(x_i-\bar{x}\right)u_i}{\sum_{i=1}^{n}\left(x_i-\bar{x}\right)^2}$$
+Invoking properties of probability limits and the law of large numbers we can show
+$$\text{plim}\left(\hat{\beta}_1\right)=\text{plim}\left(\beta_1+\frac{n^{-1}\sum_{i=1}^{n}\left(x_i-\bar{x}\right)u_i}{n^{-1}\sum_{i=1}^{n}\left(x_i-\bar{x}\right)^2}\right)$$
+$$=\text{plim}\left(\beta_1\right)+\frac{\text{plim}\left(n^{-1}\sum_{i=1}^{n}\left(x_i-\bar{x}\right)u_i\right)}{\text{plim}\left(n^{-1}\sum_{i=1}^{n}\left(x_i-\bar{x}\right)^2\right)}$$
+$$=\beta_1+\frac{\text{Cov}\left(x,u\right)}{\text{Var}\left(x\right)}=\beta_1$$
+since $\text{Cov}(x,u)=0$ under the zero conditional mean assumption. In proving the consistency of OLS estimators, the zero conditional mean assumption can be relaxed to a similar yet different assumption that $E[u]=0$ and $\text{Cov}(x_j,u)=0$ for $j=1,\dots,k$. One way to characterize the zero conditional mean assumption is that any function of the explanatory variables is uncorrelated with $u$. The zero mean and zero correlation assumption requires only that each $x_j$ is uncorrelated with $u$ (and that u has a zero mean in the population). While the zero mean and zero correlation assumption is more natural, it should be noted that OLS estimators are only consistent and not unbiased since we can no longer assume a zero conditional mean of the error term. Another fault of the zero mean and zero correlation assumption is that we can no longer assume we have properly modeled the population regression function (PRF). Under the zero conditional mean assumption, we needn't worry that $u$ is correlated with some nonlinear function of the explanatory variables; however, the zero mean and zero correlation makes no such guarantee. Such situations mean that we have neglected nonlinearities in the model that could help us better explain $y$. Nevertheless, the weaker zero correlation assumption turns out to be useful in interpreting OLS estimation of a linear model as providing the best linear approximation to the PRF.
+```{r Proof Of Consistency for OLS Estimators, echo=FALSE}
+# \underline{Proof of Consistency for OLS Estimators}
+# 
+# Previously, we've derived
+# $$\hat{\beta}_\ell=\frac{\sum_{i=1}^{n}\hat{r}_{i\ell}y_i}{\sum_{i=1}^{n}\hat{r}_{i\ell}}=\beta_\ell+\frac{\sum_{i=1}^{n}\hat{r}_{i\ell}u_i}{\sum_{i=1}^{n}\hat{r}_{i\ell}^2}$$
+# $$=\beta_\ell+\frac{\sum_{i=1}^{n}\left(x_{i\ell}-\hat{x}_{i\ell}\right)u_i}{\sum_{i=1}^{n}\left(x_{i\ell}-\hat{x}_{i\ell}\right)^2}$$
+# $$=\beta_\ell+\frac{\sum_{i=1}^{n}\left(x_{i\ell}-\left(\hat{\gamma}_0+\hat{\gamma}_1x_{i1}+\dots+\hat{\gamma}_{\ell-1}x_{i\ell-1}+\hat{\gamma}_{\ell+1}x_{i\ell+1}+\dots+\hat{\gamma}_{k}x_{ik}\right)\right)u_i}{\sum_{i=1}^{n}\left(x_{i\ell}-\hat{x}_{i\ell}\right)^2}$$
+# $$=\beta_\ell+\frac{\sum_{i=1}^{n}\left(x_{i\ell}u_i-\hat{\gamma}_0u_i-\hat{\gamma}_1x_{i1}u_i-\dots-\hat{\gamma}_{\ell-1}x_{i\ell-1}u_i-\hat{\gamma}_{\ell+1}x_{i\ell+1}u_i-\dots-\hat{\gamma}_{k}x_{ik}u_i\right)}{\sum_{i=1}^{n}\left(x_{i\ell}-\hat{x}_{i\ell}\right)^2}$$
+# $$=\beta_\ell+\frac{\sum_{i=1}^{n}x_{i\ell}u_i-\hat{\gamma}_0\sum_{i=1}^{n}u_i-\hat{\gamma}_1\sum_{i=1}^{n}x_{i1}u_i-\dots-\hat{\gamma}_{\ell-1}\sum_{i=1}^{n}x_{i\ell-1}u_i-\hat{\gamma}_{\ell+1}\sum_{i=1}^{n}x_{i\ell+1}u_i-\dots-\hat{\gamma}_{k}\sum_{i=1}^{n}x_{ik}u_i}{\sum_{i=1}^{n}\left(x_{i\ell}-\hat{x}_{i\ell}\right)^2}$$
+# $$=\beta_\ell+\frac{\sum_{i=1}^{n}x_{i\ell}u_i-\hat{\gamma}_0\sum_{i=1}^{n}u_i-\hat{\gamma}_1\sum_{i=1}^{n}x_{i1}u_i-\dots-\hat{\gamma}_{\ell-1}\sum_{i=1}^{n}x_{i\ell-1}u_i-\hat{\gamma}_{\ell+1}\sum_{i=1}^{n}x_{i\ell+1}u_i-\dots-\hat{\gamma}_{k}\sum_{i=1}^{n}x_{ik}u_i}{\sum_{i=1}^{n}\left(x_{i\ell}-\hat{x}_{i\ell}\right)^2}$$
+# $$=\beta_\ell+\frac{n^{-1}\Big\{\sum_{i=1}^{n}x_{i\ell}u_i-\hat{\gamma}_0\sum_{i=1}^{n}u_i-\hat{\gamma}_1\sum_{i=1}^{n}x_{i1}u_i-\dots-\hat{\gamma}_{\ell-1}\sum_{i=1}^{n}x_{i\ell-1}u_i-\hat{\gamma}_{\ell+1}\sum_{i=1}^{n}x_{i\ell+1}u_i-\dots-\hat{\gamma}_{k}\sum_{i=1}^{n}x_{ik}u_i\Big\}}{n^{-1}\Big\{\sum_{i=1}^{n}\left(x_{i\ell}-\hat{x}_{i\ell}\right)^2\Big\}}$$
+# Through the properties of probabilities limits and the use of the LLN, we can conclude
+# $$\text{plim}\left(\hat{\beta}_\ell\right)=\text{plim}\left(\beta_\ell+\frac{n^{-1}\Big\{\sum_{i=1}^{n}x_{i\ell}u_i-\hat{\gamma}_0\sum_{i=1}^{n}u_i-\hat{\gamma}_1\sum_{i=1}^{n}x_{i1}u_i-\dots-\hat{\gamma}_{\ell-1}\sum_{i=1}^{n}x_{i\ell-1}u_i-\hat{\gamma}_{\ell+1}\sum_{i=1}^{n}x_{i\ell+1}u_i-\dots-\hat{\gamma}_{k}\sum_{i=1}^{n}x_{ik}u_i\Big\}}{n^{-1}\Big\{\sum_{i=1}^{n}\left(x_{i\ell}-\hat{x}_{i\ell}\right)^2\Big\}}\right)$$
+# $$=\beta_\ell+\frac{E\left[x_{i\ell}u_i\right]-E\left[\hat{\gamma}_0u_i\right]-E\left[\hat{\gamma}_1x_{i1}u_i\right]-\dots-E\left[\hat{\gamma}_{\ell-1}x_{i\ell-1}u_i\right]-E\left[\hat{\gamma}_{\ell+1}x_{i\ell+1}u_i\right]-\dots-E\left[\hat{\gamma}_{k}x_{ik}u_i\right]}{\text{Var}\left(x_{i\ell}\right)}$$
+```
+
+
+### Derivation of the Inconsistency in OLS Estimators
+
+In the case of simple linear regression, deriving the \textbf{inconsistency} (sometimes referred to as \textbf{asymptotic bias}) is
+$$\text{plim}\left(\hat{\beta}_1\right)-\beta_1=\beta_1+\text{Cov}(x_1,u)/\text{Var}(x_1)-\beta_1=\text{Cov}(x_1,u)/\text{Var}(x_1)$$
+The direction of inconsistency is thus solely dependent of the direction of the correlation between $x_1$ and $u$. In cases of small correlation between $x_1$ and $u$ relative to the variance in $x_1$, the level of inconsistency will be small. Unfortunately, we can't even estimate how big this relative proportion is because $u$ is unobserved.
+
+Deriving the inconsistency in OLS estimators in multiple regression analysis is synonymous to deriving omitted variable bias. Define a model $\hat{y}=\hat{\beta}_0+\hat{\beta}_1x_1+\dots+\hat{\beta}_kx_k$ and another model $\tilde{y}=\tilde{\beta}_0+\tilde{\beta}_1x_1+\dots+\tilde{\beta}_{k-1}x_{k-1}$, then$$\tilde{\beta}_j=\hat{\beta}_j+\hat{\beta}_k\tilde{\delta}_j$$for $j=1,\dots,k-1$. Using probability limit properties:
+$$\text{plim}\left(\tilde{\beta}_j\right)=\text{plim}\left(\hat{\beta}_j\right)+\text{plim}\left(\hat{\beta}_k\tilde{\delta}_j\right)=\beta_j+\text{plim}\left(\hat{\beta}_k\right)\text{plim}\left(\tilde{\delta}_j\right)=\beta_j+\beta_k\delta_j$$
+Thus, we can derive the inconsistency as
+$$\text{Inconsistency}\left(\tilde{\beta}_j\right)=\text{plim}\left(\hat{\beta}_j\right)-\beta_j=\beta_j+\beta_k\delta_j-\beta_j=\beta_k\delta_j$$
+where
+$$\delta_j=\text{Cov}\left(x_j,x_k\right)/\text{Var}\left(x_j\right)$$
+The similarity between the bias and inconsistency from omitting key variables is evident. The difference is that the inconsistency is expressed in terms of the population variance of $x_j$ and the population covariance between $x_j$ and $x_k$, while the bias is based on their sample counterparts as we condition on the values of $x_j$ and $x_k$ in the sample.
+
+\underline{Summary of Inconsistency in $\tilde{\beta}_j$ when $x_k$ is Omitted}
+\begin{tabular}{|lll|}
+\hline
+ & $\text{Corr}(x_j,x_k)>0$ & $\text{Corr}(x_j,x_k)<0$ \\
+\hline
+$\beta_k>0$ & Positive Inconsistency & Negative Inconsistency \\
+$\beta_k<0$ & Negative Inconsistency & Positive Inconsistency \\
+\hline
+\end{tabular}
+
+As with the case in deriving bias from omitting key variables, deriving the sign and magnitude of the inconsistency in the case where several variables are omitted is harder. It's important to remember that if we have the model $y=\beta_0+\beta_1x_1+\dots+\beta_kx_k+u$ where any of the regressors is correlated with $u$ but the other explanatory variables are uncorrelated with $u$, \emph{all} of the OLS estimators are generally inconsistent. However, if $x_j$ is uncorrelated with $x_\ell$ (and $x_\ell$ is uncorrelated with $u$), then $\beta_\ell$ remains consistent despite any correlation between $x_j$ and $u$. All of these facts are directly synonymous to those discussed for omitted variable bias.
+
+### Asymptotic Normality and Large Sample Inference
+
+Consistency of an estimator is an important property, but it alone does not allow us to perform statistical inference. As discussed in the previous chapter, under the classical linear model assumptions, the sampling distributions are normal. Recall that the normality of the OLS estimators hinges on the normality of the distribution of the error term, $u$, in the population. If the errors $u_1, u_2,\dots, u_n$ are random draws from some distribution other than the normal distribution, $\hat{\beta}_j$ will not be normally distributed, which means the $t$ statistics will not have $t$ distributions and the $F$ statistics will not have $F$ distributions. Ultimately, this is a potentially serious problem because our statistical inference requires being able to obtain critical values or p-values from the $t$ or $F$ distributions. Fortunately, even if the distribution of $y$ is not approximately normal, we do not have to abandon the $t$ statistics for determining which variables are statistically significant. Invoking the central limit theorem, we can conclude that the OLS estimators satisfy \textbf{asymptotic normality}, which means they are approximately normally distributed in sufficiently large sample sizes. In other words, under the Gauss-Markov assumptions and for large enough samples, the OLS slope estimators have the following properties:
+
+\begin{enumerate}
+\item $\sqrt{n}\left(\hat{\beta}_j-\beta_j\right)\overset{\text{a}}{\sim}\mathcal{N}\left(0,\sigma_u^2/a_j^2\right)$, where $\sigma_u^2/a_j^2$ is the \textbf{asymptotic variance} of $\sqrt{n}\left(\hat{\beta}_j-\beta_j\right)$ for the slope coefficients and $a_j^2=\text{plim}\left(n^{-1}\sum_{i=1}^{n}\hat{r}_{ij}^2\right)$.
+\item $\hat{\sigma}_u^2$ is a consistent estimator of $\sigma_u^2=\text{Var}(u)$
+\item For each $j$,
+$$\left(\hat{\beta}_j-\beta_j\right)/\text{sd}\left(\hat{\beta}_j\right)\overset{\text{a}}{\sim}\mathcal{N}\left(0,1\right)$$
+and
+$$\left(\hat{\beta}_j-\beta_j\right)/\text{se}\left(\hat{\beta}_j\right)\overset{\text{a}}{\sim}\mathcal{N}\left(0,1\right)$$
+\end{enumerate}
+
+\underline{Proof of Asymptotic Normality of the OLS Slope Coefficients (SLR)}
+
+Suppose that our model can be written as $y=\beta_0+\beta_1x+u$, then
+$$\sqrt{n}\left(\hat{\beta}_1-\beta_1\right)=\sqrt{n}\left(\beta_1+\frac{\sum_{i=1}^{n}(x_i-\bar{x})u_i}{\sum_{i=1}^{n}(x_i-\bar{x})^2}-\beta_1\right)$$
+$$=\sqrt{n}\left(\frac{n^{-1}\sum_{i=1}^{n}(x_i-\bar{x})u_i}{n^{-1}\sum_{i=1}^{n}(x_i-\bar{x})^2}\right)$$
+$$=(1/s_x^2)\left[n^{-1/2}\sum_{i=1}^{n}(x_i-\bar{x})u_i\right]$$
+where $s_x^2$ denotes the sample variance of $x$. By the law of large numbers
+$$s_x^2=n^{-1}\sum_{i=1}^{n}(x_i-\bar{x})^2\overset{\text{p}}{\to}E\left[(x-E[x])^2\right]=\sigma_x^2=\text{Var}(x)$$
+Next,
+$$n^{-1/2}\sum_{i=1}^{n}(x_i-\bar{x})u_i=n^{-1/2}\sum_{i=1}^{n}(x_i-\mu_x)u_i+n^{-1/2}\sum_{i=1}^{n}(\mu_x-\bar{x})u_i$$
+$$=n^{-1/2}\sum_{i=1}^{n}(x_i-\mu_x)u_i+(\mu_x-\bar{x})\left[n^{-1/2}\sum_{i=1}^{n}u_i\right]$$
+Since $\{u_i\}$ is a sequence of i.i.d. random variables with zero mean and variance $\sigma_u^2$ (recall the G-M assumptions),
+$$n^{-1/2}\sum_{i=1}^{n}u_i=n^{-1/2}(n\bar{u})=\sqrt{n}\bar{u}\overset{\text{a}}{\sim}\mathcal{N}(0,\sigma_u^2)$$
+by the central limit theorem.
+
+Additionally, by the law of large numbers
+$$\text{plim}(\mu_x-\bar{x})=\mu_x-\mu_x=0$$
+A standard result in asymptotic theory is that if $\text{plim}(w_n)=0$ and $z_n$ has an asymptotic normal distribution, then $\text{plim}(w_n z_n)=0$. Thus, we can conclude $\text{plim}\left((\mu_x-\bar{x})\left[n^{-1/2}\sum_{i=1}^{n}u_i\right]\right)=0$.
+
+Next, because $x$ are $u$ are uncorrelated under the zero conditional mean assumption, $\{(x_i-\mu_x)u_i:i=1,\dots,n\}$ is an indefinite sequence of i.i.d. random variables with mean zero and variance $\sigma_u^2\sigma_x^2$ under the homoskedasticity assumption. Thus, $n^{-1/2}\sum_{i=1}^{n}(x_i-\mu_x)u_i$ has an asymptotic $\text{Normal}(0,\sigma_u^2\sigma_x^2)$ distribution.
+
+Haven proven that both $\text{plim}\left((\mu_x-\bar{x})\left[n^{-1/2}\sum_{i=1}^{n}u_i\right]\right)=0$ and $\text{plim}\left(n^{-1/2}\sum_{i=1}^{n}(x_i-\mu_x)u_i\right)=0$, we can invoke the result from asymptotic theory that if $z_n$ has an asymptotic normal distribution and $\text{plim}(v_n-z_n)=0$, then $v_n$ has the same asymptotic normal distribution as $z_n$. Collectively, it follows that $n^{-1/2}\sum_{i=1}^{n}(x_i-\mu_x)u_i$ also has an asymptotic $\text{Normal}(0,\sigma_u^2\sigma_x^2)$ distribution.
+
+Finally, we can rewrite
+$$\sqrt{n}\left(\hat{\beta}_1-\beta_1\right)=(1/\sigma_x^2)\left[n^{-1/2}\sum_{i=1}^{n}(x_i-\bar{x})u_i\right]+[(1/s_x^2)-(1/\sigma_x^2)]\left[n^{-1/2}\sum_{i=1}^{n}(x_i-\bar{x})u_i\right]$$
+Since we've shown $\text{plim}(1/s_x^2)=1/\sigma_x^2$, the plim of the second term is zero. Therefore, the asymptotic distribution of $\sqrt{n}\left(\hat{\beta}_1-\beta_1\right)$ is $\text{Normal}(0,\{\sigma_u^2\sigma_x^2\}/\{\sigma_x^2\}^2)=\text{Normal}(0,\sigma_u^2/\sigma_x^2)=\text{Normal}(0,1)$ because $a_1^2=\sigma_x^2$ in the simple regression case. $\blacksquare$
+
+\vspace{1cm}
+
+This theorem ultimately states that (regardless of the population distribution of $u$) the OLS estimators, when properly standardized, have approximate standard normal distributions. This approximation comes about by the central limit theorem because the OLS estimators involve (in a complicated way) the use of sample averages. Effectively, the sequence of distributions of averages of the underlying errors is approaching normality for virtually any population distribution.
+
+Because we know under the CLM assumptions the $t_{n-k-1}$ distribution holds exactly and the $t$ distribution approaches the standard normal distribution as the sample size grows, $t$ testing and the construction of confidence intervals are carried out exactly as under the classical linear model assumptions, even when the normality of $u$ assumption does not hold.
+
+If the sample size is not very large, then the $t$ distribution can be a poor approximation to the distribution of the $t$ statistics when $u$ is not normally distributed. Unfortunately, there are no general prescriptions on how big the sample size must be before the approximation is good enough. Some econometricians feel $n=30$ is satisfactory, but this cannot be sufficient for all possible distributions of u. Depending on the distribution of $u$, more observations may be necessary before the central limit theorem delivers a useful approximation. Further, the quality of the approximation depends not just on $n$, but on the degrees of freedom, $n-k-1$. Hence, with more independent variables in the model, a larger sample size is usually needed to use the $t$ approximation. Additionally, the asymptotic normality of the OLS estimators also implies that the $F$ statistics have approximate $F$ distributions in large sample sizes. Thus, for testing exclusion restrictions or other multiple hypotheses, nothing changes from what we have done before.
+
+\textit{Note:} One should remember that the normality of the error terms assumption is equivalent to stating that the distribution of $y$ given the explanatory variables is normal. Because $y$ is observed (and $u$ is not) it's much easier to think about whether the distribution of $y$ is likely to be normal. Also, one must pay special attention to the required assumptions for the asymptotically normality of the OLS slope coefficients. Specifically, if the homoskedasticity assumption does not hold, the $t$ statistics and confidence intervals are no longer valid.
+
+### The Lagrange Multiplier Statistic
+
+Sometimes it is useful to have other ways to test multiple exclusion restrictions beyond the $F$ test. The \textbf{Lagrange multiplier (LM) statistic} (or \textbf{n-R-squared statistic}), which is a test statistic with large-sample justification that can be used to test for omitted variables, heteroskedasticity, and serial correlation, among other model specification problems, is one such way of testing multiple exclusion restrictions.
+
+The general procedure for obtaining the LM statistic is as follows:
+
+Consider the usual multiple regression model with $k$ independent variables $y=\beta_0+\beta_1x_1+\dots+\beta_kx_k+u$, where we would like to test whether the last $q$ independent variables all have zero population parameters. Thus, the null hypothesis can be stated as
+$$\text{H}_0: \beta_{k-q+1}=\dots=\beta_k=0$$
+and the alternative is that at least one of the parameters is different from zero. Using the null hypothesis, we can define the restricted model as $y=\beta_0+\beta_1x_1+\dots+\beta_{k-q+1}x_{k-q+1}+u$. Thus, to obtain the LM statistic
+
+\begin{enumerate}
+\item Estimate the restricted model, which takes the form $y=\tilde{\beta}_0+\tilde{\beta}_1x_1+\dots+\tilde{\beta}_{k-q+1}x_{k-q+1}+\tilde{u}$
+\item Regress $\tilde{u}$ on \emph{all} of the dependent variables in the unrestricted model. This is an example of an \textbf{auxiliary regression}, a regression that is used to compute a test statistic but whose coefficients are not of direct interest.
+\item Compute $LM=nR_u^2$, where $n$ is the sample size and $R_u^2$ is the coefficient of determination from regressing $\tilde{u}$ on \emph{all} of the dependent variables in the unrestricted model (performed in the second step).
+\item Compare $LM$ to the appropriate critical value, $c$, in a $\chi_q^2$ distribution. If $LM > c$, the null hypothesis is rejected, just as we did with $F$ testing.
+\end{enumerate}
+
+If the null hypothesis is true, the R-squared from the auxiliary regression should be “close” to zero, subject to sampling error, because $\tilde{u}$ will be approximately uncorrelated with all the independent variables. It turns out that, under the null hypothesis, the sample size multiplied by the usual R-squared from the auxiliary regression is distributed asymptotically as a chi-square random variable with $q$ degrees of freedom, which allows for testing the joint significance of a set of $q$ independent variables.
+
+Unlike with the $F$ statistic, the degrees of freedom in the unrestricted model plays no role in carrying out the LM test. All that matters is the number of restrictions being tested $(q)$, the size of the auxiliary R-squared $(R_u^2)$, and the sample size $(n)$. The degrees of freedom in the unrestricted model plays no role because of the asymptotic nature of the LM statistic.
+
+With a large sample, important discrepancies between the outcomes of LM and $F$ tests are rare. As with the $F$ statistic, we must be sure to use the same observations in steps (i) and (ii). If data are missing for some of the independent variables that are excluded under the null hypothesis, the residuals from step (i) should be obtained from a regression on the reduced data set.
+
+###  Asymptotic Efficiency of OLS
+
+Analogous to how OLS estimators are BLUE under the Gauss-Markov assumptions, OLS is also \textbf{asymptotically efficient} among a certain class of estimators under the Gauss-Markov assumptions.
+
+Consider the model $y=\beta_0+\beta_1x+u$. Under the zero conditional mean assumption, there are a wide range of consistent for $\beta_0$ and $\beta_1$. Let $z_i=g(x_i)$ for any function of $x$, then
+$$\tilde{\beta}_1=\frac{\sum_{i=1}^{n}(z_i-\bar{z})y_i}{\sum_{i=1}^{n}(z_i-\bar{z})x_i}$$
+is a consistent estimator of $\beta_1$. To show this, we can plug in $\beta_0+\beta_1x_i+u_i$ for $y_i$, yielding the following
+$$\tilde{\beta}_1=\beta_1+\frac{n^{-1}\sum_{i=1}^{n}(z_i-\bar{z})u_i}{n^{-1}\sum_{i=1}^{n}(z_i-\bar{z})x_i}$$
+Invoking the law of large numbers to show the numerator and denominator converge to $\text{Cov}(z,u)$ and $\text{Cov}(z,x)$ respectively,
+$$\text{plim}\left(\tilde{\beta}_1\right)=\text{plim}\left(\beta_1+\frac{n^{-1}\sum_{i=1}^{n}(z_i-\bar{z})u_i}{n^{-1}\sum_{i=1}^{n}(z_i-\bar{z})x_i}\right)=\beta_1+\frac{\text{Cov}(z,u)}{\text{Cov}(z,x)}=\beta_1$$
+provided the zero conditional mean assumption holds, which allows for $\text{Cov}(z,u)=0$, and $z$ and $x$ are correlated (recall, it is possible that $g(x)$ and $x$ are uncorrelated because correlation measures \emph{linear} dependence.)
+
+It is more difficult to show that $\tilde{\beta}_1$ is asymptotically normal. Nevertheless, using arguments similar to those in the proof of asymptotic normality of the OLS slope coefficients, it can be shown that $\sqrt{n}\left(\tilde{\beta}_1-\beta_1\right)$ is asymptotically normal with mean zero and asymptotic variance $\sigma_u^2\text{Var}(z)/\left[\text{Cov}(z,x)\right]^2$. The asymptotic variance of the OLS estimator is obtained when $z=x$, in which case $\sqrt{n}\left(\hat{\beta}_1-\beta_1\right)$ is asymptotically normal with mean zero and asymptotic variance $\sigma_u^2\text{Var}(z)/\left[\text{Var}(x)\right]^2$. By the Cauchy-Schwartz inequality $\left[\text{Cov}(z,x)\right]^2\leq\left[\text{Var}(x)\right]^2$, which implies that, under the Gauss-Markov assumptions, the OLS estimator has a smaller asymptotic variance than any estimator of the aforementioned form.
+
+## Exercises
+
+### Problems
+
+### Computer Exercises
+
+# Chapter 6
+
+## Notes
+
+### Beta Coefficients
+
+Sometimes, in econometrics, a key variable is measured on a scale that is difficult to interpret. One way of alleviating interpretation difficulties is to look at what happens to the dependent variable when one of the regressors is one \emph{standard deviation} higher. A similar and perhaps better method of doing such is to \emph{standardize} all of the variables in a model. This means computing the z-score for every variable in the sample and then running a regression using the z-scores.
+
+Suppose we start with the original OLS equation $y_i=\hat{\beta}_0+\hat{\beta}_1x_{i1}+\dots+\hat{\beta}_kx_{ik}+\hat{u}_i$. Then, if we subtract $\bar{y}$ from each side and use the fact that the sample average of the residuals is zero, we get
+$$y_i-\bar{y}=\hat{\beta}_1(x_{i1}-\bar{x}_1)+\dots+\hat{\beta}_k(x_{ik}-\bar{x}_k)+\hat{u}_i$$
+If we divide each side by the sample standard deviation of $y$ $(\hat{\sigma}_y)$, the equation becomes
+$$(y_i-\bar{y})/\hat{\sigma}_y=\hat{\beta}_1/\hat{\sigma}_y(x_{i1}-\bar{x}_1)+\dots+\hat{\beta}_k/\hat{\sigma}_y(x_{ik}-\bar{x}_k)+\hat{u}_i/\hat{\sigma}_y$$
+$$(y_i-\bar{y})/\hat{\sigma}_y=\left(\hat{\sigma}_1/\hat{\sigma}_y\right)\hat{\beta}_1\left[(x_{i1}-\bar{x}_1)/\hat{\sigma}_1\right]+\dots+\left(\hat{\sigma}_k/\hat{\sigma}_y\right)\hat{\beta}_k\left[(x_{ik}-\bar{x}_k)/\hat{\sigma}_k\right]+(\hat{u}_i/\hat{\sigma}_y),$$
+which can be rewritten (after dropping the $i$ subscript) as
+$$z_y=\hat{b}_1z_1+\dots+\hat{b}_kx_k+error,$$
+where $z_y$ denotes the z-score of $y$, $z_1$ is the z-score of $x_1$, and so on. These $\hat{b}_j$ are called \textbf{standardized coefficients} or \textbf{beta coefficients}, which represent the predicted standard deviations change in $y$ for a one standard deviation change in $x_j$. Thus, we are measuring effects not in terms of the original units of $y$ or the $x_j$, but in standard deviation units. For example, if $x_1$ increases by one standard deviation, then $\hat{y}$ changes by $\hat{b}_1$ standard deviations. Even in cases where we're interested in estimating some form of an elasticity, comparing beta coefficient magnitudes can be helpful. It should be noted that, whether we use standardized or unstandardized variables does not affect statistical significance: the $t$ statistics are the same in both cases.
+
+### Logarithmic Function Forms
+
+As we've discussed, using the natural log of variables in a model is a common practice in applied econometrics. Consider the model
+$$\widehat{\ln(y)}=\hat{\beta}_0+\hat{\beta}_1\ln(x_1)+\hat{\beta}_2x_2$$
+Then, $\hat{\beta}_1$ is the approximated predicted percentage change in $y$ for a 1\% change in $x_1$ and $100\cdot\hat{\beta}_2$ is the is the approximated predicted percentage change in $y$ for a 1 unit change in $x_2$. It turns out, that for larger values of $\hat{\beta}_1$ and $\hat{\beta}_2$, these approximate percentage changes become less accurate. Using some simple algebra and calculus, we can derive the \emph{exact} predicted percentage change in $y$ for a change in $x_2$ as
+$$\%\Delta\hat{y}=100\cdot\left[exp\left(\hat{\beta}_2\Delta x_2\right)-1\right],$$
+where the multiplication by 100 turns the proportionate change into a percentage change. While this is not an unbiased estimator (because $exp(\cdot)$ is a nonlinear function), it is a consistent estimator.
+
+This adjustment is not as crucial for small percentage changes. The logarithmic approximation to percentage changes has an advantage that justifies its reporting even when the percentage change is large. For one, the exact predicted change reports a different value if $x$ changes by $a$ to that if $x$ changes by $-a$. Essentially, using logarithmic approximation is similar in spirit to calculating an arc elasticity of demand, where the averages of prices and quantities are used in the denominators in computing the percentage changes. Another advantage of using logarithmic form is, when $y>0$, models using $\ln(y)$ as the dependent variable often satisfy the CLM assumptions more closely than models using the level of $y$. Strictly positive variables often have conditional distributions that are heteroskedastic or skewed; taking the log can mitigate, if not eliminate, both problems. Another potential benefit of using logs is that taking the log of a variable often narrows its range, which can make OLS estimates less sensitive to outliers (be cautious of this when $\ln(\cdot)$ can lead to large values such as when $\cdot$ is close to zero. Generally speaking, when dealing with large integer values (such as a positive dollar amount), the natural log is often used in application. Additionally, in cases where a variable is nonnegative but can take on the value 0, $\ln(1+\cdot)$ is sometimes used. Finally, one should take caution in comparing logarithmic forms to level forms using $R^2$. It is \emph{not} legitimate to compare R-squareds from models where $y$ is the dependent variable in one case and $\ln(y)$ is the dependent variable in the other. These measures explain variations in different variables. 
+
+### Quadratic Function Forms
+
+Quadratic functions are also used quite often in applied economics to capture decreasing or increasing marginal effects. Consider the following estimated equation
+$$y=\beta_0+\beta_1x+\beta_2x^2+u,$$
+then we can solve for the approximate predicted change in $y$ as
+$$\Delta\hat{y}=\left(\hat{\beta}_1+2\hat{\beta}_2\right)\Delta x$$
+In cases where $\hat{\beta}_1>0$ and $\hat{\beta}_2<0$, the corresponding explanatory variable has a diminishing marginal effect on $y$ and the function is "concave." Thus, we can solve for the $x$ (denoted $x^*$) where the tuning point occurs, or equivalently, $y$ is maximized by
+$$x^*=-\hat{\beta}_1/\left(2\hat{\beta}_2\right)$$
+
+In cases where $\hat{\beta}_1<0$ and $\hat{\beta}_2>0$, the corresponding explanatory variable has an increasing marginal effect on $y$ and the function is "convex." Again, we can solve for the $x$ (denoted $x^*$) where the tuning point occurs, or equivalently, $y$ is maximized by
+$$x^*=-\hat{\beta}_1/\left(2\hat{\beta}_2\right)$$
+
+Some other forms that use quadratics include using quadratics along with logarithms to estimate nonconstant elasticities and using cubic and even a quartic term. Estimating such a model causes no complications. Interpreting the parameters is more involved and requires additional thought but is fairly straightforward using calculus.
+
+### Models with Interaction Terms
+
+Sometimes, it is natural for the partial effect, elasticity, or semi-elasticity of the dependent variable with respect to an explanatory variable to depend on the magnitude of yet another explanatory variable. Consider the model
+$$y=\beta_0+\beta_1x_1+\beta_2x_2+\beta_3x_1x_2+u$$
+In this case, there is an \textbf{interaction effect} between $x_1$ and $x_2$. Using calculus, we find the ceteris paribus partial effect of $x_1$ on $y$ as
+$$\frac{\Delta y}{\Delta x_1}=\beta_1+\beta_3x_2$$
+Thus, if $\beta_3>0$, then the ceteris paribus effect of $x_1$ on $y$ is greater for larger values of $x_2$ and $\beta_1$ only measures the ceteris paribus effect of $x_1$ on $y$ when $x_2=0$ (assuming $\beta_3\neq 0$).
+
+Often, it is useful to reparameterize a model so that the coefficients on the original variables have an interesting meaning. Reparametrizing the model, we can obtain
+$$y=\alpha_0+\delta_1x_1+\delta_2x_2+\beta_3(x_1-\mu_1)(x_2-\mu_2)+u,$$
+where $\delta_1$ represents the ceteris paribus effect of $x_1$ on $y$ at the mean value of $x_2$. Therefore, if we subtract the means of the variables (in practice, we would typically use the sample means) before creating the interaction term, the coefficients on the original variables have a useful interpretation. Plus, we immediately obtain standard errors for the partial effects at the mean values. Nothing prevents us from replacing $\mu_1$ or $\mu_2$ with other values of the explanatory variables that may be of interest (such as the median, mode or the lower and upper quartiles in the sample.)
+
+### Average Partial Effects
+
+In cases in which we specify models that have nonconstant partial effects (such as when using interaction terms or quadratics), often, we want a single value to describe the relationship between the dependent variable $y$ and each explanatory variable. One popular summary measure is the \textbf{average partial effect (APE)} or the \textbf{average marginal effect}. If we estimated the model $y=\beta_0+\beta_1x_1+\beta_2x_2+\beta_3x_1x_2+u$, the predicted ceteris paribus partial effect of $x_1$ on $y$ as
+$$\hat{\beta}_1+\hat{\beta}_3x_{i2}$$
+So, the estimated partial effect of $x_1$ on $y$ depends on $x_2$, and thus it's likely each observation will have a unique partial effect. Instead, we can report the average partial effect as
+$$\text{APE}_{y}=\hat{\beta}_1+\hat{\beta}_3\bar{x}_2$$
+
+### Adjusted R-Squared
+
+Because $R^2$ strictly increases as we add more explanatory variables to a model, it's often attractive to use the \textbf{adjusted R-squared} (denoted $\bar{R}^2$) as it imposes a penalty for adding additional independent variables to a model. To inspire the intuition behind the adjusted R-squared, consider the \textbf{population R-squared}, which is defined as $\rho^2=1-\sigma_u^2/\sigma_y^2$ and represents the proportion of the variation in $y$ in the population explained by the independent variables. $R^2$ estimates this value by estimating $\sigma_u^2$ as $\text{SSR}/n$ and $\sigma_u^2$ as $\text{SST}/n$, which we know are both biased as estimators. $\bar{R}^2$ instead uses the unbiased estimators $\text{SSR}/(n-k-1)$ and $\text{SST}/(n-1)$. Thus,
+$$\bar{R}^2=1-[\text{SSR}/(n-k-1)]/[\text{SST}/(n-1)],$$
+which can be rewritten as
+$$\bar{R}^2=1-(1-R^2)(n-1)/(n-k-1)$$
+It's tempting to this $\bar{R}^2$ is a better estimator of $\rho^2$ than $R^2$. Unfortunately, $\bar{R}^2$ is not generally known to be a better estimator than $R^2$ and is not unbiased as the ratio of two unbiased estimators is not an unbiased estimator.
+
+Interestingly, adding a new independent variable to a regression equation, $\bar{R}^2$ increases if, and only if, the $t$ statistic on the new variable is greater than one in absolute value. Similarly, $\bar{R}^2$ increases when a group of variables is added to a regression if, and only if, the $F$ statistic for joint significance of the new variables is greater than one. One final note of importance is that it's possible to obtain a negative $\bar{R}^2$, which indicates a very poor model fit relative to the number of degrees of freedom.
+
+### Choosing Between Different Models
+
+Previously, we've seen how to use an $F$ statistic to decide,whether at least one variable in the group affects the dependent variable. This test does not allow us to decide which of the variables has an effect. In some cases, we want to choose a model without redundant independent variables, and the adjusted R-squared can help with this. Suppose we are choosing between two models
+$$y=\beta_0+\beta_1x_1+\beta_2x_2+\beta_3p+u$$
+and
+$$y=\beta_0+\beta_1x_1+\beta_2x_2+\beta_3q+u$$
+These two equations are \textbf{nonnested models} because neither equation is a special case of the other. $F$ statistics only allow us to test nested models: one model (the restricted model) is a special case of the other model (the unrestricted model). The adjusted R-squared (and thus the $R^2$ since the models have the same number of regressors) can be used to guide selecting between the two models.
+
+Comparing $\bar{R}^2$ to choose among different nonnested sets of independent variables can be valuable when these variables represent different functional forms. Consider
+$$y=\beta_0+\beta_1\ln(x)+u$$
+and
+$$y=\beta_0+\beta_1x+\beta_2x^2+u,$$
+where both models allow for capturing nonconstant returns to $y$ from $x$; however the first model only has one explanatory variable and uses logarithmic form while the second has two explanatory variables and uses a quadratic. In general, the model with the larger $\bar{R}^2$ is preferred. Unfortunately, there is an important limitation in using $\bar{R}^2$ to choose between nonnested models as we cannot use it to choose between different functional forms for the dependent variable. For example, if we wanted to decide on using $y$ or $\ln(y)$ as the dependent variable, neither $R^2$ nor $\bar{R}^2$ can be used for this purpose the different dependent variables will have different amounts of variation to explain. Thus, comparing the adjusted R-squareds from regressions with these different forms of the dependent variables does not tell us anything about which model fits better because they are fitting two separate dependent variables.
+
+### Prediction Analysis
+
+Suppose we have estimated the equation $\hat{y}=\hat{\beta}_0+\hat{\beta}_1x_1+\dots+\hat{\beta}_kx_k$. When we plug in particular values of the independent variables, we obtain a prediction for $y$, which is an estimate of the expected value of $y$ given the particular values for the explanatory variables. Let $c_1,c_2,\dots,c_k$ denote particular values for each of the $k$ independent variables, then the parameter we would like to estimate is
+$$\theta_0=\beta_0+\beta_1x_1+\dots+\beta_kx_k=E\left[y\middle|x_1=c_1,\dots,x_k=c_k\right]$$
+and the estimator is
+$$\hat{\theta}_0=\hat{\beta}_0+\hat{\beta}_1c_1+\dots+\hat{\beta}_kc_k$$
+In practice, this is easy to compute, but if we want some measure of the uncertainty in this predicted value, it's natural to construct a confidence interval for $\theta_0$, which is centered at $\hat{\theta}_0$. However, to obtain a confidence interval for $\theta_0$, we need a standard error for $\hat{\theta}_0$. Then, with a large df, we can construct a 95% confidence interval using the rule of thumb $\hat{\theta}_0\pm 2\cdot\text{se}\left(\hat{\theta}_0\right)$. To obtain the standard error for $\hat{\theta}_0$, start by writing $\beta_0$ as
+$$\beta_0=\theta_0-\beta_1c_1-\dots-\beta_kc_k$$
+and plug it into $y=\beta_0+\beta_1x_1+\dots+\beta_kx_k+u$. Thus, we get
+$$y=\theta_0+\beta_1(x_1-c_1)+\dots+\beta_k(x_k-c_k)+u$$
+Finally, we obtain the predicted value ($\hat{\theta}_0$) and its standard error ($\text{se}\left(\hat{\theta}_0\right)$) from the intercept, which we can use to construct a confidence interval for $\theta_0$. This result allows us to construct a confidence interval for the \emph{average} value of $y$ for the subpopulation with a given set of explanatory variables. But a confidence interval for the average person in the subpopulation is not the same as a confidence interval for a \emph{particular} unit from the population. In forming a confidence interval for an unknown outcome on $y$, we must also account for the variance in the unobserved error.
+
+Let $y^0$ denote the value for which we would like to construct a confidence interval or \textbf{prediction interval}. For example, $y_0$ could represent a person or firm not in our original sample. Let $x^0_1\dots,x^0_k$ be the new values of the independent variables (assuming they are observed) and let $u^0$ be the unobserved error. Thus,
+$$y^0=\beta_0+\beta_1x^0_1+\dots+\beta_kx^0_k+u^0$$
+Just as we did for predicting the average among a subpopulation, our best prediction of $y^0$ is the expected value of $y^0$ given the explanatory variables, which we estimate from the OLS regression line $\hat{y}^0=\hat{\beta}_0+\hat{\beta}_1x^0_1+\dots+\hat{\beta}_kx^0_k$. Thus, the prediction error is
+$$\hat{e}^0=y^0-\hat{y}^0$$
+and the expected value equals
+$$E\left[\hat{e}^0\middle|x^0\right]=E\left[y^0\middle|x^0\right]-E\left[\hat{y}^0\middle|x^0\right]$$
+$$=\left(\beta_0+\beta_1x^0_1+\dots+\beta_kx^0_k+E\left[u^0\middle|x^0\right]\right)-E\left[\hat{\beta}_0+\hat{\beta}_1x^0_1+\dots+\hat{\beta}_kx^0_k\middle|x^0\right]=0$$
+since the $\hat{\beta}_j$ is unbiased for all $j$ and $u^0$ has a zero mean. The variance of $\hat{e}^0$ (called the \textbf{variance of the prediction error}) is also easily derivable.
+$$\text{Var}\left(\hat{e}^0\middle|x^0\right)=\text{Var}\left(y^0-\hat{y}^0\middle|x^0\right)$$
+$$=\text{Var}\left(y^0\middle|x^0\right)+\text{Var}\left(\hat{y}^0\middle|x^0\right)-2\text{Cov}\left(y^0,\hat{y}^0\middle|x^0\right)$$
+$$=\text{Var}\left(u^0\middle|x^0\right)+\text{Var}\left(\hat{y}^0\middle|x^0\right)-2\text{Cov}\left(u^0,\hat{\beta}_0+\hat{\beta}_1x^0_1+\dots+\hat{\beta}_kx^0\middle|x^0\right)$$
+$$=\sigma_u^2+\text{Var}\left(\hat{y}^0\middle|x^0\right)$$
+since $u^0$ is uncorrelated with each $\hat{\beta}_j$ because $u^0$ is uncorrelated with the errors in the sample used to obtain $\hat{\beta}_j$.
+It directly follows that
+$$\text{se}\left(\hat{e}^0\right)=\sqrt{\left[\text{se}\left(\hat{y}^0\right)\right]^2+\hat{\sigma}_u^2}$$
+and the prediction interval for $y^0$ is
+$$\hat{y}^0\pm t_{.025}\cdot\text{se}\left(\hat{e}^0\right)$$
+
+### Residual Analysis
+
+Often, it's useful to perform \textbf{residual analysis} in which individual observations are examined to see whether the actual value of the dependent variable is above or below the predicted value; that is, to examine the residuals for the individual observations. An example of residual analysis can be used to rank MBA programs. By regressing the median starting salary on a variety of student characteristics (such as GMAT scores, median college GPA, etc.) residuals can be obtained. The school with the largest residual has the highest predicted value added. An additional example would be determining which professional athletes are overpaid or underpaid relative to their performance. Ultimately, residual analysis can be used to determine whether particular members of the sample have predicted values that are well above or well below the actual outcomes.
+
+### Prediction Analysis with the Dependent Variable in Logarithmic Form
+
+Consider
+$$\ln(y)=\beta_0+\beta_1x_1+\dots+\beta_kx_k+u$$
+Given the OLS estimators, our prediction of $\ln(y)$ (given the value(s) of the independent variables) is
+$$\widehat{\ln(y)}=\hat{\beta}_0+\hat{\beta}_1x_1+\dots+\hat{\beta}_kx_k$$
+While it's tempting to predict $\hat{y}$ by taking $\exp(\widehat{\ln(y)})=\exp(\hat{\beta}_0+\hat{\beta}_1x_1+\dots+\hat{\beta}_kx_k)$; however, this will systematically underestimate the expected value of $y$. Under the CLM assumptions,
+$$E\left[y\middle|x\right]=E\left[\exp(\beta_0+\beta_1x_1+\dots+\beta_kx_k+u)\middle|x\right]$$
+$$=E\left[\exp(u)\middle|x\right]\cdot\exp(\beta_0+\beta_1x_1+\dots+\beta_kx_k)$$
+$$=\exp(\sigma_u^2/2)\cdot\exp(\beta_0+\beta_1x_1+\dots+\beta_kx_k)$$
+Because $E\left[\exp(u)\middle|x\right]=\exp(\sigma_u^2/2)$ under the normality of the error term assumption from the CLM assumptions. Adjusting this equation to obtain predictions of $y$ using observable values
+$$\hat{y}=\exp(\hat{\sigma}_u^2/2)\cdot\exp(\widehat{\ln(y))}$$
+This prediction is not unbiased but is consistent. Unfortunately, there are no unbiased predictions of $y$, but the above prediction often works well. However, it does rely on the normality of the error term, u. If we just assume that $u$ is independent of the explanatory variables, then we have
+$$\hat{y}=\hat{\alpha}_0\exp(\widehat{\ln(y))}$$
+where $\hat{\alpha}_0$ is an estimate of $\alpha_0=E[\exp(u)|x]$ and replaces $\hat{\sigma}_u^2/2$ as $E\left[\exp(u)\middle|x\right]$ no longer equals $\exp(\sigma_u^2/2)$. To obtain $\hat{alpha}_0$ the method of moments estimator
+$$\hat{\alpha}_0=n^{-1}\sum_{i=1}^{n}\exp(\hat{u}_i),$$
+which is a biased but consistent estimator of $\alpha_0$. Another biased yet consistent estimator of $\alpha_0$ can be obtained from simple linear regression through the origin (see page 207 for further details).
+
+### Comparing Models where the Dependent Variable Appears in Alternaitve Forms
+
+As we discussed earlier, $R^2$ and $\bar{R}^2$ cannot be used to compare models where the dependent variables are in different forms (such as $y$ vs $\ln(y)$). Fortunately, there are two easy ways to find a goodness-of-fit measure in which the $\ln(y)$ model that can be compared with an R-squared from a model where $y$ is the dependent variable. Consider the equation estimated by OLS,
+$$\hat{y}=\hat{\beta}_0+\hat{\beta}_1x_1+\dots+\hat{\beta}_kx_k$$
+Recall that the $R^2$ from this model is simply the squared correlation between $y_i$ and $\hat{y}_i$. Taking the predicted values we derived earlier, $\hat{y}=\hat{\alpha}_0\exp(\widehat{\ln(y))}$ for all observations $i$, we can compute the squared correlation coefficient between $y_i$ and these values as an R-squared, which is comparable to the $R^2$ from the level model.
+
+An alternative form uses the sum of squared residuals. Recall $R^2=1-\text{SSR}/\text{SST}$. If we define the residuals as
+$$\hat{r}_i=y_i-\hat{\alpha}_0\exp(\widehat{\ln(y_i)}),$$
+an alternative goodness-of-fit measure that can be compared with the R-squared from the linear model for $y$ is
+$$1-\frac{\sum_{i=1}^{n}\hat{r}_i^2}{\sum_{i=1}^{n}\left(y_i-\bar{y}\right)^2}$$
+
+### Bootstrapping
+
+In many cases where formulas for standard errors are hard to obtain mathematically, or where they are thought not to be very good approximations to the true sampling variation of an estimator, we can rely on a \textbf{resampling method}. The general idea is to treat the observed data as a population that we can draw samples from. The most common resampling method is the \textbf{bootstrap}. While there are several versions of the bootstrap, we'll focus on the \textbf{nonparametric bootsrap}. Suppose we have an estimate, $\hat{\theta}$, of a population parameter, $\theta$, from a random sample of size $n$. Then, we can obtain a valid standard error for $\hat{\theta}$ by computing the estimate from different random samples drawn from the original data. To implement this process, draw $n$ numbers, with replacement, randomly from the original data set. This produces a new data set (of size $n$) that consists of the original data, but with many observations appearing multiple times. If $\hat{\theta}^{(b)}$ denotes the sample estimate from the bootstrap sample $b$, the \textbf{bootstrap sample error} of $\hat{\theta}$ is just the sample standard deviation of $\hat{\theta}^{(b)}$
+$$\text{bse}(\hat{\theta})=\sqrt{\frac{1}{m-1}\sum_{i=1}^{m}\left(\hat{\theta}^{(b)}-\bar{\hat{\theta}^{(b)}}\right)^2},$$
+where $m$ is the number of times we resample from the original data set.
+
+
+
+
+
+
+
+
 
 
 
