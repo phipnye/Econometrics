@@ -11,13 +11,14 @@ header-includes:
 
 ```{r Setup, echo=FALSE,include=FALSE}
 library(tidyverse)
+library(car)
 library(wooldridge)
 options(scipen = 99999999)
 ```
 
 \newpage
 
-# Math Review A
+# Math Refresher A
 
 ## Notes
 
@@ -33,7 +34,7 @@ $$=\sum_{i=1}^{n}x_i^2-\bar{x}\sum_{i=1}^{n}x_i$$
 $$=\sum_{i=1}^{n}(x_i^2-\bar{x}x_i)$$
 $$=\sum_{i=1}^{n}x_i(x_i-\bar{x})$$
 
-$$\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})=\sum_{i=1}^{n}(x_iy_i-x_i\bar{y}-y_i\bar{x}+\bar{x}\bar)$$
+$$\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})=\sum_{i=1}^{n}(x_iy_i-x_i\bar{y}-y_i\bar{x}+\bar{x})$$
 $$=\sum_{i=1}^{n}x_iy_i-\sum_{i=1}^{n}x_i\bar{y}-\sum_{i=1}^{n}y_i\bar{x}+\sum_{i=1}^{n}\bar{x}\bar{y}$$
 $$=\sum_{i=1}^{n}x_iy_i-\bar{y}\sum_{i=1}^{n}x_i-\bar{x}\sum_{i=1}^{n}y_i+\bar{y}\sum_{i=1}^{n}\bar{x}$$
 $$=\sum_{i=1}^{n}x_iy_i-n\bar{y}\bar{x}-n\bar{x}\bar{y}+n\bar{y}\bar{x}$$
@@ -42,14 +43,14 @@ $$=\sum_{i=1}^{n}x_iy_i-\bar{x}\sum_{i=1}^{n}y_i$$
 $$=\sum_{i=1}^{n}(x_iy_i-\bar{x}y_i)$$
 $$=\sum_{i=1}^{n}y_i(x_i-\bar{x})=\sum_{i=1}^{n}x_i(y_i-\bar{y})$$
 
-### Natural Logorithm
+### Natural Logarithm
 \begin{enumerate}
 \item $\ln(xy)=\ln(x)+\ln(y)$
 \item $\ln(\frac{x}{y})=\ln(x)-\ln(y)$
 \item $\ln(x^c)=c\ln(x)$
 \end{enumerate}
 
-The difference in lns can be used to approximate proportionate changes. Let $x_0$ and $x_1$ be positive values. Then, for small changes in x
+The difference in natural logs can be used to approximate proportionate changes. Let $x_0$ and $x_1$ be positive values. Then, for small changes in x
 $$\ln(x_1)-\ln(x_0)\approx \frac{x_1-x_0}{x_0}=\frac{\Delta x}{x_0}$$
 Thus, $$ 100\cdot\Delta\ln(x)\approx \%\Delta x$$
 
@@ -87,7 +88,7 @@ Median = `r median(c(ex1_data[1:7],900,ex1_data[9:10]))`
 \end{enumerate}
 \item 
 \begin{enumerate}
-\item See below
+\item See below. The intercept indicates that, on average, individuals who live on campus (0 miles from the school) will miss three classes.
 \item `r 3 + 0.2 * 5` classes
 \item `r 0.2 * (20 - 10)` classes
 \end{enumerate}
@@ -112,7 +113,7 @@ ggplot(mapping = aes(x=distance,y=missed))+
 \item A `r 6.4-5.6` percentage point decrease.
 \item A `r (6.4-5.6)/6.4`\% fall.
 \end{enumerate}
-\item The correct terminology would be the stock return increased by 3 percentage points, a 20\% increase in the return on the stock.
+\item The correct terminology would be the stock return increased by 3 percentage points, which is a 20\% increase in the return on the stock.
 \item 
 \begin{enumerate}
 \item `r 100 * (42000-35000)/35000`\%
@@ -126,11 +127,11 @@ ggplot(mapping = aes(x=distance,y=missed))+
 \item $\%\Delta\text{salary}=100(.027)(5)=$ `r .027 * 500`\%
 \item `r ((exp(10.6 + .027 * 5)-exp(10.6))/(exp(10.6))-.135)/.135 * 100`\% error
 \end{enumerate}
-\item The intercept indicates that, with no sales tax, the proportionate growth in employment would be .043 units. The slope indicates that for every unit increase in sales tax, we would expect the proportionate growth in employment to decrease by .78 units.
+\item The intercept indicates that, with no sales tax, the proportionate growth in employment would be .043. The slope indicates that for every unit increase in sales tax, we would expect the proportionate growth in employment to decrease by .78.
 \item 
 \begin{enumerate}
 \item See below
-\item The most notable difference is the convexity/concavity of the functions. A linear model would have constant marginal returns to yield with respect to fertilizer while the given relationship displays diminishing marginal returns.
+\item The most notable difference is the change to marginal returns in the nonlinear function. A linear model would have constant marginal returns to yield with respect to fertilizer while the given relationship displays diminishing marginal returns.
 \end{enumerate}
 \end{enumerate}
 ```{r Problem 9 Graph, echo=FALSE,include=TRUE,fig.align='center',fig.height=3,fig.width=4}
@@ -139,7 +140,7 @@ yield <- 120 + .19 * sqrt(fertilizer)
 ggplot(mapping = aes(x = fertilizer, y = yield))+
   geom_line(color = "blue")+
   geom_point(color = "red", size = 0.5, alpha = 0.5)+
-  xlab("fertilizr")+
+  xlab("fertilizer")+
   ylab("yield")+
   theme_bw()
 ```
@@ -175,7 +176,7 @@ ggplot(mapping = aes(x = class_, y = score))+
 \item $$\bar{y}=\frac{y_1+y_2}{2}=\frac{\beta_0+ \beta_1 x_1+\beta_0+ \beta_1 x_2}{2}$$
 $$=\frac{2\beta_0+ \beta_1 (x_1+x_2)}{2}$$
 $$=\beta_0+\beta_1 \frac{(x_1+x_2)}{2}=\beta_0+\beta_1 \bar{x}$$
-\item $$\bar{y}=\frac{\sum_{i=1}^{n}y_i}{n}=\frac{\sum_{i=1}^{n}\beta_0+\beta_1 x_i}{n}$$
+\item $$\bar{y}=\frac{\sum_{i=1}^{n}y_i}{n}=\frac{\sum_{i=1}^{n}(\beta_0+\beta_1 x_i)}{n}$$
 $$=\frac{n\beta_0+ \beta_1 \sum_{i=1}^{n}x_i}{n}$$
 $$=\beta_0+\beta_1 \frac{n\bar{x}}{n}=\beta_0+\beta_1 \bar{x}$$
 \end{enumerate}
@@ -186,7 +187,7 @@ $$=\frac{1}{n}\left(n_1\bar{x_1}+n_2\bar{x_2}\right)$$
 $$=\frac{n_1}{n}\bar{x_1}+=\frac{n_2}{n}\bar{x_2}$$
 $$=w_1\bar{x_1}+=w_2\bar{x_2}$$
 \item Yes, they represent the relative portions of the sample space in $i=1,\dots,n_1$ and $i=n_1+1,\dots,n$.
-\item The case in part (a) applies to all cases for $g\in\mathbb{Z}^+$.
+\item The case in part (a) applies to all cases for $g\in\mathbb{Z}^+\leq n$.
 \end{enumerate}
 \item 
 \begin{enumerate}
@@ -196,7 +197,9 @@ $$\sum_{i=1}^{n}\frac{1}{x_i}=\frac{1}{2}+\frac{1}{2}=1$$ while $$\frac{1}{\sum_
 \end{enumerate}
 \end{enumerate}
 
-# Math Review B
+\newpage
+
+# Math Refresher B
 
 ## Notes
 
@@ -258,17 +261,20 @@ For $X\sim \text{Binomial}(n,\theta)$, we can rewrite $X$ as $Y_1+\dots+Y_n$, wh
 
 ### Variance
 
-For a random variable $X$, $$\text{Var}(x)=E[(X-\mu)^2]$$ The \textbf{variance} tells us the expected distance from $X$ to its mean and is sometimes denoted $\sigma_x^2 \text{ or just } \sigma^2$. For a Bernoulli random variable $X$ $$\sigma_x^2 = E[X^2]-E[X]^2=\theta - \theta^2=\theta(1-\theta)$$
+For a random variable $X$, $$\text{Var}(x)=E[(X-\mu)^2]$$ The \textbf{variance} tells us the expected (squared) distance of $X$ from its mean and is sometimes denoted $\sigma_x^2$ or just $\sigma^2$. For a Bernoulli random variable $X$ $$\sigma_x^2 = E[X^2]-E[X]^2=\theta - \theta^2=\theta(1-\theta)$$
+
+\newpage
 
 \underline{Variance Properties}
 \begin{enumerate}
 \item $\text{Var}(x)=0$ if, and only if, there is a constant c such that $P(X=c)=1$, in which case $E[X]=c$. In other words, this first property says that the variance of any constant is zero and if a random variable has zero variance, then it is essentially constant.
-\item For any constants $a$ and $b$, $\text{Var}(aX+b)=a^2\text{Var}(x)$
-\item For any constants $a$ and $b$, $$\text{Var}(aX+bY)=a^2\text{Var}(x)+2ab\text{Cov}(X,Y)+b^2\text{Var}(Y)$$
-\item If $\{X_1,\dots,X_n\}$ are pairwise uncorrelated random variables and $a_i:i=1,\dots,n$ are constants then $$\text{Var}(a_1X_1+\dots+a_nX_n)=a_1^2\text{Var}(X_1)+\dots+a_n^2\text{Var}(X_n)=\text{Var}\left(\sum_{i=1}^{n}a_iX_i\right)=\sum_{i=1}^{n}a_i^2\text{Var}(X_i)$$
+\item For any constants $a$ and $b$, $\text{Var}(aX+b)=a^2\text{Var}(X)$
+\item For any constants $a$ and $b$, $$\text{Var}(aX+bY)=a^2\text{Var}(X)+2ab\text{Cov}(X,Y)+b^2\text{Var}(Y)$$
+\item If $\{X_1,\dots,X_n\}$ are pairwise uncorrelated random variables and $a_i:i=1,\dots,n$ are constants, then $$\text{Var}(a_1X_1+\dots+a_nX_n)=a_1^2\text{Var}(X_1)+\dots+a_n^2\text{Var}(X_n)=\text{Var}\left(\sum_{i=1}^{n}a_iX_i\right)=\sum_{i=1}^{n}a_i^2\text{Var}(X_i)$$
 \end{enumerate}
 
 ### Standard Deviation
+
 The \textbf{standard deviation} of a random variable, denoted $\text{sd}(X)$, is simply the positive square root of the variance: $\text{sd}(X)=+\sqrt{\text{Var}(X)}$. The standard deviation is sometimes denoted $\sigma_X$, or simply $\sigma$, when the random variable is understood.
 
 \underline{Standard Deviation Properties}
@@ -289,7 +295,7 @@ It also can be informative to compute the fourth moment of $Z$ $$E[Z^4]=\frac{E[
 
 ### Covariance and Correlation
 
-The \textbf{covariance} between two random variables $X$ and $Y$, sometimes called the \textit{population covariance} to emphasize that it concerns the relationship between two variables describing a population, is defined as the expected value of the product $(X-\mu_X)(Y-\mu_Y)$: $$\text{Cov}(X,Y)\equiv E\left[(X-\mu_X)(Y-\mu_Y)\right]$$which is sometimes denoted $\sigma_{XY}$. If $\sigma_{XY}>0$, then, on average, when $X$ is above its mean, $Y$ is also above its mean. If $\sigma_{XY}<0$,  then, on average, when $X$ is above its mean, $Y$ is below its mean. Note that $$\text{Cov}(X,Y) = E\left[(X-\mu_X)(Y-\mu_Y)\right]= E\left[(X-\mu_X)Y\right]$$$$= E\left[X(Y-\mu_Y)\right]=E[XY]-E[X]E[Y]$$ Covariance measures the amount of linear dependence between two random variables. A positive covariance indicates that two random variables move in the same direction, while a negative covariance indicates they move in opposite directions.
+The \textbf{covariance} between two random variables $X$ and $Y$, sometimes called the \textit{population covariance} to emphasize that it concerns the relationship between two variables describing a population, is defined as the expected value of the product $(X-\mu_X)(Y-\mu_Y)$: $$\text{Cov}(X,Y)\equiv E\left[(X-\mu_X)(Y-\mu_Y)\right],$$which is sometimes denoted $\sigma_{XY}$. If $\sigma_{XY}>0$, then, on average, when $X$ is above its mean, $Y$ is also above its mean. If $\sigma_{XY}<0$,  then, on average, when $X$ is above its mean, $Y$ is below its mean. Note that $$\text{Cov}(X,Y) = E\left[(X-\mu_X)(Y-\mu_Y)\right]= E\left[(X-\mu_X)Y\right]$$$$= E\left[X(Y-\mu_Y)\right]=E[XY]-E[X]E[Y]$$ Covariance measures the amount of linear dependence between two random variables. A positive covariance indicates that two random variables move in the same direction, while a negative covariance indicates they move in opposite directions.
 
 \underline{Covariance Properties}
 \begin{enumerate}
@@ -310,20 +316,21 @@ The fact that the covariance depends on units of measurement is a deficiency tha
 
 ### Conditional Expectation
 
-The \textbf{conditional expectation} of a random variable is the expected or average value of one random variable, called the dependent or explained variable, that depends on the values of one or more other variables, called the independent or explanatory variables. When $Y$ is a discrete random variable $$E[Y|x]=\sum_{i=1}^{n}y_i f_{Y|X}(y_i|x)$$When $Y$ is a continuous random variable $$E[Y|x]=\int_{-\infty}^{\infty}y_i f_{Y|X}(y_i|x)dy$$
-\newpage
+The \textbf{conditional expectation} of a random variable is the expected or average value of one random variable, called the dependent or explained variable, that depends on the values of one or more other variables, called the independent or explanatory variables. When $Y$ is a discrete random variable $$E[Y|x]=\sum_{i=1}^{n}y_i f_{Y|X}(y_i|x)$$When $Y$ is a continuous random variable $$E[Y|x]=\int_{-\infty}^{\infty}y f_{Y|X}(y|x)dy$$
+
 \underline{Conditional Expecation Properties}
 \begin{enumerate}
 \item $E[c(X)|X]=c(X)$, for any function $c(X)$.
 \item For any functions $a(X)$ and $b(X)$, $$E[a(X)Y+b(X)|X]=a(X)E[Y|X]+b(X)$$
 \item If $X$ and $Y$ are independent, $E[Y|X]=E[Y]$.
-\item From the \textbf{law of iterated expectations} $E[E[Y|X]]=E[Y]$.
-\item From a more general version of the law of iterated expectation $E[Y|X]=E[E[Y|X,Z]|X]$.
+\item From the \textbf{law of iterated expectations}, $E[E[Y|X]]=E[Y]$.
+\item From a more general version of the law of iterated expectation, $E[Y|X]=E[E[Y|X,Z]|X]$.
 \item If $E[Y|X]=E[Y]$, then $\text{Cov}(X,Y)=0$.
 \item If $E[Y^2]<\infty$ and $E[g(X)^2]<\infty$ for some function $g$, then $E[[Y-E[Y|X]]^2|X]\leq E[[Y-g(X)]^2|X]$ and $E[[Y-E[Y|X]]^2]\leq E[[Y-g(X)]^2]$. This property is very useful in predicting or forecasting contexts. The first inequality says that, if we measure prediction inaccuracy as the expected squared prediction error, conditional on $X$, then the conditional mean is better than any other function of $X$ for predicting $Y$. The conditional mean also minimizes the unconditional expected squared prediction error.
 \end{enumerate}
 
 ### Conditional Variance
+
 Given random variables $X$ and $Y$, the variance of $Y$, conditional on $X = x$, is simply the variance associated with the conditional distribution of $Y$, given $X = x:E[\left(Y-E[Y|x]\right)^2|x]$. The formula can be rewritten as $$\text{Var}(Y|X=x)=E[Y^2|x]-E[Y|x]^2$$
 
 \underline{Conditional Variance Properties}
@@ -349,12 +356,24 @@ One special case of the normal distribution is the \textbf{standard normal distr
 
 The chi-square distribution is obtained directly from independent, standard normal random variables. Let $Z_i, i=1,2,\dots,n$ be independent random variables, each distributed as standard normal. Define a new random variable as the sum of the squares of the $Z_i$: $$X=\sum_{i=1}^{n}Z_i^2$$Then, $X$ has what is known as a \textbf{chi-square distribution} with $n$ \textbf{degrees of freedom}. We write this as $X\sim\chi_n^2$ where the expected value of $X$ is $n$ and the variance of $X$ is $2n$.
 
-### t Distribution
+$$E[X]=E\left[\sum_{i=1}^{n}Z_i^2\right]$$
+$$=\sum_{i=1}^{n}E\left[Z_i^2\right]$$
+$$=\sum_{i=1}^{n}\left(E\left[Z_i^2\right]-E\left[Z_i\right]^2\right)$$
+$$=\sum_{i=1}^{n}\sigma_Z^2$$
+$$=\sum_{i=1}^{n}1=n$$
 
-A \textbf{t distribution} is obtained from a standard normal and a chi-square random variable. Let $Z$ have a standard normal distribution and let $X$ have a chi-square distribution with $n$ degrees of freedom. Further, assume that $Z$ and $X$ are independent. Then, the random variable $$T=\frac{Z}{\sqrt{X/n}}$$has a $t$ distribution with $n$ degrees of freedom. This is denoted by $T\sim t_n$ where $n$ comes from the degrees of freedom of the chi-square random variable in the denominator. The pdf of the t distribution has a shape similar to that of the standard normal distribution (maintaining a zero expected value), except that it is more spread out (with a variance of $n/(n-2)$ and therefore has more area in the tails. As the degrees of freedom gets large, the $t$ distribution approaches the standard normal distribution.
+$$\text{Var}(X)=\text{Var}\left(\sum_{i=1}^{n}Z_i^2\right)$$
+$$=\sum_{i=1}^{n}\text{Var}\left(Z_i^2\right)$$
+$$=\sum_{i=1}^{n}\left(E\left[Z_i^4\right]-E\left[Z_i^2\right]^2\right)$$
+$$=\sum_{i=1}^{n}\left(3-1\right)=2n$$
+Where $E[Z^4]=3$ because the kurtosis of a standard normal variable is 3, and $\text{Var}\left(\sum_{i=1}^{n}Z_i^2\right)=\sum_{i=1}^{n}\text{Var}\left(Z_i^2\right)$ because the $Z_i$ are independent.
+
+### $t$ distribution
+
+A \textbf{t distribution} is obtained from a standard normal and a chi-square random variable. Let $Z$ have a standard normal distribution and let $X$ have a chi-square distribution with $n$ degrees of freedom. Further, assume that $Z$ and $X$ are independent. Then, the random variable $$T=\frac{Z}{\sqrt{X/n}}$$has a $t$ distribution with $n$ degrees of freedom. This is denoted by $T\sim t_n$ where $n$ comes from the degrees of freedom of the chi-square random variable in the denominator. The pdf of the $t$ distribution has a shape similar to that of the standard normal distribution (maintaining a zero expected value), except that it is more spread out (with a variance of $n/(n-2)$) and therefore has more area in the tails. As the degrees of freedom gets large, the $t$ distribution approaches the standard normal distribution.
 
 ### F Distribution
-To define an F random variable, let $X_1\sim\chi_{k_1}^2$, and $X_2\sim\chi_{k_2}^2$ and assume that $X_1$ and $X_2$ are independent. Then, the random variable $$F=\frac{X_1/k_1}{X_2/k_2}$$ has an \textbf{F distribution} with $(k_1,k_2)$ degrees of freedom. This is denoted as $F\sim F_{k_1,k_2}$
+To define an $F$ random variable, let $X_1\sim\chi_{k_1}^2$, and $X_2\sim\chi_{k_2}^2$ and assume that $X_1$ and $X_2$ are independent. Then, the random variable $$F=\frac{X_1/k_1}{X_2/k_2}$$ has an \textbf{F distribution} with $(k_1,k_2)$ degrees of freedom. This is denoted as $F\sim F_{k_1,k_2}$
 
 ## Exercises
 \begin{enumerate}
@@ -374,7 +393,7 @@ To define an F random variable, let $X_1\sim\chi_{k_1}^2$, and $X_2\sim\chi_{k_2
 Similarly, this equals $1-\binom{4170}{0}(.5^{10})^0(1-.5^{10})^{4170}=$ `r 1-pbinom(0, 4170, .5**10)`
 \item $P(X\geq5) = 1-P(X<4)=$ `r 1-pbinom(4, 4170, .5**10)`
 \end{enumerate}
-\item $P(X\geq.6)=1-P(X<.6)=F(.6)=$ `r 3*.6^2+2*.6^3`
+\item $P(X\geq.6)=1-P(X<.6)=F(.6)=$ `r 3*.6^2-2*.6^3`
 \item 
 \begin{enumerate}
 \item $P(\text{At least one})=1-P(\text{None})=1-\binom{12}{0}(.2)^0(.8)^{12}=$ `r 1-pbinom(0,12,.2)`
@@ -409,12 +428,14 @@ $E[1/X]=1/2(1)+1/2(1/2)=3/4$
 
 From part(b), $E[1/X]=3/4\neq(1/E[X])=2/3$
 
-\item $$E[F]=E\left[\frac{X_1/k_1}{X_2/k_2}\right]$$Because $k_1$ and $k_2$ are constants, $$=\frac{k_2}{k_1}E\left[\frac{X_1}{X_2}\right]$$Using the fact that $X_1$ and $X_2$ are assumed independent $$=\frac{k_2}{k_1}E[X_1]E[X_2^{-1}]$$Using the fact that $X_1$ is a chi-square random variable (and thus has a mean of $k_1$) $$=\frac{k_2}{k_1}k_11E[X_2^{-1}]=k_2E[X_2^{-1}]=E\left[\frac{k_2}{X_2}\right]=E\left[\frac{1}{X_2/k_2}\right]$$As we showed in parts (a-c), $E\left[\frac{1}{X_2/k_2}\right]$ has a nonlinear 'internal' function, and thus, we cannot conclude that $E[F]=1$.
+\item $$E[F]=E\left[\frac{X_1/k_1}{X_2/k_2}\right]$$Because $k_1$ and $k_2$ are constants, $$=\frac{k_2}{k_1}E\left[\frac{X_1}{X_2}\right]$$Using the fact that $X_1$ and $X_2$ are assumed independent $$=\frac{k_2}{k_1}E[X_1]E[X_2^{-1}]$$Using the fact that $X_1$ is a chi-square random variable (and thus has a mean of $k_1$) $$=\frac{k_2}{k_1}k_1E[X_2^{-1}]=k_2E[X_2^{-1}]=E\left[\frac{k_2}{X_2}\right]=E\left[\frac{1}{X_2/k_2}\right]$$As we showed in parts (a-c), $E\left[\frac{1}{X_2/k_2}\right]$ has a nonlinear 'internal' function, and thus, we cannot conclude that $E[F]=1$.
 \end{enumerate}
 
 \end{enumerate}
 
-# Math Review C
+\newpage
+
+# Math Refresher C
 
 ## Notes
 
@@ -464,11 +485,21 @@ The \textbf{sample correlation coefficient} is defined as $$R_{XY}=\frac{S_{XY}}
 
 ### Efficiency
 
-The variance of an estimator is often called its \textbf{sampling variance} because it is the variance associated with a sampling distribution. Remember, the sampling variance is not a random variable; it is a constant, but it might be unknown.
+The variance of an estimator is often called its \textbf{sampling variance} because it is the variance associated with a sampling distribution. The sampling variance is not a random variable; it is a constant, but it might be unknown.
 
 An estimator, $W_1$, is \textbf{efficient} relative to another estimator, $W_2$, when $\text{Var}(W_1)\leq\text{Var}(W_2)$ for all $\theta$, with strict inequality for at least one value of $\theta$.
 
-One way to compare estimators that are not necessarily unbiased is to compute the \textbf{mean squared error (MSE)} of the estimators. If $W$ is an estimator of $\theta$, then the MSE of $W$ is defined as$$\text{MSE}(W)=E[(W-\theta)^2]$$The MSE measures how far, on average, the estimator is away from $\theta$. It can be shown that $\text{MSE}(W)=\text{Var}(W)+[\text{Bias}(W)]^2$, so that $\text{MSE}(W)$ depends on the variance and bias (if any is present). This allows us to compare two estimators when one or both are biased.
+One way to compare estimators that are not necessarily unbiased is to compute the \textbf{mean squared error (MSE)} of the estimators. If $W$ is an estimator of $\theta$, then the MSE of $W$ is defined as
+$$\text{MSE}(W)=E[(W-\theta)^2]$$
+The MSE measures how far, on average, the estimator is away from $\theta$. Since
+$$\text{MSE}(W)=E[(W-\theta)^2]$$
+$$=E\left[W^2-2\theta W+\theta^2\right]$$
+$$=E[W^2]-2\theta E[W]+\theta^2$$
+$$=\left(E[W^2]-E[W]^2\right)+\left(E[W]^2-2\theta E[W]+\theta^2\right)$$
+$$=\text{Var}(W)+\left(E[W]-\theta\right)^2$$
+$$=\text{Var}(W)+\left[\text{Bias}(W)\right]^2$$
+
+$\text{MSE}(W)$ depends on the variance and bias (if any is present). This allows us to compare two estimators when one or both are biased.
 
 ### Consistency
 
@@ -480,13 +511,12 @@ Consider an estimator $W_n$ for a parameter $\theta$. Asymptotic unbiasedness me
 
 \textsl{\underline{Asymptotic Unbiasedness + Vanishing Variance $\rightarrow$ Consistency}}
 
-If you have an asymptotically unbiased estimator, and its variance converges to zero, this is sufficient to give weak consistency. (This follows from Markov's inequality, which ensures that convergence in mean-square implies convergence in probability). Intuitively, this reflects the fact that a vanishing variance means that the sequence of random variables is converging closer and closer to the expected value, and if the expected value converges to the true parameter (as it does under asymptotic unbiasedness) then the random variable is converging to the true parameter.
+If you have an asymptotically unbiased estimator, and its variance converges to zero, this is sufficient to give weak consistency. (This follows from Markov's inequality, which ensures that convergence in mean-square implies convergence in probability). Intuitively, this reflects the fact that a vanishing variance means that the sequence of random variables is converging closer and closer to the expected value, and if the expected value converges to the true parameter (as it does under asymptotic unbiasedness), then the random variable is converging to the true parameter.
 
 More simply, unbiased estimators are not necessarily consistent, but those whose variances shrink to zero as the sample size grows are \emph{consistent}. For example, the sample variance and standard deviation formulas without \textbf{Bessel's correction} are biased estimators; however, they are also consistent because the converge in probability toward their population values as $n\to\infty$.
 
-The \textbf{law of large numbers (LLN)} is a theorem that states the average from a random sample converges in probability to the population average. It also holds for stationary and weakly dependent time series. This result comes from the fact that $\text{Var}(\bar{Y})=\frac{\sigma_Y}{n}$, which approaches $0$ as $n\to\infty$.
+The \textbf{law of large numbers (LLN)} is a theorem that states the average from a random sample converges in probability to the population average. It also holds for stationary and weakly dependent time series. This result comes from the fact that $\text{Var}(\bar{Y})=\frac{\sigma_Y}{n}$ (for pairwise uncorrelated $Y$s), which approaches $0$ as $n\to\infty$.
 
-\newpage
 \underline{Plim Properties}
 \begin{enumerate}
 \item If $\theta$ is a parameter and $\gamma=g(\theta)$ is a newly-defined parameter for some continuous function $g(\theta)$. If $\text{plim}(W_n)=\theta$, then the estimator of $\gamma, G_n=g(W_n),$ has a plim defined by$$\text{plim}(G_n)=\gamma$$This is often stated as $$\text{plim}(g(W_n))=g\left(\text{plim}(W_n)\right)$$
@@ -504,18 +534,21 @@ Let $\{Z_n:n=1,2,\dots\}$ be a sequence of random variables, such that for numbe
 
 The \textbf{central limit theorem (CLT)} states that the average from a random sample (and many other estimators that depend on the sample mean) for any population (with finite variance), when standardized, has an asymptotic standard normal distribution. More formally, for a random sample $\{Y_1,Y_2,\dots,Y_n\}$ with a mean $\mu$ and a variance $\sigma^2$. Then, $$Z_n=\frac{\bar{Y}-\mu}{\sigma/\sqrt{n}}$$ has an asymptotic standard normal distribution. Note that $Z_n$ is the standardized version of $\bar{Y_n}$: $E[\bar{Y_n}]=\mu$ has been subtracted off and divided by $\text{sd}(\bar{Y_n})=\sigma/\sqrt{n}$.
 
-### Maximum Likelihood
+### Method of Moments Estimators
+
+One way of estimating a parameter is using \textbf{method of moments} estimation. Generally, method of moments estimation proceeds as follows. The parameter $\theta$ is shown to be related to some expected value in the distribution of $Y$, usually $E[Y]$ or $E[Y^2]$ (sometimes other choices are used). If, for example, the parameter of interest, $\theta$, is related to the population mean as $\theta=g(\mu)$ for some function $g$, since $\bar{Y}$ is an unbiased and consistent estimator of $\mu$, method of moments estimators replace $\mu$ with $\bar{Y}$. This gives us a consistent estimator $g(\bar{Y})$ of $\theta$, which is also unbiased if $g(\mu)$ is a linear function of $\mu$. Ultimately, all that's done is replace the population moment, $\mu$, with its sample counterpart, $\bar{Y}$.
+
+### Maximum Likelihood Estimators
 
 The \textbf{maximum likelihood estimator} of $\theta$, call it $W$, is the value of $\theta$ that maximizes the \textbf{likelihood function} $$L(\theta;Y_1,Y_2,\dots,Y_n)=f(Y_1;\theta)f(Y_2;\theta)\dots f(Y_n;\theta)$$which equals $P(Y_1=y_1,Y_2=y_2,\dots,Y_n=y_n)$ in the discrete case. Usually, it is more convenient to work with the \textbf{log-likelihood function}, which is obtained by taking the natural log of the likelihood function: $$\mathscr{L}(\theta)=\ln\left(L(\theta;Y_1,Y_2,\dots,Y_n)\right)=\sum_{i=1}^{n}\ln[f(Y_i,\theta)]=\sum_{i=1}^{n}\ell(\theta;X_i)$$where we use the fact that the log of the product is the sum of the logs.
 
-### Least Squares
+### Least Squares Estimators
 
-A \text{least squares estimator} is an estimator of a parameter that minimizes the sum of squared differences. That is, an estimator, $W$ is a least squares estimator if it minimizes $$\sum_{i=1}^{n}(W-\theta)^2$$It should be noted that the principles of least 
-squares, method of moments, and maximum likelihood often result in the same estimator. In other cases, the estimators are similar but not identical.
+A \text{least squares estimator} is an estimator of a parameter that minimizes the sum of squared differences. That is, an estimator, $W$ is a least squares estimator if it minimizes $$\sum_{i=1}^{n}(W-\theta)^2$$for all estimators of $\theta$. It should be noted that the principles of least squares, method of moments, and maximum likelihood often result in the same estimator. In other cases, the estimators are similar but not identical.
 
 ### Confidence Intervals
-A \textbf{condidence interval} is a rule used to construct a random interval so that a certain percentage of all data sets, determined by the confidence level, yields an interval that contains the population value. Thus, a 95% confidence interval of an estimator will contain the true population value 95% of the time. Theoretically, for the sample average the 95% confidence interval can be constructed as follows: $$P\left(-1.96<\frac{\bar{Y}-\mu}{\sigma/\sqrt{n}}<1.96\right)=.95$$
-$$\to CI_{95}=[\bar{y}-1.96(\sigma/\sqrt{n}),\bar{y}+1.96(\sigma/\sqrt{n})]$$where $\mu$ is the hypothesized population mean. In practice, however, $\sigma$ is unknown and must be estimated with $s$. Unfortunately, this does not preserve the 95% level of confidence because $s$ depends on the particular sample. In other words, the random interval $[\bar{Y}\pm 1.96(S/\sqrt{n})]$ no longer contains $\mu$ with probability .95 because the constant $\sigma$ has been replaced with the random variable $S$. Thus, rather than using the standard normal distribution, we must rely on the $t$ distribution. The $t$ distribution arises from the fact that $$\frac{\bar{Y}-\mu}{S/\sqrt{n}}\sim t_{n-1}$$The denominator $S/\sqrt{N}$ is an estimate of the $\text{sd}(\bar{Y})$. In general, these estimators of \textbf{sampling standard deviations} are referred to as \textbf{standard errors}.
+A \textbf{condidence interval} is a rule used to construct a random interval so that a certain percentage of all data sets, determined by the confidence level, yields an interval that contains the population value. Thus, a 95% confidence interval of an estimator will contain the true population value 95% of the time. Theoretically, for the sample average, the 95% confidence interval can be constructed as follows: $$P\left(-1.96<\frac{\bar{Y}-\mu}{\sigma/\sqrt{n}}<1.96\right)=.95$$
+$$\to CI_{95}=[\bar{y}-1.96(\sigma/\sqrt{n}),\bar{y}+1.96(\sigma/\sqrt{n})]$$where $\mu$ is the hypothesized population mean. In practice, however, $\sigma$ is unknown and must be estimated with $s$. Unfortunately, this does not preserve the 95% level of confidence because $s$ depends on the particular sample. In other words, the random interval $[\bar{Y}\pm 1.96(S/\sqrt{n})]$ no longer contains $\mu$ with probability .95 because the constant $\sigma$ has been replaced with the random variable $S$. Thus, rather than using the standard normal distribution, we must rely on the $t$ distribution. The $t$ distribution arises from the fact that $$\frac{\bar{Y}-\mu}{S/\sqrt{n}}\sim t_{n-1}$$The denominator $S/\sqrt{n}$ is an estimate of the $\text{sd}(\bar{Y})$. In general, these estimators of \textbf{sampling standard deviations} are referred to as \textbf{standard errors}.
 
 ### Hypothesis Testing
 
@@ -527,7 +560,7 @@ A \textbf{significance level} is the probability of committing a Type I error, w
 
 A \textbf{$p$-value} is the \emph{largest} significance level at which we could carry out a test and still fail to reject the null hypothesis. Formally,$$p-\text{value}=P(T>t|H_0)=1-\Phi(t)$$where $\Phi(\cdot)$ is the standard normal cdf.
 
-```{r Math Review C Values, include=FALSE,echo=FALSE}
+```{r Math Refresher C Values, include=FALSE,echo=FALSE}
 #Ex4
 y <- c(165.76,96.32,76.08,185.35,116.43,162.08,152.04,161.75,92.88,149.94,64.75,127.07,133.55,77.70,206.39,108.33,118.17)
 x <- c(374,209,253,432,367,361,288,369,206,316,145,355,295,223,459,290,307)
@@ -557,7 +590,7 @@ $$=\frac{1}{64}\text{Var}(Y_1)+\frac{1}{64}\text{Var}(Y_2)+\frac{1}{16}\text{Var
 
 \item I prefer $\bar{Y}$ over $W$ because $\bar{Y}$ is a more efficient unbiased estimator.
 
-\textit{Note:} Parts (a and b) make use of the fact that the sample is iid and thus the variance of the sums of the variables is equal to the sum of the variances of the variables.
+\textit{Note:} Parts (a) and (b) make use of the fact that the sample is i.i.d., and thus, the variance of the sums of the variables is equal to the sum of the variances of the variables.
 \end{enumerate}
 \item 
 \begin{enumerate}
@@ -578,33 +611,32 @@ $$\rightarrow a_1^{*}=\dots=a_n^{*}=\frac{1}{n}$$
 \begin{enumerate}
 \item $E[W_1]=E\left[\frac{n-1}{n}(\bar{Y})\right]=\frac{n-1}{n}E[\bar{Y}]=\frac{n-1}{n}(\mu)\neq \mu$
 
-$\text{bias}(W_1)=E[W_1]-\mu=\frac{n-1}{n}(\mu)-\mu=\frac{-\mu}{n}$
+$\text{Bias}(W_1)=E[W_1]-\mu=\frac{n-1}{n}(\mu)-\mu=\frac{-\mu}{n}$
 
 $E[W_2]=E\left[\frac{\bar{Y}}{2}\right]=\frac{1}{2}E[\bar{Y}]=\frac{\mu}{2}$
 
-$\text{bias}(W_2)=E[W_2]-\mu=\frac{\mu}{2}-\mu=\frac{-\mu}{2}$
+$\text{Bias}(W_2)=E[W_2]-\mu=\frac{\mu}{2}-\mu=\frac{-\mu}{2}$
 
 One important difference is that the bias of $W_1$ converges to 0 as $n\to\infty$, while the bias of $W_2$ is constant.
 \item $\text{plim}(W_1)=\text{plim}\left(\frac{n-1}{n}(\bar{Y})\right)=\text{plim}\left(\frac{n-1}{n}\right)\text{plim}(\bar{Y})=1\cdot\mu=\mu$
 
 $\text{plim}(W_2)=\text{plim}\left(\frac{\bar{Y}}{2}\right)=\text{plim}(\bar{Y})/\text{plim}(2)=\frac{\mu}{2}$
 
-$W_1$ is consistent.
+Of the two estimators, only $W_1$ is consistent.
 
 \item $$\text{Var}(W_1)=\text{Var}\left(\frac{n-1}{n}(\bar{Y})\right)=\left(\frac{n-1}{n}\right)^2\text{Var}(\bar{Y})=\left(\frac{(n-1)^2\sigma^2}{n^3}\right)$$
 $$\text{Var}(W_2)=\text{Var}\left(\frac{\bar{Y}}{2}\right)=\frac{1}{4}\text{Var}(\bar{Y})=\frac{\sigma^2}{4n}$$
 
-\item While $\bar{Y}$ is unbiased regardless of the value of $\mu$, when $\mu$ is "close" to zero, the bias of $W_1$ is also close to zero (especially for large samples). Thus, it may be worthwhile to consider $W_1$ over $\bar{Y}$ if $W_1$ is efficient relative to $\bar{Y}$. We know $\text{Var}(\bar{Y})=\frac{\sigma^2}{n}$ and $\text{Var}(W_1)=\left(\frac{(n-1)^2\sigma^2}{n^3}\right)$. Using these calculations to evaluate when $W_1$ is efficient relative to $\bar{Y}$:
+\item While $\bar{Y}$ is unbiased regardless of the value of $\mu$, when $\mu$ is "close" to zero, the bias of $W_1$ is also close to zero (especially for large samples). Thus, it may be worthwhile to consider $W_1$ over $\bar{Y}$ if $W_1$ is efficient relative to $\bar{Y}$. We know $\text{Var}(\bar{Y})=\frac{\sigma^2}{n}$ and $\text{Var}(W_1)=\left(\frac{(n-1)^2\sigma^2}{n^3}\right)$. Using these calculations to evaluate when $W_1$ has a smaller variance than $\bar{Y}$
 $$\left(\frac{(n-1)^2\sigma^2}{n^3}\right)\leq\frac{\sigma^2}{n}$$
 $$\left(\frac{n-1}{n}\right)^2\leq 1$$
-which holds for all positive values of $n$. Thus, $W_1$ is efficient relative to $\bar{Y}$ and, given the small amount of bias, it may be a better estimator of $\mu$.
+which holds for all $n\in\mathbb{Z}^+$. Thus, $W_1$ has a smaller variance than $\bar{Y}$ and, given the small amount of bias, it may be a better estimator of $\mu$.
 \end{enumerate}
 \item 
 \begin{enumerate}
 \item $E[Z]=E\left[E[Z|X]\right]=E\left[E\left[\frac{Y}{X}|X\right]\right]=E\left[\frac{1}{X}E\left[Y|X\right]\right]=E\left[\frac{1}{X}\theta X\right]=E[\theta]=\theta$
-\item $E[W_1]=E\left[n^{-1}\sum_{i=1}^{n}(Y_i/X_i)\right]=n^{-1}\sum_{i=1}^{n}E\left[(Y_i/X_i)\right]=n^{-1}\sum_{i=1}^{n}\theta=n^{-1}(n\theta)=\theta$
-\item In general, the average of the ratios, $Y_i/X_i$, is not the ratio of the averages $\bar{Y}/\bar{X}$. $$E[W_2|X_1,\dots,X_2]=E\left[\frac{\bar{Y}}{\bar{X}}|X_1,\dots,X_2\right]$$
-$$=\frac{1}{\bar{X}}E[\bar{Y}|X_1,\dots,X_n]$$
+\item $E[W_1]=E\left[n^{-1}\sum_{i=1}^{n}(Y_i/X_i)\right]=n^{-1}\sum_{i=1}^{n}E\left[Y_i/X_i\right]=n^{-1}\sum_{i=1}^{n}\theta=n^{-1}(n\theta)=\theta$
+\item In general, the average of the ratios, $Y_i/X_i$, is not the ratio of the averages $\bar{Y}/\bar{X}$. However, $$E\left[\frac{\bar{Y}}{\bar{X}}|X_1,\dots,X_2\right]=\frac{1}{\bar{X}}E[\bar{Y}|X_1,\dots,X_n]$$
 $$=\frac{1}{\bar{X}}E\left[n^{-1}\sum_{i=1}^{n}Y_i|X_1,\dots,X_n\right]$$
 $$=\frac{1}{n\bar{X}}\sum_{i=1}^{n}E[Y_i|X_1,\dots,X_n]$$
 $$=\frac{1}{n\bar{X}}\left(n\theta \bar{X}\right)=\theta$$
@@ -616,7 +648,7 @@ Yes, they are similar.
 \end{enumerate}
 \item 
 \begin{enumerate}
-\item $G$ is not an unbiased estimator of $\gamma$ because $G$ has a nonlinear relationship with $\bar{Y}$. As we concluded in Math Review B, the expected value of the ratio is not the ratio of the expected value.
+\item $G$ is not an unbiased estimator of $\gamma$ because $G$ has a nonlinear relationship with $\bar{Y}$. As we concluded in Math Refresher B, the expected value of the ratio is not the ratio of the expected value.
 \item $\text{plim}(G)=\text{plim}\left(\frac{\bar{Y}}{1-\bar{Y}}\right)=\text{plim}(\bar{Y})/\text{plim}(1-\bar{Y})=\theta/(\text{plim}(1)-\text{plim}(\bar{Y}))=\frac{\theta}{1-\theta}=\gamma$
 \end{enumerate}
 \item 
@@ -631,7 +663,7 @@ We reject the null hypothesis at the 5\% level but fail to reject $H_0$ at the 1
 
 \item We've already shown there is a statistically significant difference at the 5\% level but not at the 1\% level. On the other hand, I would struggle to argue there is a practical significance when there is only a 32.8 ounce difference in alcohol consumption over an entire year.
 
-\item This analysis implicitly assumes all other factors that affect liquor consumption have remained the same. Factors such as such as income, or changes in price due to transportation costs, are assumed constant over the two years.
+\item This analysis implicitly assumes all other factors that affect liquor consumption have remained the same. Factors such as such as income and changes in prices of factors of production are assumed constant over the two years.
 \end{enumerate}
 \item 
 \begin{enumerate}
@@ -672,6 +704,8 @@ Based on his average up to the strike, there is not very strong evidence against
 The difference is statistically greater than zero at the 5\% level but not at the 1\% level.
 \end{enumerate}
 
+\newpage
+
 # Chapter 1
 
 ## Notes
@@ -680,25 +714,26 @@ The difference is statistically greater than zero at the 5\% level but not at th
 
 \textbf{Nonexperimental data} are not accumulated through controlled experiments on individuals, firms, or segments of the economy. Non-experimental data are sometimes called \textbf{observational data}, or \textbf{retrospective data}, to emphasize the fact that the researcher is a passive collector of the data.
 
-\textbf{Experimental data} are often collected in laboratory environments in the natural sciences, but they are more difficult to obtain in the social sciences. Although some social experiments can be devised, it is often impossible, prohibitively expensive, or morally repugnant to conduct the kinds of controlled experiments that would be needed to address economic issues.
+\textbf{Experimental data} are often collected in laboratory environments in the natural sciences, but they are more difficult to obtain in the social sciences. Although some social experiments can be devised, it is often impossible, prohibitively expensive, or immoral to conduct the kinds of controlled experiments that would be needed to address economic issues.
 
 An \textbf{empirical analysis} uses data to test a theory or to estimate a relationship.
 
-A \textbf{cross-sectional data set} consists of a sample of individuals, households, firms, cities, states, countries, or a variety of other units, taken at a given point in time. An important feature of cross-sectional data is that we can often assume that they have been obtained by \textbf{random sampling} from the underlying population. Sometimes, however, the random sampling assumption is not appropriate for a variety of reasons such as respondents' willingness to answer or sampling from units that are large relative to the population. Nevertheless, random sampling is often assumed with cross-sectional data. The analysis of cross-sectional data is closely aligned with the applied microeconomics fields, such as labor economics, state and local public finance, industrial organization, urban economics, demography, and health economics.
+A \textbf{cross-sectional data set} consists of a sample of individuals, households, firms, cities, states, countries, or a variety of other units, taken at a given point in time. An important feature of cross-sectional data is that we can often assume that they have been obtained by \textbf{random sampling} from the underlying population. Sometimes, however, the random sampling assumption is not appropriate for a variety of reasons such as respondents' willingness to answer or sampling from units that are large relative to the population. Nevertheless, random sampling is often assumed with cross-sectional data. The analysis of cross-sectional data is closely aligned with the applied microeconomics fields, such as labor economics, public finance, industrial organization, urban economics, demography, and health economics.
 
 A \textbf{time series data set} consists of observations on a variable or several variables over time. Unlike the arrangement of cross-sectional data, the chronological ordering of observations in a time series conveys potentially important information. A key feature of time series data that makes them more difficult to analyze than cross-sectional data is that economic observations can rarely, if ever, be assumed to be independent across time.
 
 A \textbf{pooled cross section} is a data configuration where independent cross sections, usually collected at different points in time, are combined to produce a single data set.
 
-A \textbf{panel data} (or \textbf{longitudinal data}) \textbf{set} consists of a time series for each cross-sectional member in the data set. The key feature of panel data that distinguishes them from a pooled cross section is that the \emph{same} cross-sectional units are followed over a given time period.
+A \textbf{panel data} (or \textbf{longitudinal data}) \textbf{set} consists of a time series for each cross-sectional member in the data set. The key feature of panel data that distinguishes them from a pooled cross section is that the \emph{same} cross-sectional units are followed over a given time period. Time series and panel data differ in that time series data focus on a single individual at multiple time intervals while panel data focus on multiple individuals at multiple time intervals.
 
 ### Causality
 
-In econometrics, we're often concerned about finding a \textbf{causaul effect}, or  A \textbf{ceteris paribus} (meaning all other relevant factors are held fixed) change in one variable that has an effect on another variable.
+In econometrics, we're often concerned about finding a \textbf{causaul effect} or \textbf{ceteris paribus} (meaning all other relevant factors are held fixed) change in one variable that has an effect on another variable.
 
 ## Exercises
 
 ### Problems
+
 \begin{enumerate}
 \item 
 \begin{enumerate}
@@ -736,7 +771,6 @@ mean(wage1$wage)
 #It seems low for the year 2013
 
 #iii
-#Consumer Price Index (CPI) for the years 1976 and 2013.
 cpi_1976 <- 55.6
 cpi_2013 <- 230.280
 
@@ -745,9 +779,7 @@ mean(wage1$wage)*cpi_2013/cpi_1976
 #Yes, the average wage now seems more reasonable
 
 #v
-#women
 sum(wage1$female)
-#men
 sum(wage1$female==0)
 
 rm(cpi_1976,cpi_2008)
@@ -793,9 +825,7 @@ sum(meap01$math4 == 100)
 sum(meap01$math4 == 50)
 
 #iv
-#math
 mean(meap01$math4)
-#reading
 mean(meap01$read4)
 #The reading test seems harder to pass
 
@@ -811,26 +841,22 @@ sd(meap01$exppp)
 #vii
 #actual
 500*100/5500
-#ln approx
+#natural log approximation
 100 * (log(6000)-log(5500))
 ```
 
 C4)
 ```{r Chapter 1 Computer Exercises C4, include=TRUE,echo=TRUE}
-#i (reporting proportion instead of fraction)
+#i
 mean(jtrain2$train)
 
 #ii
-#receiving training
 mean(jtrain2$re78[jtrain2$train==1])
-#not receiving training
 mean(jtrain2$re78[jtrain2$train==0])
 #The difference does appear economically large
 
 #iii
-#receiving training
 mean(jtrain2$unem78[jtrain2$train==1])
-#not receiving training
 mean(jtrain2$unem78[jtrain2$train==0])
 #The proportion of unemployed who are not receiving training is about 11% larger
 
@@ -840,11 +866,8 @@ mean(jtrain2$unem78[jtrain2$train==0])
 C5)
 ```{r Chapter 1 Computer Exercises C5, echo=TRUE,include=TRUE}
 #i
-#min
 min(fertil2$children)
-#max
 max(fertil2$children)
-#mean
 mean(fertil2$children)
 
 #ii
@@ -858,7 +881,7 @@ mean(fertil2$children[fertil2$electric==0 & !is.na(fertil2$electric)])
 #Those without electricity have more children on average (for this sample)
 
 #iv
-#No, ceteris paribus is not established
+#No, the ceteris paribus condition is not established
 ```
 
 C6)
@@ -874,11 +897,8 @@ n_distinct(county_murders$countyid[county_murders$murders==0])
 100 * n_distinct(county_murders$countyid[county_murders$murders==0]) / n_distinct(county_murders$countyid)
 
 #ii
-#max number of murders
 max(county_murders$murders)
-#max number of executions
 max(county_murders$execs)
-#mean number of executions
 mean(county_murders$execs)
 
 #iii
@@ -906,13 +926,12 @@ C7)
 100 * mean(alcohol$employ[alcohol$abuse==0])
 
 #iv
-#No, ceteris paribus is not established
+#No, the ceteris paribus condition is not established
 ```
 
 C8)
 ```{r Chapter 1 Computer Exercises C8, echo=TRUE,include=TRUE}
 #i
-#assuming each obs/row corresponds to a unique student
 NROW(econmath)
 
 #ii
@@ -930,13 +949,15 @@ mean(econmath$score[econmath$econhs==0])
 #and one that does not), then performing part(ii) can be used to obtain a good causal estimate
 ```
 
+\newpage
+
 # Chapter 2
 
 ## Notes
 
 A \textbf{simple linear regression model} is a model relating a dependent variable to one independent variable and generally takes the form$$y=\beta_0+\beta_1x+u$$It is also called the \textbf{two-variable linear regression model} or \textbf{bivariate linear regression model} because it relates the two variables $x$ and $y$.
 
-The variable $u$, called the \textbf{error term} or \textbf{disturbance} in the relationship, represents factors other than $x$ that affect $y$.
+The variable $u$, which is called the \textbf{error term} or \textbf{disturbance}, represents factors other than $x$ that affect $y$.
 
 If the other factors in $u$ are held fixed, so that the change in $u$ is zero, $\Delta u = 0$, then $x$ has a linear effect on $y$:$$\Delta y=\beta_1\Delta x\text{ if }\Delta u =0$$
 
@@ -944,8 +965,7 @@ As long as the intercept $\beta_0$ is included in the equation, nothing is lost 
 
 One of the most important assumptions in econometrics is the \textbf{zero conditional mean assumption}. This crucial assumption says that the average value of the unobservables ($u$) is the same across all slices of the population determined by the value of $x$ and that the common average \emph{is} necessarily equal to the average of $u$ over the entire population. Thus, under this assumption (and the zero unconditional mean assumption), we write$$E[u|x]=E[u]=0$$
 
-Using the zero conditional mean assumption and taking the expected value of $y$ given $x$ from the simple linear linear regression model gives$$E[y|x]=\beta_0+\beta_1 x,$$This is called the \textbf{population regression function (PRF)} and shows that $E[y|x]$ is a linear function of $x$. The PRF gives us a relationship between the average level of $y$ at different levels of $x$. It is important to understand that the PRF tells us how the average value of $y$ changes with $x$; it does not say that $y$ equals $\beta_0 + \beta_1 x$ for all units in the population.
-\newpage
+Using the zero conditional mean assumption and taking the expected value of $y$ given $x$ from the simple linear regression model gives$$E[y|x]=\beta_0+\beta_1 x,$$This is called the \textbf{population regression function (PRF)} and shows that $E[y|x]$ is a linear function of $x$. The PRF gives us a relationship between the average level of $y$ at different levels of $x$. It is important to understand that the PRF tells us how the average value of $y$ changes with $x$; it does not say that $y$ equals $\beta_0 + \beta_1 x$ for all units in the population.
 
 ### OLS Estimators Derivation (SLR)
 
@@ -955,7 +975,7 @@ To minimize the sum of squared residuals, we take two first order conditions:
 
 \underline{FOC 1:}
 
-$$\frac{\partial SSR}{\partial\beta_0}=\sum_{i=1}^{n}-2(y_i-\hat{\beta}_0-\hat{\beta}_1 x_i)=0$$
+$$\frac{\partial SSR}{\partial\hat{\beta}_0}=\sum_{i=1}^{n}-2(y_i-\hat{\beta}_0-\hat{\beta}_1 x_i)=0$$
 $$\to \sum_{i=1}^{n}(y_i-\hat{\beta}_0-\hat{\beta}_1 x_i)=0$$
 $$\to n\bar{y}-n\hat{\beta}_0-n\hat{\beta}_1\bar{x}=0$$
 $$\to \bar{y}=\hat{\beta}_0+\hat{\beta}_1\bar{x}$$
@@ -966,7 +986,7 @@ $$\to \hat{\beta}_0=\bar{y}-\hat{\beta}_1\bar{x}$$
 
 \underline{FOC 2:}
 
-$$\frac{\partial SSR}{\partial\beta_1}=\sum_{i=1}^{n}-2x_i(y_i-\hat{\beta}_0-\hat{\beta}_1 x_i)=0$$
+$$\frac{\partial SSR}{\partial\hat{\beta}_1}=\sum_{i=1}^{n}-2x_i(y_i-\hat{\beta}_0-\hat{\beta}_1 x_i)=0$$
 $$\to\sum_{i=1}^{n}x_i(y_i-\hat{\beta}_0-\hat{\beta}_1 x_i)=0$$
 $$\to\sum_{i=1}^{n}(x_iy_i-\hat{\beta}_0x_i-\hat{\beta}_1 x_i^2)=0$$
 $$\to\sum_{i=1}^{n}x_iy_i=\sum_{i=1}^{n}\left(\hat{\beta}_0x_i+\hat{\beta}_1 x_i^2\right)$$
@@ -983,12 +1003,12 @@ FOC 1 can be restated as
 $$E[\hat{u}]=0\to E[y-\hat{y}]=E[y-\hat{\beta}_0-\hat{\beta}_1x]=n^{-1}\sum_{i=1}^{n}(y-\hat{\beta}_0-\hat{\beta}_1x)=0$$
 
 And FOC 2 can be restated as
-$$E[\hat{u}|x]=E[\hat{u}]\to \hat{u}\indep x\to \text{Cov}(x,\hat{u})=0\to E[x\hat{u}]-E[x]E[\hat{u}]=E[x\hat{u}]=0$$
+$$E[\hat{u}|x]=E[\hat{u}]\to \text{Cov}(x,\hat{u})=0\to E[x\hat{u}]-E[x]E[\hat{u}]=E[x\hat{u}]=0$$
 $$\to n^{-1}\sum_{i=1}^{n}x_i(y_i-\hat{\beta}_0-\hat{\beta}_1x_i)=0$$
 
 ### OLS Regression
 
-The estimators $(\hat{\beta}_0,\hat{\beta}_1)$ are called the \textbf{ordinary least squares (OLS)} estimators of $\beta_0$ and $\beta_1$. A \textbf{fitted value} for $y$ when $x=x_i$ is defined as $$\hat{y}_i=\hat{\beta}_0+\hat{\beta}_1 x_i$$The \textbf{residual} for observation $i$ is the difference between the actual $y_i$ and its fitted value:$$\hat{u}_i=y_i-\hat{y}_i=y_i-\hat{\beta}_0-\hat{\beta}_1 x_i$$Thus, we defined the \textbf{OLS regression line} or \textbf{sample regression function (SRF)} as$$\hat{y}=\hat{\beta}_0+\hat{\beta}_1 x$$
+The estimators $(\hat{\beta}_0,\hat{\beta}_1)$ are called the \textbf{ordinary least squares (OLS)} estimators of $\beta_0$ and $\beta_1$. A \textbf{fitted value} for $y$ when $x=x_i$ is defined as $$\hat{y}_i=\hat{\beta}_0+\hat{\beta}_1 x_i$$The \textbf{residual} for observation $i$ is the difference between the actual $y_i$ and its fitted value:$$\hat{u}_i=y_i-\hat{y}_i=y_i-\hat{\beta}_0-\hat{\beta}_1 x_i$$Thus, we define  the \textbf{OLS regression line} or \textbf{sample regression function (SRF)} as$$\hat{y}=\hat{\beta}_0+\hat{\beta}_1 x$$
 
 \underline{Properties of OLS Statistics}
 \begin{enumerate}
@@ -1021,14 +1041,14 @@ $$=SST-2\sum_{i=1}^{n}\hat{u}_i(\hat{\beta}_0+\hat{\beta_1}x_i)$$
 $$=SST-2\left[\hat{\beta}_0\sum_{i=1}^{n}\hat{u}_i+\hat{\beta_1}\sum_{i=1}^{n}x_iu_i\right]=SST$$
 
 The \textbf{R-squared} of the regression, sometimes called the \textbf{coefficient of determination}, is defined as$$R^2\equiv\frac{SSE}{SST}=1-\frac{SSR}{SST}$$
-$R^2$is the ratio of the explained variation compared to the total variation; thus, it is interpreted as the fraction of the sample variation in $y$ that is explained by $x$. $R^2$ is equal to the square of the sample correlation coefficient between $y_i$ and $\hat{y}_i$:$$R^2=\frac{\left[\sum_{i=1}^{n}\left(y_i-\bar{y}\right)\left(\hat{y}_i-\bar{\hat{y}}\right)\right]^2}{\sum_{i=1}^{n}\left(y_i-\bar{y}\right)^2\sum_{i=1}^{n}\left(\hat{y}_i-\bar{\hat{y}}\right)^2}$$An important fact about $R^2$ is that it never decreases, and it usually increases, when another independent variable is added to a regression and the same set of observations is used for both regressions. The fact that $R^2$ never decreases when any variable is added to a regression makes it a poor tool for deciding whether particular variables should be added to a model; instead, one should focus on whether an explanatory variable has a nonzero partial effect on $y$ in the \emph{population} to decide whether to include an explanatory variable in a model. 
+$R^2$ is the ratio of the explained variation compared to the total variation; thus, it is interpreted as the fraction of the sample variation in $y$ that is explained by $x$. $R^2$ is equal to the square of the sample correlation coefficient between $y_i$ and $\hat{y}_i$:$$R^2=\frac{\left[\sum_{i=1}^{n}\left(y_i-\bar{y}\right)\left(\hat{y}_i-\bar{\hat{y}}\right)\right]^2}{\sum_{i=1}^{n}\left(y_i-\bar{y}\right)^2\sum_{i=1}^{n}\left(\hat{y}_i-\bar{\hat{y}}\right)^2}$$An important fact about $R^2$ is that it never decreases, and it usually increases, when another independent variable is added to a regression and the same set of observations is used for both regressions. The fact that $R^2$ never decreases when any variable is added to a regression makes it a poor tool for deciding whether particular variables should be added to a model; instead, one should focus on whether an explanatory variable has a nonzero partial effect on $y$ in the \emph{population} to decide whether to include an explanatory variable in a model. 
 
 
 ### Nonlinear Models
 
 In a linear regression model, changing the units of the variables has a multiplicative effect on the slope and intercepts but has not effect on the $R^2$.
 
-In a nonlinear regression model that incorporates natural logarithms, changing the units has no effect on the slope but does change the intercept. Take for example, $\ln(y)=\beta_0+\beta_1\ln(x)+u$. If we multiply $y$ by some constant $c_1$ and $x$ by some constant $c_2$, the equation becomes
+In a nonlinear regression model that incorporates natural logarithms, changing the units has no effect on the slope but does change the intercept. For example, take $\ln(y)=\beta_0+\beta_1\ln(x)+u$. If we multiply $y$ by some constant $c_1$ and $x$ by some constant $c_2$, the equation becomes
 $$\ln(c_1y)=\beta_0+\beta_1\ln(c_2 x)+u$$
 $$\to\ln(c_1)+\ln(y)=\beta_0+\beta_1\left[\ln(c_2)+\ln(x)\right]+u$$
 $$\to\ln(y)=\alpha+\beta_1\ln(x)+u$$where $\alpha=\beta_0-\ln(c_1)+\beta_1\ln(c_2)$.
@@ -1048,24 +1068,33 @@ Log-log (constant elasticity model) & $\ln(y)$ & $\ln(x)$ & $\%\Delta y=\beta_1\
 ### Gauss-Markov Assumptions
 
 \begin{itemize}
-\item Assumption 1: The population model is linear in parameters such that $$y_i=\alpha +\beta_1x_{i,1}+...+\beta_mx_{i,m}+u_i$$
-\item Assumption 2: The sample data $\{x_{i,1},...x_{i,m},y_i\}$ is a random sample.
-\item Assumption 3: The error term has a zero conditional mean such that $$E[u|x_{i,1},...x_{i,m}]=0$$
-For a random sample, this assumption implies that $E[u_i|x_i]=0\ \forall\ i=1,2,\dots,n$
-\item Assumption 4: The error term is homoskedastic such that $$Var(u|x_{i,1},...x_{i,m})=\sigma_u^2$$
+\item Assumption 1: The population model is linear in parameters such that $$y_i=\alpha +\beta_1x_{i1}+...+\beta_kx_{ik}+u_i$$
+\item Assumption 2: The sample data $\{x_{i1},...x_{ik},y_i\}$ is a random sample.
+\item Assumption 3: The error term has a zero conditional mean such that $$E[u|x_{i1},...x_{ik}]=0$$
+For a random sample, this assumption implies that $E[u_i|x_{i1},...x_{ik}]=0\ \forall\ i=1,2,\dots,n$. This also means that $\text{Cov}(u,g(x))=0$ for some function of $g$ (see below for proof).
+\item Assumption 4: The error term is homoskedastic such that $$\text{Var}(u|x_{i1},...x_{ik})=\sigma_u^2$$
 \item Assumption 5: None of the regressors exhibit perfect collinearity with one another.
-\item Assumption 6: There exists no serial correlation between the error terms such that $$cov(u_i,u_j)=0 \: \forall \: i\neq j$$Note: Assumption 2 is sufficient to satisfy assumption 6 in the case of cross-sectional data (see below for proof).
+\item Assumption 6: There exists no serial correlation between the error terms such that $$\text{Cov}(u_i,u_j)=0 \: \forall \: i\neq j$$Note: Assumption 2 is sufficient to satisfy assumption 6 in the case of cross-sectional data (see below for proof).
 \end{itemize}
 
 Under this set of assumptions, the \textbf{Gauss-Markov Theorem} states that the OLS estimator is BLUE (conditional on the sample values of the explanatory variable(s)).
 
+\underline{Proof that the Zero Conditional Mean Assumption Implies Zero Correlation between $u$ and functions of $x$}
+
+$$\text{Cov}\left(u,g(x)\right)=E[ug(x)]-E[u]E[g(x)]$$
+By the law of iterated expectations,
+$$=E[E[ug(x)|x]]-0\cdot E[g(x)]$$
+$$=E[g(x)E[u|x]]-0$$
+$$=E[g(x)\cdot 0]=0$$
+
 \underline{Proof that Random Sampling Implies Zero Serial Correlation with Cross-Sectional Data}
+
 Under assumption 2, we know the sample data is independent and identically distributed (i.i.d), meaning drawing one observation does not make drawing another observation any more or less likely and that the observations come from the same distribution. Thus, for some observation $i\neq j$,
-$$cov(y_i,y_j)=E[y_i y_j]-E[y_i]E[y_j]=E[y_i]E[y_j]-E[y_i]E[y_j]=0$$
-Similarly, by our first assumption that $y_i=\beta_0+\beta_1x_{i,1}+...+\beta_{i,m}x_{i,m}+u_i$
-$$0=cov(y_i,y_j)=cov(\beta_0+\beta_1x_{i,1}+...+\beta_{i,m}x_{i,m}+u_i,\beta_0+\beta_1x_{j,1}+...+\beta_{j,m}x_{j,m}+u_j)$$
-$$=\sum_{s=1}^m \sum_{t=1}^m \beta_s \beta_t cov(x_{i,s},x_{j,t}) + \sum_{s=1}^m \beta_s cov(x_{i,s},u_j) + \sum_{t=1}^m \beta_t cov(x_{j,t},u_i) + cov(u_i,u_j)$$
-Using the fact that the sample is i.i.d., $$\sum_{s=1}^m \sum_{t=1}^m \beta_s \beta_t cov(x_{i,s},x_{j,t})=0$$ Also, by the exogeneity assumption, $$\sum_{s=1}^{m} \beta_s cov(x_{i,s},u_j) + \sum_{t=1}^m \beta_t cov(x_{j,t},u_i)=0$$ Leaving us with $$cov(u_i,u_j)=0$$
+$$\text{Cov}(y_i,y_j)=E[y_i y_j]-E[y_i]E[y_j]=E[y_i]E[y_j]-E[y_i]E[y_j]=0$$
+Thus, replacing $y$ with the equation in our first assumption
+$$0=\text{Cov}(y_i,y_j)=\text{Cov}(\beta_0+\beta_1x_{i1}+...+\beta_kx_{ik}+u_i,\beta_0+\beta_1x_{j1}+...+\beta_kx_{jk}+u_j)$$
+$$=\sum_{s=1}^k \sum_{t=1}^k \beta_s \beta_t \text{Cov}(x_{is},x_{jt}) + \sum_{s=1}^k \beta_s \text{Cov}(x_{is},u_j) + \sum_{t=1}^k \beta_t \text{Cov}(x_{jt},u_i) + \text{Cov}(u_i,u_j)$$
+Using the fact that the sample is i.i.d., $$\sum_{s=1}^k \sum_{t=1}^k \beta_s \beta_t \text{Cov}(x_{is},x_{jt})=0$$ Also, by the exogeneity assumption, $$\sum_{s=1}^{k} \beta_s \text{Cov}(x_{is},u_j) + \sum_{t=1}^k \beta_t \text{Cov}(x_{jt},u_i)=0$$ Leaving us with $$\text{Cov}(u_i,u_j)=0$$
 
 ### Unbiasedness of OLS Estimators (SLR)
 
@@ -1408,6 +1437,7 @@ $P(\text{All }x=1 \text{ or all } x=0)=P(\text{All }x=1 \cup\text{ all } x=0)=0.
 
 ### Computer Exercises
 
+C1)
 ```{r Chapter 2 Computer Exercise 1,echo=TRUE,include=TRUE,comment=NA}
 #i
 mean(k401k$prate)
@@ -1434,6 +1464,7 @@ summary(lm1)["r.squared"]
 rm(lm1)
 ```
 
+C2)
 ```{r Chapter 2 Computer Exercise 2,echo=TRUE,include=TRUE,comment=NA}
 #i
 mean(ceosal2$salary)
@@ -1448,6 +1479,7 @@ lm(log(salary) ~ ceoten, data = ceosal2)
 #An additional year as CEO is predicted to increase salary by about 1%.
 ```
 
+C3)
 ```{r Chapter 2 Computer Exercise 3,echo=TRUE,include=TRUE,comment=NA}
 #i
 lm1 <- lm(sleep ~ totwrk, data = sleep75)
@@ -1461,6 +1493,7 @@ unname(lm1$coefficients[2])*120
 rm(lm1)
 ```
 
+C4)
 ```{r Chapter 2 Computer Exercise 4,echo=TRUE,include=TRUE,comment=NA}
 #i
 mean(wage2$wage)
@@ -1479,7 +1512,7 @@ unname(lm1$coefficients[2])*15*100
 rm(lm1)
 ```
 
-
+C5)
 ```{r Chapter 2 Computer Exercise 5,echo=TRUE,include=TRUE,comment=NA}
 #i
 #ln(rd) = beta_0+ beta_1 ln(sales) + u
@@ -1491,6 +1524,7 @@ summary(lm1)
 #increase in sales
 ```
 
+C6)
 ```{r Chapter 2 Computer Exercise 6,echo=TRUE,include=TRUE,comment=NA}
 #i
 #I expected a diminishing marginal return in the pass rate for each additional dollar spent.
@@ -1514,6 +1548,7 @@ max(meap93$math10)
 rm(lm1)
 ```
 
+C7)
 ```{r Chapter 2 Computer Exercise 7,echo=TRUE,include=TRUE,comment=NA}
 #i
 mean(charity$gift)
@@ -1540,6 +1575,7 @@ min(lm1$fitted.values)
 rm(lm1)
 ```
 
+C9)
 ```{r Chapter 2 Computer Exercise 8,echo=TRUE,include=TRUE,comment=NA}
 #i
 x <- runif(500, 0, 10)
@@ -1580,6 +1616,7 @@ summary(lm2)
 rm(x,y,u,lm1,lm2)
 ```
 
+C9)
 ```{r Chapter 2 Computer Exercise 9,echo=TRUE,include=TRUE,comment=NA}
 county_murders <- as_tibble(countymurders) %>%
   filter(year == 1996)
@@ -1609,6 +1646,7 @@ unname(lm1$residuals[which(county_murders$execs == 0)[1]])
 rm(county_murders,lm1)
 ```
 
+C10)
 ```{r Chapter 2 Computer Exercise 10 parts i-ii,echo=TRUE,include=TRUE,comment=NA}
 #i
 length(catholic$math12)
@@ -1638,6 +1676,7 @@ $$n = `r length(catholic$math12)`, R^2 = `r unname(unlist(summary(lm1)["r.square
 #make the slope coefficient biased (if interpreted as a causal effect)
 ```
 
+C11)
 ```{r Chapter 2 Computer Exercise 11,echo=TRUE,include=TRUE,comment=NA}
 #i
 length(gpa1$colGPA)
@@ -1982,6 +2021,7 @@ Thus, for a large sample size, the two important factors in determining the size
 
 ### Computer Exercises
 
+C1)
 ```{r Chapter 3 Computer Exercise 1,echo=TRUE,include=TRUE,comment=NA}
 #i
 #beta 2 is likely positive
@@ -1998,6 +2038,7 @@ summary(lm(bwght ~ cigs + faminc, data = bwght))
 summary(lm(bwght ~ cigs, data = bwght))
 ```
 
+C2)
 ```{r Chapter 3 Computer Exercise 2,echo=TRUE,include=TRUE,comment=NA}
 lm1 <- lm(price ~ sqrft + bdrms, data = hprice1)
 #i
@@ -2022,6 +2063,7 @@ lm1$residuals[1]*1000
 rm(lm1)
 ```
 
+C3)
 ```{r Chapter 3 Computer Exercise 3,echo=TRUE,include=TRUE,comment=NA}
 #i
 lm(lsalary ~ lsales + lmktval, data = ceosal2)
@@ -2043,6 +2085,7 @@ cor(ceosal2$lmktval, ceosal2$profits)
 rm(lm2,lm3)
 ```
 
+C4)
 ```{r Chapter 3 Computer Exercise 4,echo=TRUE,include=TRUE,comment=NA}
 #i
 #atndrte
@@ -2083,6 +2126,7 @@ unname(lm1$coefficients[2]+lm1$coefficients[3]*-5)
 rm(lm1)
 ```
 
+C5)
 ```{r Chapter 3 Computer Exercise 5,echo=TRUE,include=TRUE,comment=NA}
 lm1 <- lm(educ ~ exper + tenure, data = wage1)
 lm(lwage ~ lm1$residuals, data = wage1)
@@ -2092,6 +2136,7 @@ lm(lwage ~ educ + exper + tenure, data = wage1)
 rm(lm1)
 ```
 
+C6)
 ```{r Chapter 3 Computer Exercise 6,echo=TRUE,include=TRUE,comment=NA}
 #i
 lm1 <- lm(IQ ~ educ, data = wage2)
@@ -2112,6 +2157,7 @@ unname(near(lm2$coefficients[2],lm3$coefficients[2] + lm3$coefficients[3] * lm1$
 rm(lm1,lm2,lm3)
 ```
 
+C7)
 ```{r Chapter 3 Computer Exercise 7,echo=TRUE,include=TRUE,comment=NA}
 #i
 summary(lm(math10 ~ lexpend + lnchprg, data = meap93))
@@ -2136,6 +2182,7 @@ cor(meap93$lexpend, meap93$lnchprg)
 #spending effect as shown by the difference in the coefficient estimates
 ```
 
+C8)
 ```{r Chapter 3 Computer Exercise 8,echo=TRUE,include=TRUE,comment=NA}
 #i
 #prpblck
@@ -2178,6 +2225,7 @@ cor(discrim$lincome, discrim$prppov, use = "pairwise.complete.obs")
 #hand, including both reduces the amount of bias in the estimators
 ```
 
+C9)
 ```{r Chapter 3 Computer Exercise 9,echo=TRUE,include=TRUE,comment=NA}
 #i
 summary(lm(gift ~ mailsyear + giftlast + propresp, data = charity))
@@ -2207,6 +2255,7 @@ lm(gift ~ mailsyear + giftlast + propresp + avggift, data = charity)
 #correlated
 ```
 
+\newpage
 
 # Chapter 4
 
@@ -2247,9 +2296,9 @@ in which case we reject the null in favor of the alternative hypothesis if
 $$|t_{\hat{\beta}_j}|>c$$
 Generally, if we reject the null in favor of the alternative hypothesis (for testing against $\beta_j=0$) we say that $x_j$ is \textbf{statistically significant} or \textbf{statistically different from 0} at the specified significance level. Otherwise, we say $x_j$ is \textbf{statistically insignificant}.
 
-Often, it's useful to compute a \textbf{p-value}, which provides the \emph{smallest} significance level at which the null hypothesis would be rejected. In other words, the p-value is the probability of observing a t statistic as extreme as we did if the null hypothesis is true and is equal to
+Often, it's useful to compute a \textbf{p-value}, which provides the \emph{smallest} significance level at which the null hypothesis would be rejected. In other words, the p-value is the probability of observing a $t$ statistic as extreme as we did if the null hypothesis is true and is equal to
 $$P\left(|T|>|t|\right),$$
-where $T$ denotes a t distributed random variable with $n-k-1$ degrees of freedom and $t$ denotes the numerical value of the test statistic. It's important to note that these statements for the p-value hold for two-sided tests. For one-sided tests the p-value equals
+where $T$ denotes a $t$ distributed random variable with $n-k-1$ degrees of freedom and $t$ denotes the numerical value of the test statistic. It's important to note that these statements for the p-value hold for two-sided tests. For one-sided tests the p-value equals
 $$P\left(T>|t|\right)=P\left(|T|>|t|\right)/2$$
 
 The CLM assumptions also make it simple to construct a \textbf{confidence interval}, which is a rule used to construct a random interval so that confidence level percentage of all data sets yields an interval that contains the population value. Confidence intervals are still dependent on the underlying assumptions, and, if these assumptions hold, take the form
@@ -2260,7 +2309,7 @@ $$\text{CI}=\left[\hat{\beta}_j-c\cdot\text{se}\left(\hat{\beta}_j\right),\hat{\
 It's often the case where we want to compare the coefficients on the explanatory variables. In this case, we can write the hypotheses
 $$\text{H}_0: \beta_j=\beta_\ell$$
 $$\text{H}_1: \beta_j\neq\beta_\ell$$
-Thus, we can construct the t statistic as
+Thus, we can construct the $t$ statistic as
 $$t=\frac{\hat{\beta}_j-\hat{\beta}_\ell}{\text{se}\left(\hat{\beta}_j-\hat{\beta}_\ell\right)}$$
 The numerator is trivial to compute; however, the standard error in the denominator is somewhat difficult to compute. We know
 $$\text{Var}\left(\hat{\beta}_j-\hat{\beta}_\ell\right)=\text{Var}\left(\hat{\beta}_j\right)+\text{Var}\left(\hat{\beta}_\ell\right)-2\text{Cov}\left(\hat{\beta}_j,\hat{\beta}_\ell\right)$$
@@ -2272,7 +2321,7 @@ $$\to y=\beta_0+\beta_1 x_1+\dots+\beta_j x_j+\dots+\beta_\ell x_\ell+\dots+\bet
 $$\to y=\beta_0+\beta_1 x_1+\dots+\beta_j x_j-\beta_\ell x_j+\dots+\beta_\ell x_\ell+\beta_\ell x_j+\dots+\beta_k x_k+u$$
 $$\to y=\beta_0+\beta_1 x_1+\dots+\left(\beta_j-\beta_\ell\right) x_j+\dots+\beta_\ell\left(x_\ell+x_j\right)+\dots+\beta_k x_k+u$$
 $$\to y=\beta_0+\beta_1 x_1+\dots+\left(\beta_j-\beta_\ell\right) x_j+\dots+\beta_\ell\left(x_j+x_\ell\right)+\dots+\beta_k x_k+u$$
-Creating a new variable $x_j+x_\ell$, it's easy to estimate the coefficient on $x_j$ and evaluate the desired t statistic.
+Creating a new variable $x_j+x_\ell$, it's easy to estimate the coefficient on $x_j$ and evaluate the desired $t$ statistic.
 
 ### Hypothesis Testing Multiple Linear Restrictions: The $F$ Test
 
@@ -2327,7 +2376,291 @@ The process of computing the $F$ statistic is the same as in previous problems w
 
 ### Problems
 
+\begin{enumerate}
+\item (i) Heteroskedasticity and (iii) Omitting an important explanatory variable can cause the usual OLS $t$ statistics to be invalid. Multicollinearity does not violate any of the CLM assumptions.
+\item 
+\begin{enumerate}
+\item $$\text{H}_0:\beta_3=0$$
+$$\text{H}_1:\beta_3 > 0$$
+\item $salary$ is predicted to increase by `r .00024*50*100`\% if $ros$ increases by 50 points. No, $ros$ does not have a practically large effect on $salary$.
+\item The $t$ statistic on $ros$ is approximately `r .00024/.00054`, which is below the one-sided critical value at the 10\% significance level. Thus, we fail to reject $H_0$ at the 10\% significance level.
+\item Based on the provided results, $ros$ does not have a statistically or practically significant impact on $salary$. Thus, I would not include it in a final model explaining CEO compensation in terms of firm performance.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item The coefficient on $\ln(sales)$ indicates, if sales increases by 10\%, the estimated percentage point change in $rdintens$ is .0321. This is not an economically large effect.
+\item The $t$ statistic on $sales$ (or $\ln(sales)$) is approximately `r .321/.216`. The critical value at the 10\% significance level is `r qt(p=.1, df=29, lower.tail= FALSE)`, and the critical value at the 5\% significance level is `r qt(p=.05, df=29, lower.tail= FALSE)`. Thus, we reject $H_0$ at the 10\% significance level but fail to reject $H_0$ at the 5\% significance level.
+\item The coefficient on $profmarg$ indicates a predicted .050 increase in $rdintens$ for every percentage point increase in $profmarg$. Again, this effect does not seem economically large.
+\item No, the one-sided p-value is approximately `r pt(.050/.046, 29, lower.tail= FALSE)`. Thus, $profmarg$ does not have a statistically significant effect on $rdtens$ at every conventional significance level based on these results.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item $$\text{H}_0:\beta_3 = 0$$
+$$\text{H}_1:\beta_3 \neq 0$$
+\item I expect $\beta_1$ and $\beta_2$ to be positive as greater income and population values shift demand curves right, which increases equilibrium prices.
+\item The elasticity in the statement is off by a decimal place. A more accurate statement would be: "Controlling for the average city income and the student population as a percentage of the total population, a 10\% increase in population is associated with a 0.66\% increase in $rent$."
+\item The two-sided p-value is approximately `r pt(.0056/.0017, df=60, lower.tail = FALSE)`. Thus, we reject $H_0$ at the 1\% significance level.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item $CI_{95}=[.412\pm `r qnorm(.025, lower.tail = TRUE)`\cdot .094]=[`r .412 + qnorm(.025, lower.tail = TRUE) * .094`,`r .412 + qnorm(.025, lower.tail = FALSE) * .094`]$
+\item No, 0.4 is within the bounds of the confidence interval constructed in part (a).
+\item Yes, 1 is not within the bounds of the confidence interval constructed in part (a).
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item The p-value associated with the hypothesis that $\beta_0 = 0$ is `r pt((-14.47/16.27)/2, df = 86, lower.tail = FALSE)`.
+The p-value associated with the hypothesis that $\beta_1 = 1$ is `r pt(((.976 - 1)/.049)/2, df = 86, lower.tail = FALSE)`. Thus, in both cases, we fail to reject $H_0$ at every conventional significance level.
+\item $F=\frac{(209,448.99-165,644.51)/2}{165,644.51/(88-2)}\approx$`r ((209448.99-165644.51)/2)/(165644.51/(88-2))` and the associated p-value is `r pf(((209448.99-165644.51)/2)/(165644.51/(88-2)), df1 = 2, df2 = 86, lower.tail = FALSE)` in which case we reject $H_0$ in favor of $H_1$ at every conventional significance level.
+\item $F=\frac{(.829-.820)/3}{(1-.829)/86}\approx$`r ((.829-.820)/3)/((1-.829)/86)`. The associated p-value is `r pf(((.829-.820)/3)/((1-.829)/81),df1 = 3, df2 = 81, lower.tail = FALSE)`. Thus, we fail to reject $H_0$ at every conventional significance level.
+\item The $F$ test is no longer valid because this notion violates the homoskedasticity assumption.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item In the equation estimated in example 4.7, the $t$ statistics are: $t_{hrsemp}=`r -.029/.023`, t_{sales}=`r -.962/.453`, t_{employ}=`r .761/.407`$.
+
+In the equation estimated in the problem, the $t$ statistics are: $t_{hrsemp}=`r -.042/.019`, t_{sales}=`r -.951/.370`, t_{employ}=`r .992/.360`$.
+\item $$\ln(scrap)=\beta_0+\beta_1 hrsemp+\beta_2\ln(sales)+\beta_3\ln(employ)+u$$
+$$\to\ln(scrap)=\beta_0+\beta_1 hrsemp+\beta_2\ln(sales)+\beta_3\ln(employ)+u-\beta_2\ln(employ)+\beta_2\ln(employ)$$
+$$\to\ln(scrap)=\beta_0+\beta_1 hrsemp+\beta_2\left[\ln(sales)-\ln(employ)\right]+(\beta_2+\beta_3)\ln(employ)+u$$
+$$\to\ln(scrap)=\beta_0+\beta_1 hrsemp+\beta_2\ln(sales/employ)+\theta_3\ln(employ)+u$$
+\item No, the $t$ statistic on $employ$ is approximately `r .041/.205`. The corresponding one-sided p-value is `r pt(.041/.205, df = 39, lower.tail = FALSE)`. Thus, at every conventional significance level, we would fail to reject the null hypothesis that $\theta_3=0$.
+\item $t_{sales/employ}=\frac{-.951-(-1)}{.370}\approx$`r (1-.951)/.370`. The corresponding one-sided p-value is about `r pt((1-.951)/.370, df = 39, lower.tail = TRUE)`. Thus, at every conventional significance level, we fail to reject the null hypothesis that $\beta_2=-1$.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item $$\text{Var}\left(\hat{\beta}_1-3\hat{\beta}_2\right)=\text{Var}\left(\hat{\beta}_1\right)+9\text{Var}\left(\hat{\beta}_2\right)-6\text{Cov}\left(\hat{\beta}_1,\hat{\beta}_2\right)$$
+$$\text{se}\left(\hat{\beta}_1-3\hat{\beta}_2\right)=\sqrt{\hat{\sigma}_{\hat{\beta}_1}^2+9\hat{\sigma}_{\hat{\beta}_2}^2-6\hat{\sigma}_{\hat{\beta}_1\hat{\beta}_2}}$$
+\item $$t=\frac{\hat{\beta}_1-3\hat{\beta}_2-1}{\text{se}\left(\hat{\beta}_1-3\hat{\beta}_2\right)}=\frac{\hat{\beta}_1-3\hat{\beta}_2-1}{\sqrt{\hat{\sigma}_{\hat{\beta}_1}^2+9\hat{\sigma}_{\hat{\beta}_2}^2-6\hat{\sigma}_{\hat{\beta}_1\hat{\beta}_2}}}$$
+\item $$y=\beta_0+\beta_1x_1+\beta_2x_2+\beta_3x_3+u$$
+$$\to y=\beta_0+\beta_1x_1+\beta_2x_2+\beta_3x_3+u-3\beta_2x_1+3\beta_2x_1$$
+$$\to y=\beta_0+(\beta_1-3\beta_2)x_1+\beta_2(3x_1+x_2)+\beta_3x_3+u$$
+$$\to y=\beta_0+\theta_1x_1+\beta_2(3x_1+x_2)+\beta_3x_3+u$$
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item $t_{educ}\approx `r -11.13/5.88`$, which is not below the 5\% two-sided critical value of `r qt(.025,df=702,lower.tail = T)`. $t_{age}\approx `r 2.2/1.45`$, which does not exceed the 5\% two-sided critical value of `r qt(.025,df=702,lower.tail = F)`. Thus, neither $educ$ nor $age$ is individually significant at the 5\% level against a two-sided alternative.
+\item $F=\frac{(.113-.103)/2}{(1-.113)/702}\approx `r ((.113-.103)/2)/((1-.113)/702)`$. The corresponding 5\% critical value is about `r qf(.05, df1=2, df2 = 702, lower.tail = F)`. Thus, we fail to reject $H_0$ that $educ$ and $age$ are jointly insignificant at the 5\% level.
+\item No, omitting $age$ and $educ$ from the equation only changes the coefficient on $totwrk$ from -.148 to -.151.
+\item Heteroskedasticity implies the tests computed in parts (a) and (b) are no longer "valid" and the computed test statistics do not have much meaning.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item $F=\frac{(.0395-0)/4}{(1-.0395)/137}\approx `r (.0395/4)/((1-.0395)/137)`$, which is well below the 5\% level critical value. Thus, we cannot reject the null that the explanatory variables are jointly insignificant at the 5\% level.
+
+The largest $t$ statistic (in absolute value) on the explanatory variables is that on $dkr$, where $t_{dir}\approx `r .321/.201`$. The corresponding two-sided critical value at the 5\% level is `r qt(.025, df=137, lower.tail=F)`. Thus, none of the explanatory variables is individually significant at the 5\% level.
+\item After reestimating the model, $F=\frac{(.0330-0)/4}{(1-.0330)/137}\approx `r (.0330/4)/((1-.0330)/137)`$, which is still well below the 5\% level critical value. Thus, we still cannot reject the null that the explanatory variables are jointly insignificant at the 5\% level.
+
+The largest $t$ statistic (in absolute value) on the explanatory variables is  still that on $dkr$, where $t_{dir}\approx `r .327/.203`$. The corresponding two-sided critical value at the 5\% level is `r qt(.025, df=137, lower.tail=F)`. Thus, none of the explanatory variables is individually significant at the 5\% level. In total, none of the conclusions change.
+\item No, one should not use natural logarithm form for explanatory variables that take on the value 0.
+\item  Overall, the evidence for predictability of stock returns is weak.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item The partial effect of $profmarg$ on CEO salary is not statistically significant at any conventional significance level, regardless of whether we control for $ceoten$ and $comten$ or not.
+\item Controlling for $sales$, $profmar$, $ceoten$, and $comten$, $t_{mktval}\approx `r .100/.049`$. The corresponding two-sided critical value at the 5\% level is approximately `r qt(.025, df = 171, lower.tail = F)`. Thus, we reject the null that market value does not have an effect on CEO salary at the 5\% level in favor of the two-sided alternative.
+\item The coefficient on $ceoten$ indicates a predicted 1.71\% increase in a CEO's salary for an additional year as the CEO with the current company. The coefficient on $comten$ indicates a predicted 0.92\% decrease in a CEO's salary for an additional year with the current company.
+
+The $t$ statistic on $ceoten$ is approximately `r .0171/.0055`, and  the $t$ statistic on $comten$ is approximately `r -.0092/.0033`. Individually, these explanatory variables are statistically significant at the 5\% significance level.
+
+Testing the hypothesis that the explanatory variables are jointly insignificant, the $F$ statistic is about `r ((.353-.304)/2)/((1-.353)/171)`, which provides strong evidence that these explanatory variables are jointly statistically significant.
+\item It seems odd that longer tenure with the company, holding the other factors fixed, is associated with a lower salary. I suppose, since we're controlling for $ceoten$, a larger $comten$ implies less experience as a CEO, which may be the reason we see this association.
+\end{enumerate}
+\end{enumerate}
+
 ### Computer Exercises
+
+C1)
+```{r Chapter 4 Computer Exercise 1,echo=TRUE,include=TRUE,comment=NA}
+#i
+#beta_1/100 is the partial effect on voteA from a 1% increase in expendA
+
+#ii
+#H_0: beta_1+beta_2=0
+
+#iii
+summary(lm(voteA ~ lexpendA + lexpendB + prtystrA, data = vote1))$coefficients[,1:3]
+
+#iv
+VOTE1 <- as_tibble(vote1) %>%
+  mutate(
+    lexpend_diff = lexpendB - lexpendA
+  )
+
+summary(lm(voteA ~ lexpendA + lexpend_diff + prtystrA, data = VOTE1))$coefficients[,1:3]
+
+rm(VOTE1)
+```
+
+C2)
+```{r Chapter 4 Computer Exercise 2,echo=TRUE,include=TRUE,comment=NA}
+lm1 <- lm(lsalary ~ LSAT + GPA + llibvol + lcost + rank, data = lawsch85)
+
+#i
+#H_0: beta_5=0
+summary(lm1)$coefficients[6,]
+
+#ii
+summary(lm1)$coefficients[2:3,]
+linearHypothesis(lm1, c("LSAT = 0", "GPA = 0"))
+
+#iii
+lm2 <- lm(lsalary ~ LSAT + GPA + llibvol + lcost + rank + clsize + faculty, data = lawsch85)
+linearHypothesis(lm2, c("clsize = 0", "faculty = 0"))
+
+#iv
+#Other factors may include history of the school and the demographics
+
+rm(lm1, lm2)
+```
+
+C3)
+```{r Chapter 4 Computer Exercise 3,echo=TRUE,include=TRUE,comment=NA}
+#i
+HPRICE1 <- as_tibble(hprice1) %>%
+  mutate(
+    bdrms_150 = sqrft - 150 * bdrms
+  )
+lm1 <- lm(lprice ~ bdrms_150 + bdrms, data = HPRICE1)
+
+summary(lm1)$coefficients[3,]
+
+#ii
+#beta_2=theta_1-150*beta_1
+
+#iii
+confint(lm1)[3,]
+
+rm(lm1, HPRICE1)
+```
+
+C4)
+```{r Chapter 4 Computer Exercise 4,echo=TRUE,include=TRUE,comment=NA}
+summary(lm(bwght ~ cigs + parity + faminc + motheduc + fatheduc, data = bwght))["r.squared"]
+```
+
+C5)
+```{r Chapter 4 Computer Exercise 5,echo=TRUE,include=TRUE,comment=NA}
+#i
+summary(lm(lsalary ~ years + gamesyr + bavg + hrunsyr, data = mlb1))$coefficients[5,]
+
+#ii
+lm1 <- lm(lsalary ~ years + gamesyr + bavg + hrunsyr + runsyr + fldperc + sbasesyr, data = mlb1)
+summary(lm1)$coefficients[6:8,]
+
+#iii
+linearHypothesis(lm1, c("bavg = 0", "fldperc = 0", "sbasesyr = 0"))
+rm(lm1)
+```
+
+C6)
+```{r Chapter 4 Computer Exercise 6,echo=TRUE,include=TRUE,comment=NA}
+#i
+#beta_2-beta_3=0
+
+WAGE2 <- as_tibble(wage2) %>%
+  mutate(
+    tenure_exper = tenure + exper
+  )
+
+#ii
+confint(lm(lwage ~ educ + exper + tenure_exper, data = WAGE2))[3,]
+
+rm(WAGE2)
+```
+
+C7)
+```{r Chapter 4 Computer Exercise 7,echo=TRUE,include=TRUE,comment=NA}
+#i
+min(twoyear$phsrank)
+max(twoyear$phsrank)
+mean(twoyear$phsrank)
+
+#ii
+summary(lm(lwage ~ jc + totcoll + exper + phsrank, data = twoyear))$coefficients[5,]
+
+#iii
+#Adding phsrank makes the absolute value of the t statistic on jc smaller
+
+#iv
+#id a worker identification number. Assuming random assignment,
+#it shouldn't be correlated with any of the variables
+summary(lm(lwage ~ jc + totcoll + exper + phsrank + id, data = twoyear))$coefficients[6,]
+```
+
+C8)
+```{r Chapter 4 Computer Exercise 8,echo=TRUE,include=TRUE,comment=NA}
+K401KSUBS <- as_tibble(k401ksubs) %>%
+  filter(fsize == 1)
+
+#i
+nrow(K401KSUBS)
+
+#ii
+lm1 <- lm(nettfa ~ inc + age, data = K401KSUBS)
+summary(lm1)$coefficients[,1:3]
+
+#iii
+#The intercept does not have much meaning
+#It predicts the net financial wealth for a (single-person) household
+#Where the survey respondent is 0 years old and has no income
+
+#iv
+pt((lm1$coefficients[[3]]-1) / coefficients(summary(lm1))[, "Std. Error"][[3]], df = 2014, lower.tail = TRUE)
+
+#v
+lm(nettfa ~ inc, data = K401KSUBS)
+cor(K401KSUBS$age,K401KSUBS$inc)
+#The small level of correlation is why the coefficient doens't change much
+
+rm(K401KSUBS, lm1)
+```
+
+C9)
+```{r Chapter 4 Computer Exercise 9,echo=TRUE,include=TRUE,comment=NA}
+#i
+summary(lm(lpsoda ~ prpblck + lincome + prppov, data = discrim))$coefficients
+
+#ii
+cor(discrim$lincome, discrim$prppov, use = "pairwise.complete.obs")
+
+#iii
+lm1 <- lm(lpsoda ~ prpblck + lincome + prppov + lhseval, data = discrim)
+summary(lm1)$coefficients
+
+#iv
+linearHypothesis(lm1, c("lincome = 0", "prppov = 0"))
+
+#v
+#Because the regression equation in part (iii) controls for more variables,
+#it's likely to be more accurate
+rm(lm1)
+```
+
+C10)
+```{r Chapter 4 Computer Exercise 10,echo=TRUE,include=TRUE,comment=NA}
+#i
+confint(lm(lavgsal ~ bs, data = elem94_95))[2,]
+
+#ii
+summary(lm(lavgsal ~ bs + lenrol + lstaff, data = elem94_95))$coefficients[2,]
+
+#iii
+#The sum of squared residuals "effect" exceeds that from correlation between the
+#explanatory variables in the sample
+
+#iv
+#The negative coefficient indicates an association between smaller classes
+#and lower teacher salaries
+
+#v
+summary(lm(lavgsal ~ bs + lenrol + lstaff + lunch, data = elem94_95))$coefficients[5,]
+
+#vi
+#Yes. These results are very similar to those in Table 4.1
+```
+
+\newpage
 
 # Chapter 5
 
@@ -2482,6 +2815,8 @@ It is more difficult to show that $\tilde{\beta}_1$ is asymptotically normal. Ne
 
 ### Computer Exercises
 
+\newpage
+
 # Chapter 6
 
 ## Notes
@@ -2634,6 +2969,16 @@ $$1-\frac{\sum_{i=1}^{n}\hat{r}_i^2}{\sum_{i=1}^{n}\left(y_i-\bar{y}\right)^2}$$
 In many cases where formulas for standard errors are hard to obtain mathematically, or where they are thought not to be very good approximations to the true sampling variation of an estimator, we can rely on a \textbf{resampling method}. The general idea is to treat the observed data as a population that we can draw samples from. The most common resampling method is the \textbf{bootstrap}. While there are several versions of the bootstrap, we'll focus on the \textbf{nonparametric bootsrap}. Suppose we have an estimate, $\hat{\theta}$, of a population parameter, $\theta$, from a random sample of size $n$. Then, we can obtain a valid standard error for $\hat{\theta}$ by computing the estimate from different random samples drawn from the original data. To implement this process, draw $n$ numbers, with replacement, randomly from the original data set. This produces a new data set (of size $n$) that consists of the original data, but with many observations appearing multiple times. If $\hat{\theta}^{(b)}$ denotes the sample estimate from the bootstrap sample $b$, the \textbf{bootstrap sample error} of $\hat{\theta}$ is just the sample standard deviation of $\hat{\theta}^{(b)}$
 $$\text{bse}(\hat{\theta})=\sqrt{\frac{1}{m-1}\sum_{i=1}^{m}\left(\hat{\theta}^{(b)}-\bar{\hat{\theta}^{(b)}}\right)^2},$$
 where $m$ is the number of times we resample from the original data set.
+
+## Exercises
+
+### Problems
+
+### Computer Exercises
+
+\newpage
+
+# Chapter 7
 
 
 
