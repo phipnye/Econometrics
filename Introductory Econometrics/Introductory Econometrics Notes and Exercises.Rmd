@@ -13,6 +13,7 @@ header-includes:
 library(tidyverse)
 library(car)
 library(wooldridge)
+library(datawizard)
 options(scipen = 99999999)
 ```
 
@@ -1195,7 +1196,7 @@ Simple regression can also be applied to the case where x is a \textbf{binary va
 
 It follows that$$\beta_1=E[y|x=1]-E[y|x=0]$$
 
-In cases where we hope to study the effect of an intervention or new policy, the idea of counterfactuals or potential outcomes are used. Define, the \textbf{control group} as those not subject to the intervention or new policy act and the \textbf{treatment group} as those subject to the intervention. Then, the causal (or treatment) effect of the intervention for unit $i$ is$$te_i=y_i(1)-y_i(0),$$the difference between the two potential outcomes. A noteworthy items about $te_i$is it is not observed for any unit $i$ because it depends on both counterfactuals. We cannot hope to estimate tei for each unit i. Instead, the focus is typically on the \textbf{average treatment effect (ATE)}, also called the \textbf{average causal effect (ACE)}. The ATE is simply the average of the treatment effects across the entire population. We can write the ATE parameter as $$\tau_{ate}=E[te_i]=E[y_i(1)-y_i(0)]=E[y_i(1)]-E[y_i(0)]$$
+In cases where we hope to study the effect of an intervention or new policy, the idea of counterfactuals or potential outcomes are used. Define, the \textbf{control group} as those not subject to the intervention or new policy act and the \textbf{treatment group} as those subject to the intervention. Then, the causal (or treatment) effect of the intervention for unit $i$ is$$te_i=y_i(1)-y_i(0),$$the difference between the two potential outcomes. A noteworthy items about $te_i$is it is not observed for any unit $i$ because it depends on both counterfactuals. We cannot hope to estimate $te_i$ for each unit $i$. Instead, the focus is typically on the \textbf{average treatment effect (ATE)}, also called the \textbf{average causal effect (ACE)}. The ATE is simply the average of the treatment effects across the entire population. We can write the ATE parameter as $$\tau_{ate}=E[te_i]=E[y_i(1)-y_i(0)]=E[y_i(1)]-E[y_i(0)]$$
 
 For each unit $i$ let $x_i$ be the program participation status—a binary variable. Then the observed outcome, $y_i$, can be written as$$y_i=(1-x_i)y_i(0)+x_iy_i(1)=y_i(0)+[y_i(1)-y_i(0)]x_i$$
 Imposing a usually unrealistic assumption of a constant treatment effect$$\to y_i=y_i(0)+\tau x_i$$
@@ -2211,7 +2212,7 @@ lm(lpsoda ~ prpblck + lincome, data = discrim)
 
 #v
 lm(lpsoda ~ prpblck + lincome + prppov, data = discrim)
-#The coefficent on prpblck falls
+#The coefficient on prpblck falls
 
 #vi
 cor(discrim$lincome, discrim$prppov, use = "pairwise.complete.obs")
@@ -2611,7 +2612,7 @@ pt((lm1$coefficients[[3]]-1) / coefficients(summary(lm1))[, "Std. Error"][[3]], 
 #v
 lm(nettfa ~ inc, data = K401KSUBS)
 cor(K401KSUBS$age,K401KSUBS$inc)
-#The small level of correlation is why the coefficient doens't change much
+#The small level of correlation is why the coefficient doesn't change much
 
 rm(K401KSUBS, lm1)
 ```
@@ -2813,7 +2814,127 @@ It is more difficult to show that $\tilde{\beta}_1$ is asymptotically normal. Ne
 
 ### Problems
 
+\begin{enumerate}
+\item $$\text{plim}\left(\hat{\beta}_0\right)=\text{plim}\left(\bar{y}-\hat{\beta}_1\bar{x}_1\right)$$
+$$=\text{plim}(\bar{y})-\text{plim}(\hat{\beta}_1)\cdot\text{plim}(\bar{x}_1)$$
+Using the fact that $\bar{y}$ and $\bar{x_1}$ are consistent estimators for their corresponding expectations (from the LLN) and that $\hat{\beta}_1$ is a consistent estimator of $\beta_1$,
+$$=E[y]-\beta_1E[x_1]=\beta_0$$
+\item  If $funds$ and $risktol$ are positively correlated, the inconsistency in $\tilde{\beta}_1$ depends on the correlation between $pctstck$ and $risktol$. Assuming $pctstck$ and $risktol$ are also positively correlated, then the inconsistency in $\tilde{\beta}_1$ is positive.
+\item No, I highly doubt $cigs$ has a normal distribution in the U.S. adult population because $cigs$ is strictly nonnegative and a large proportion (more than half) of the population doesn't smoke. Thus, not only does the distribution fail to conform the symmetry of a normal distribution, but it also fails to take on no particular value with zero probability.
+\item $$\text{plim}\left(\tilde{\beta}_0\right)=\text{plim}\left(\bar{y}-\tilde{\beta}_1\bar{x}\right)$$
+$$=\text{plim}(\bar{y})-\text{plim}(\tilde{\beta}_1)\cdot\text{plim}(\bar{x})$$
+Using the fact that $\bar{y}$ and $\bar{x}$ are consistent estimators for their corresponding expectations (from the LLN) and that $\tilde{\beta}_1$ is a consistent estimator of $\beta_1$,
+$$=E[y]-\beta_1E[x]=\beta_0$$
+\item 
+\begin{enumerate}
+\item Using the normal distribution to estimate the probability that score exceeds 100, the answer would not be zero but would be very small. This is contradictory to the fact that $score$ cannot exceed 100.
+\item The normal distribution somewhat fits that left tail but is certainly imperfect. More specifically, there are "spikes" in the proportions around scores of 20, 50, and 60, which accounts for some of the misfit between the histogram and the normal distribution.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item 
+\item 
+\item 
+\item $\hat{\beta}_1$ is a consistent estimator for $\beta_1$ because, as we showed in part(c), $\text{Cov}(x,v)=0$. On the other hand, $\hat{\beta}_1$ is unbiased only if $\beta_2=0$ since $E[v|x]$ depends on $x$ unless $\beta_2=0$ (as showed in part (b)).
+\item Consider the multiple regression model $y=\beta_0+\beta_1x+\beta_2x^2+u$,
+$$\frac{\partial y}{\partial x}=\beta_1+2\beta_2x=\beta_1\text{ if }x=0,$$
+\item Assuming $\beta_2\neq 0$, it's more valuable to consistently estimate $\beta_1$ and $\beta_2$ because $\beta_2$ allows for diminishing or increasing marginal returns to $y$ from $x$ and allows for interpreting the partial effect of $x$ on $y$ from values of $x$ other than its mean.
+\end{enumerate}
+\end{enumerate}
+
 ### Computer Exercises
+
+C1)
+```{r Chapter 5 Computer Exercise 1,echo=TRUE,include=TRUE,comment=NA,fig.align='center',fig.width=4,fig.height=3}
+#i
+lm1 <- lm(wage ~ educ + exper + tenure, data = wage1)
+ggplot(mapping = aes(lm1$residuals))+
+  geom_histogram(fill = "lightblue", color = "darkblue", bins = 27)
+
+#ii
+lm2 <- lm(lwage ~ educ + exper + tenure, data = wage1)
+ggplot(mapping = aes(lm2$residuals))+
+  geom_histogram(fill = "lightblue", color = "darkblue", bins = 27)
+
+#iii
+#Closer with log-level model
+
+rm(lm1,lm2)
+```
+
+C2)
+```{r Chapter 5 Computer Exercise 2,echo=TRUE,include=TRUE,comment=NA}
+#i
+lm1 <- lm(colgpa ~ hsperc + sat, data = gpa2)
+summary(lm1)
+
+#ii
+lm2 <- lm(colgpa[1:2070] ~ hsperc[1:2070] + sat[1:2070], data = gpa2)
+summary(lm2)
+
+#iii
+coef(summary(lm2))[, "Std. Error"][[2]] / coef(summary(lm1))[, "Std. Error"][[2]]
+sqrt(nrow(gpa2))/sqrt(2070)
+
+rm(lm1,lm2)
+```
+
+C3)
+```{r Chapter 5 Computer Exercise 3,echo=TRUE,include=TRUE,comment=NA}
+BWGHT <- as_tibble(bwght) %>%
+  filter(!is.na(motheduc), !is.na(fatheduc))
+
+restricted_model <- lm(bwght ~ cigs + parity + faminc, data = BWGHT)
+
+lm_statistic <- nrow(BWGHT) * summary(lm(restricted_model$residuals ~ cigs + parity + faminc + motheduc + fatheduc, data = BWGHT))[["r.squared"]]
+
+lm_statistic
+
+pchisq(q = lm_statistic, df = 2, lower.tail = FALSE)
+
+#Compared to the F-Statistic
+linearHypothesis(lm(bwght ~ cigs + parity + faminc + motheduc + fatheduc, data = BWGHT), c("motheduc = 0","fatheduc = 0"))
+
+rm(BWGHT, restricted_model, lm_statistic)
+```
+
+C4)
+```{r Chapter 5 Computer Exercise 4,echo=TRUE,include=TRUE,comment=NA}
+#i
+K401KSUBS <- as_tibble(k401ksubs) %>%
+  filter(fsize == 1)
+
+z_inc <- standardize(K401KSUBS$inc)
+
+sum(z_inc^3) / (length(z_inc) - 1)
+
+z_linc <- standardize(log(K401KSUBS$inc))
+
+sum(z_linc^3) / (length(z_linc) - 1)
+
+#inc has more skewness and therefore seems less likely to be normally distributed
+
+#ii
+z_bwght <- standardize(bwght2$bwght)
+
+sum(z_bwght^3) / (length(z_bwght) - 1)
+
+z_lbwght <- standardize(log(bwght2$bwght))
+
+sum(z_lbwght^3) / (length(z_lbwght) - 1)
+
+#log(bwght) has more skewness and therefore seems less likely to be normally distributed
+
+rm(K401KSUBS, z_inc, z_linc, z_bwght, z_lbwght)
+
+#iii
+#This statement is certainly fallacious. Part (ii) serves as an example
+#But cases where y is close to zero (or even negative) will likely also
+#disprove this statement
+
+#iv
+#In regression analysis, we should be concerned with the conditional distributions
+```
 
 \newpage
 
@@ -2974,11 +3095,377 @@ where $m$ is the number of times we resample from the original data set.
 
 ### Problems
 
+\begin{enumerate}
+\item No, this generality is not necessary. In general, we used quadratics to allow for diminishing (or increasing) marginal effects of the independent variable on the dependent variable. In some cases, allowing for nonconstant effects using quadratics is reasonable but certainly not always. In this example, including $roe^2$ is definitely not necessary since the estimated coefficient on $roe^2$ is both statistically and practically insignificant.
+\item Considering the model $c_0y_i=\beta_0+c_1x_{i1}+\dots+c_kx_{ik}+u_i$,
+$SSR=\sum_{i=1}^{n}(c_oy_i-\tilde{\beta}_0-\tilde{\beta}_1c_1x_{i1}-\dots-\tilde{\beta}_kc_kx_{ik})^2$, and the OLS first order conditions are:
+$$\frac{\partial{SSR}}{\partial{\tilde{\beta}_0}}=-2\sum_{i=1}^{n}(c_oy_i-\tilde{\beta}_0-\tilde{\beta}_1c_1x_{i1}-\dots-\tilde{\beta}_kc_kx_{ik})=0,$$
+which solves for $\tilde{\beta}_0$ by
+$$\tilde{\beta}_0=c_0\bar{y}-c_1\tilde{\beta}_1\bar{x}_1-\dots-c_k\tilde{\beta}_k\bar{x}_k$$
+and
+$$\frac{\partial{SSR}}{\partial{\tilde{\beta}_j}}=-2\sum_{i=1}^{n}x_{ij}(c_oy_i-\tilde{\beta}_0-\tilde{\beta}_1c_1x_{i1}-\dots-\tilde{\beta}_kc_kx_{ik})=0$$
+Solving for $\tilde{\beta}_j$,
+$$\sum_{i=1}^{n}x_{ij}(c_oy_i-\tilde{\beta}_0-\tilde{\beta}_1c_1x_{i1}-\dots-\tilde{\beta}_kc_kx_{ik})=0$$
+$$\to\sum_{i=1}^{n}\hat{x}_{ij}(c_oy_i-\tilde{\beta}_0-\tilde{\beta}_1c_1x_{i1}-\dots-\tilde{\beta}_kc_kx_{ik})+\sum_{i=1}^{n}\hat{r}_{ij}(c_oy_i-\tilde{\beta}_0-\tilde{\beta}_1c_1x_{i1}-\dots-\tilde{\beta}_kc_kx_{ik})=0$$
+$$\to 0+\sum_{i=1}^{n}\hat{r}_{ij}(c_oy_i-\tilde{\beta}_jc_jx_{ij})+\sum_{i=1}^{n}\hat{r}_{ij}(\tilde{\beta}_0-\tilde{\beta}_1c_1x_{i1}-\dots-\tilde{\beta}_{j-1}c_{j-1}x_{ij-1}-\tilde{\beta}_{j+1}c_{j+1}x_{ij+1}-\dots-\tilde{\beta}_kc_kx_{ik})=0$$
+$$\to \sum_{i=1}^{n}\hat{r}_{ij}(c_oy_i)-\tilde{\beta}_jc_j\sum_{i=1}^{n}\hat{r}_{ij}x_{ij}+0=0$$
+$$\to c_0\sum_{i=1}^{n}\hat{r}_{ij}y_i-\tilde{\beta}_jc_j\sum_{i=1}^{n}\hat{r}_{ij}^2-\tilde{\beta}_jc_j\sum_{i=1}^{n}\hat{r}_{ij}\hat{x}_{ij}=0$$
+$$\to c_0\sum_{i=1}^{n}\hat{r}_{ij}y_i=\tilde{\beta}_jc_j\sum_{i=1}^{n}\hat{r}_{ij}^2$$
+$$\to \tilde{\beta}_j=\frac{c_0}{c_j}\cdot\frac{\sum_{i=1}^{n}\hat{r}_{ij}^2}{\sum_{i=1}^{n}\hat{r}_{ij}y_i}$$
+$$\to \tilde{\beta}_j=\frac{c_0}{c_j}\cdot\hat{\beta}_j$$
+Returning to $\tilde{\beta}_0=c_0\bar{y}-c_1\tilde{\beta}_1\bar{x}_1-\dots-c_k\tilde{\beta}_k\bar{x}_k$ and replacing $\tilde{\beta}_j$ with $\frac{c_0}{c_j}\cdot\hat{\beta}_j$
+$$\tilde{\beta}_0=c_0\bar{y}-c_1\cdot\frac{c_0}{c_1}\hat{\beta}_1\bar{x}_1-\dots-c_k\cdot\frac{c_0}{c_k}\hat{\beta}_k\bar{x}_k$$
+$$\to\tilde{\beta}_0=c_0\left(\bar{y}-\hat{\beta}_1\bar{x}_1-\dots-\hat{\beta}_k\bar{x}_k\right)$$
+$$\to\tilde{\beta}_0=c_0\hat{\beta}_0$$
+\item
+\begin{enumerate}
+\item $$\frac{\partial{\widehat{\ rdintens}}}{\partial{\ sales}}=.00030-0000000140\ sales$$
+$$.00030-0000000140\ sales < 0$$
+$$sales < `r .00030/.0000000140`$$
+\item Yes, I would keep $sales^2$ in the equation because its t-statistic has a one-sided p-value of approximately `r pt(-.0000000070 / .0000000037, df = 29, lower.tail = TRUE)`.
+\item $$\widehat{rdintens}=2.613+\underset{(.14)}{.30}\ salesbil - \underset{(`r .0000000037 * 1000^2`)}{`r .0000000070 * 1000^2`}\ salesbil^2$$
+$$n=32, R^2=.1484$$
+\item I prefer the equation reported in part (c) since it uses fewer zeros and is thus easier to read.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item $$\ln(wage)=\beta_0+\beta_1educ+\beta_2educ\cdot pareduc+\beta_3exper+\beta_4tenure+u$$
+$$\to\Delta\ln(wage)=\beta_1\Delta educ+\beta_2\Delta educ\cdot pareduc$$
+$$\to\Delta\ln(wage)/\Delta educ=\beta_1+\beta_2pareduc$$
+I expect $\beta_2>0$ because I expect returns to education (in wage) to be greater for those who have more educated parents.
+\item Using $pareduc=32$ and $pareduc=24$, the estimated difference in the return to education is .00078(32-24)=`r .00078*(32-24)`.
+\item No, the estimated return to education now depends negatively on parent education. The $t$ statistic on $educ\cdot pareduc$ is approximately `r -.0016/.0012`, which gives a two-sided p-value of `r pt(-.0016/.0012, df = 716, lower.tail = T)*2`. Hence, we fail to reject $H_0$ at every conventional significance level.
+\end{enumerate}
+\item Example 4.2 is interested in the effect of school size on student performance. It does not make sense to include $sci11$ to an equation where $math10$ is the dependent variable. This would be a case of overspecifying the model in which we include an explanatory variable that does not have a partial effect on the dependent variable (in the population).
+\item $F=\frac{(.232-.229)/2}{(1-.232)/671}\approx `r ((.232-.229)/2)/((1-.232)/671)`$. The corresponding p-value is approximately `r pf(((.232-.229)/2)/((1-.232)/671), df1 = 2, df2 = 671, lower.tail = FALSE)`, which offers little support for including $atndrte^2$ and $ACT\cdot atndrte$ in the model.
+\item Considering $\widehat{prate}$ is the dependent model in all of the equations, the second model is generally preferred since it has the greatest $\bar{R}^2$.
+\item 
+\begin{enumerate}
+\item I would argue we should not include $attend$ because lower attendance rates may be a consequence of large amounts of alcohol consumption. If we included $attend$, $\beta_{alcohol}$ would be the partial effect of $alcohol$ on $colGPA$ after controlling for students' attendance rates.
+\item Yes, we should include $SAT$ and $hsGPA$ as explanatory variables in a multiple regression model. Including these variables again allows for a more "controlled" interpretation of $\beta_{alcohol}$. Although including both may lead to a high level of multicollinearity, this is not a concern because we're only interested in estimating $\beta_{alcohol}$. The benefit of including both is that we can control for the quality of students by using measurements from their performance in high school.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item $$\exp(-1.96\hat{\sigma})\exp(\widehat{logy^0})\leq\exp(\hat{\sigma}^2/2)\exp(\widehat{logy^0})\leq\exp(1.96\hat{\sigma})\exp(\widehat{logy^0})$$
+$$\exp(-1.96\hat{\sigma})\leq\exp(\hat{\sigma}^2/2)\leq\exp(1.96\hat{\sigma})$$
+$$-1.96\hat{\sigma}\leq\hat{\sigma}^2/2\leq1.96\hat{\sigma}$$
+$$-3.92\leq\hat{\sigma}\leq 3.92$$
+$$0\leq\hat{\sigma}\leq 3.92$$
+With the dependent variable appearing in logarithmic form, an estimated SER of 3.92 is quite large. Thus, I would argue most applications would satisfy this condition
+\item The SER from example 6.7 is about `r summary(lm(lsalary ~ lsales + lmktval + ceoten, data = ceosal2))[["sigma"]]`, which is well below 3.92.
+\end{enumerate}
+\item 
+\begin{enumerate}
+\item The first equation is more relevant because it doesn't control for $read4$, which is another measure of student performance. Using the first equation, the estimated effect of a 10\% increase in expenditures per student is .901 percentage points.
+\item Yes, while the signs of the coefficients remain the same, the sizes of the coefficients change considerably.
+\item I prefer the equation with the smaller adjusted R-squared in this case because it gives a better understanding of the effect of interest. Controlling for $read4$, another measure of student performance, doesn't make sense in interpreting the return to student performance from additional expenditures per student.
+\end{enumerate}
+\end{enumerate}
+
 ### Computer Exercises
+
+C1)
+```{r Chapter 6 Computer Exercise 1,echo=TRUE,include=TRUE,comment=NA}
+#i
+summary(lm(lprice ~ ldist, data = kielmc))$coefficients[,1:3]
+
+#ii
+summary(lm(lprice ~ ldist + lintst + larea + lland + rooms + baths + age, data = kielmc))$coefficients[,1:3]
+
+#iii
+summary(lm(lprice ~ ldist + lintst + larea + lland + rooms + baths + age + lintstsq, data = kielmc))$coefficients[,1:3]
+
+#iv
+kielmc$ldistsq <- kielmc$ldist^2
+summary(lm(lprice ~ ldist + lintst + larea + lland + rooms + baths + age + lintstsq + ldistsq, data = kielmc))$coefficients[10,4]
+#No, not at conventional significance levels
+```
+
+C2)
+```{r Chapter 6 Computer Exercise 2,echo=TRUE,include=TRUE,comment=NA}
+#i+ii
+lm1 <- lm(lwage ~ educ + exper + expersq, data = wage1)
+summary(lm1)$coefficients
+
+#iii
+100 * (lm1$coefficients[[3]] + 2 * lm1$coefficients[[4]] * 5)
+100 * (lm1$coefficients[[3]] + 2 * lm1$coefficients[[4]] * 20)
+
+#iv
+- lm1$coefficients[[3]] / (2 * lm1$coefficients[[4]])
+sum(wage1$exper > - lm1$coefficients[[3]] / (2 * lm1$coefficients[[4]]))
+
+rm(lm1)
+```
+
+C3)
+```{r Chapter 6 Computer Exercise 3,echo=TRUE,include=TRUE,comment=NA}
+#i
+#d log(wage)/d exper = beta_1 + beta_3 exper
+
+#ii
+#H_0: beta_3 = 0
+#H_1: beta_3 > 0
+
+#iii
+lm1 <- lm(lwage ~ educ + exper + (educ * exper), data = wage2)
+pt(lm1$coefficients[[4]] / coefficients(summary(lm1))[4, "Std. Error"], df = lm1$df, lower.tail = FALSE)
+
+#iv
+wage2$educ_exper10 <- wage2$educ * (wage2$exper - 10)
+confint(lm(lwage ~ educ + exper + educ_exper10, data = wage2), parm = "educ")
+
+rm(lm1)
+```
+
+C4)
+```{r Chapter 6 Computer Exercise 4,echo=TRUE,include=TRUE,comment=NA}
+#i
+lm1 <- lm(sat ~ hsize + hsizesq, data = gpa2)
+summary(lm1)$coefficients
+
+#ii
+- lm1$coefficients[[2]] / (2 * lm1$coefficients[[3]])
+
+#iii
+#No, only those who take the SAT exam are considered
+
+#iv
+lm1 <- lm(sat ~ hsize + hsizesq, data = gpa2)
+- lm1$coefficients[[2]] / (2 * lm1$coefficients[[3]])
+
+rm(lm1)
+```
+
+C5)
+```{r Chapter 6 Computer Exercise 5,echo=TRUE,include=TRUE,comment=NA}
+#i
+lm1 <- lm(lprice ~ llotsize + lsqrft + bdrms, data = hprice1)
+summary(lm1)$coefficients
+
+#ii
+lm1$coefficients[[1]] + lm1$coefficients[[2]] * log(20000) + lm1$coefficients[[3]] * log(2500) + lm1$coefficients[[4]] * 4
+mean(exp(lm1$residuals)) * exp(lm1$coefficients[[1]] + lm1$coefficients[[2]] * log(20000) + lm1$coefficients[[3]] * log(2500) + lm1$coefficients[[4]] * 4)
+
+#iii
+summary(lm(price ~ lotsize + sqrft + bdrms, data = hprice1))$r.squared
+
+cor(hprice1$price, mean(exp(lm1$residuals)) * exp(lm1$coefficients[[1]] + lm1$coefficients[[2]] * hprice1$llotsize + lm1$coefficients[[3]] * hprice1$lsqrft + lm1$coefficients[[4]] * hprice1$bdrms))^2
+#The model from part(i) is preferred
+
+rm(lm1)
+```
+
+C6)
+```{r Chapter 6 Computer Exercise 6,echo=TRUE,include=TRUE,comment=NA}
+#i+ii
+lm1 <- lm(voteA ~ prtystrA + expendA + expendB + (expendA*expendB), data = vote1)
+summary(lm1)$coefficients
+
+#iii
+mean(vote1$expendA)
+lm1$coefficients[[4]] * 100 + lm1$coefficients[[5]] * 100 * 300
+
+#iv
+lm1$coefficients[[3]] * 100 + lm1$coefficients[[5]] * 100 * 100
+
+#v
+lm1 <- lm(voteA ~ prtystrA + expendA + expendB + shareA, data = vote1)
+#It doesn't make sense to to hold expendA and expendB while changing shareA
+
+#vi
+lm1$coefficients[[4]] - lm1$coefficients[[5]] * (1/3)
+rm(lm1)
+```
+
+C7)
+```{r Chapter 6 Computer Exercise 7,echo=TRUE,include=TRUE,comment=NA}
+#i
+attend$priGPAsq <- attend$priGPA^2
+attend$ACTsq <- attend$ACT^2
+lm1 <- lm(stndfnl ~ atndrte + priGPA + ACT + priGPAsq + ACTsq + priGPA*atndrte, data = attend)
+lm1$coefficients[[3]] + 2 * lm1$coefficients[[5]] * 2.59 + lm1$coefficients[[7]] * .82
+
+#ii
+attend$priGPA_259sq <- (attend$priGPA - 2.59)^2
+attend$priGPA_atndrte_82 <- attend$priGPA * (attend$atndrte - .82)
+summary(lm(stndfnl ~ atndrte + priGPA + ACT + priGPA_259sq + ACTsq + priGPA_atndrte_82, data = attend))$coefficients[3, ]
+
+rm(lm1)
+```
+
+C8)
+```{r Chapter 6 Computer Exercise 8,echo=TRUE,include=TRUE,comment=NA}
+#i
+lm1 <- lm(price ~ lotsize + sqrft + bdrms, data = hprice1)
+summary(lm1)$coefficients
+round((lm1$coefficients[[1]] + lm1$coefficients[[2]] * 10000 + lm1$coefficients[[3]] * 2300 + lm1$coefficients[[4]] * 4) * 1000)
+
+lotsize_10000 <- hprice1$lotsize - 10000
+sqrft_2300 <- hprice1$sqrft - 2300
+bdrms_4 <- hprice1$bdrms - 4
+
+#ii
+#For average observation
+lm2 <- lm(hprice1$price ~ lotsize_10000 + sqrft_2300 + bdrms_4)
+confint(lm2, parm = "(Intercept)") * 1000
+
+#iii
+cat("Lower Bound:", -2 * sd(lm2$residuals * 1000) + (lm1$coefficients[[1]] + lm1$coefficients[[2]] * 10000 + lm1$coefficients[[3]] * 2300 + lm1$coefficients[[4]] * 4) * 1000)
+
+cat("Upper Bound:", 2 * sd(lm2$residuals * 1000) + (lm1$coefficients[[1]] + lm1$coefficients[[2]] * 10000 + lm1$coefficients[[3]] * 2300 + lm1$coefficients[[4]] * 4) * 1000)
+
+rm(lm1, lm2, lotsize_10000, sqrft_2300, bdrms_4)
+```
+
+C9)
+```{r Chapter 6 Computer Exercise 9,echo=TRUE,include=TRUE,comment=NA}
+#i
+lm1 <- lm(points ~ exper + age + coll + expersq, data = nbasal)
+summary(lm1)$coefficients
+
+#ii
+round(-lm1$coefficients[[2]] / (2 * lm1$coefficients[[5]]))
+
+#iii
+#Because better players generally go to the draft before completing college
+
+#iv
+summary(lm(points ~ exper + age + coll + expersq + agesq, data = nbasal))
+#It's not needed but suggests an increasing return to age
+
+#v
+lm1 <- lm(lwage ~ points + exper + expersq + age + coll, data = nbasal)
+linearHypothesis(lm1, c("age = 0", "coll = 0"))
+
+rm(lm1)
+```
+
+C10)
+```{r Chapter 6 Computer Exercise 10,echo=TRUE,include=TRUE,comment=NA}
+BWGHT2 <- as_tibble(bwght2) %>%
+  filter(!is.na(mage), !is.na(npvis))
+
+#i
+lm1 <- lm(lbwght ~ npvis + npvissq, data = BWGHT2)
+summary(lm1)$coefficients
+
+#ii
+-lm1$coefficients[[2]] / (2 * lm1$coefficients[[3]])
+sum(BWGHT2$npvis >= 22, na.rm = T)
+
+#iii
+#In my opinion more prenatal visits shouldn't impact birth weight
+#However, many visits may be an indication of problems
+
+#iv
+lm1 <- lm(lbwght ~ npvis + npvissq + mage + magesq, data = BWGHT2)
+-lm1$coefficients[[4]] / (2 * lm1$coefficients[[5]])
+sum(BWGHT2$mage >= -lm1$coefficients[[4]] / (2 * lm1$coefficients[[5]]), na.rm = T)
+
+#v
+summary(lm1)$r.squared
+#No, only about 2.5% of the variation
+
+#vi
+lm2 <- lm(bwght ~ npvis + npvissq + mage + magesq, data = BWGHT2)
+summary(lm2)$r.squared
+cor(exp(lm1$fitted.values), BWGHT2$bwght)^2
+#The level model is slightly better
+
+rm(lm1,lm2, BWGHT2)
+```
+
+C11)
+```{r Chapter 6 Computer Exercise 11,echo=TRUE,include=TRUE,comment=NA}
+#i+ii
+lm1 <- lm(ecolbs ~ ecoprc + regprc, data = apple)
+summary(lm1)
+
+#iii
+range(lm1$fitted.values)
+sum(apple$ecolbs == 0) / length(apple$ecolbs)
+
+#iv
+summary(lm1)$r.squared
+#No, they only explain about 3% of the variation
+
+#v
+lm1 <- lm(ecolbs ~ ecoprc + regprc + faminc + hhsize + educ + age, data = apple)
+linearHypothesis(lm1, c("faminc = 0", "hhsize = 0", "educ = 0", "age = 0"))
+
+#vi
+summary(lm(ecolbs ~ ecoprc, data = apple))
+summary(lm(ecolbs ~ regprc, data = apple))
+cor(apple$ecoprc, apple$regprc)
+
+#vii
+summary(lm(ecolbs ~ ecoprc + regprc + faminc, data = apple))$r.squared
+summary(lm(ecolbs ~ ecoprc + regprc + reglbs, data = apple))$r.squared
+summary(lm(ecolbs ~ ecoprc + reglbs + faminc, data = apple))$r.squared
+summary(lm(ecolbs ~ reglbs + regprc + faminc, data = apple))$r.squared
+
+rm(lm1)
+```
 
 \newpage
 
 # Chapter 7
+
+## Notes
+
+### Dummy Variable Regression
+
+In cases in which we want to know the partial effect of a qualitative factor, we often use a \textbf{dummy variable} (also called a \textbf{binary} or \textbf{zero-one variable}). Consider the model
+$$y=\beta_0+\delta_1x_1+\beta_2x_2+\dots+\beta_kx_k+u,$$
+where $\delta_1$ denotes the partial effect of dummy variable $x_1$ on $y$. Computing and interpreting $\delta_1$ is fairly simple and often depicted graphically as an \textbf{intercept shift}. More specifically (under the zero conditional mean assumption),
+$$\delta_1=E[y|x_1=1,x_2,\dots,x_k]-E[y|x_1=0,x_2,\dots,x_k],$$
+where $E[y|x_1=0,x_2,\dots,x_k]$ is the conditional expectation of the \textbf{base} (or \textbf{benchmark}) group and $E[y|x_1=1,x_2,\dots,x_k]$ is the conditional expectation of the group where $x_1=1$ [In \textbf{policy analysis} (more specifically \textbf{program evaluation}), the group where $x_1=0$ is referred to as the \textbf{control group}, and the group where $x_1=1$ is referred to as the \textbf{experimental} (or \textbf{treatment}) \textbf{group}]. Thus, the intercept for the base group can be viewed as $\beta_0$ and that for the other group can be viewed as $\beta_0+\delta_1$.
+
+### Regression with Ordinal Variables
+
+Sometimes, we may wish to use an \textbf{ordinal variable}, which is a variable where the ordering of the values conveys information but the magnitude of the values does not (they do not express cardinality), in our regression equation. Consider the equation $y=\beta_0+\beta_1x+u$, where $x$ is an ordinal variable that takes on the values $\{0,1,2,3,4\}$. Unfortunately, it's difficult to interpret $\beta_1$ because we do not know whether the difference between 0 and 1 is the same as the difference between 1 and 2, 2 and 3, or 3 and 4. Instead of using $x$, we can use dummy variable regression with 0 as the base group. Thus, the equation can be rewritten as
+$$y=\beta_0+\delta_1x_1+\delta_2x_2+\delta_3x_3+\delta_4x_4+u,$$
+where $x_j=1$ if $x=j$ and 0 otherwise. In applications where the ordinal variable takes on many values (such as a ranking of 100+ schools), one can split the variable in to several groups and then compare the $\bar{R}^2$ to see whether this action is warranted.
+
+### Modeling Differences between Two Groups
+
+In the general model with $k$ explanatory variables and an intercept, suppose we have two groups ($g=1$ or $g=2$), where we want to test whether the intercept and all slopes are the same across the two groups. The model takes the form
+$$y=\beta_0+\beta_{g,1}x_1+\dots+\beta_{g,k}x_k+u$$
+The restricted model (where we suppose the all of the slopes and the intercepts are the same for the two groups) involves $k+1$ restrictions. On the other hand, the unrestricted model, which we can think of as having a group dummy variable and $k$ interaction terms in addition to the intercept and variables themselves, has $n-2(k+1)$ degrees of freedom. Carrying out the joint hypothesis that all of the slopes and the intercepts are the same for the two groups is similar to an $F$ test; however, the main difference is that the sum of squared residuals from the unrestricted model can be obtained from two separate regressions, one for each group. If $SSR_1$ is the SSR from estimating the above equation for group 1 and $SSR_2$ is the SSR from estimating the above equation for group 2, then the $F$ statistic, which is commonly called the \textbf{Chow statistic}, becomes
+$$F=\frac{[SSR_p-(SSR_1+SSR_2)]/(k+1)}{(SSR_1+SSR_2)/[n-2(k+1)]},$$
+where $SSR_p$ denotes the sum of squared residual from pooling the groups and estimating a single equation.
+
+Another case where we use the Chow test is when we only want to allow for a difference in intercepts. Thus, we're only interested in testing whether all of the slopes are the same for the two groups. In this case, the $F$ (or Chow) statistic takes the form
+$$F=\frac{[SSR_p-(SSR_1+SSR_2)]/k}{(SSR_1+SSR_2)/[n-2(k+1)]},$$
+where $SSR_p$ still denotes the pooled sum of squared residual, except it now allows for a difference in intercepts and thus includes a dummy variable that indicates the group (such as $female$).
+
+## Exercises
+
+### Problems
+
+### Computer Exercises
+
+\newpage
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
