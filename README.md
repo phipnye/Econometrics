@@ -11,7 +11,7 @@ Econometrics Work Done in R and Jupyter
 ## An Introduction to Statistical Learning
 - Finished problem sets and notes from An Introduction to Statistical Learning by Professors Daniela Witten, Gareth James,  Trevor Hastie, and Robert Tibshirani.
 - Answers to exercises are my own work; however, I take no credit for the notes sections as the notes are heavily influenced by words used in the text.
-- 
+
 ## Lambert
 - Finished problem sets from Dr. Ben Lambert's Econometrics course
 - The course can be found at: https://youtube.com/playlist?list=PLwJRxp3blEvZyQBTTOMFRP_TDaSdly3gU
