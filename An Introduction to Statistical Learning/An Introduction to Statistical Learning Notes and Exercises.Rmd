@@ -1,0 +1,1076 @@
+---
+title: "An Introduction to Statistical Learning"
+output: pdf_document
+header-includes:
+  - \pagenumbering{gobble}
+  - \usepackage{amsmath}
+  - \usepackage{enumitem}
+---
+
+\newpage
+
+```{r setup, include=FALSE,echo=FALSE}
+library(ISLR2)
+library(tidyverse)
+library(gridExtra)
+options(scipen = 99999999)
+```
+
+
+# Chapter 1
+
+## Notes
+
+### Introduction
+
+In statistical learning, we often wish to predict an outcome based on a set of features. We have a \emph{training set of data}, in which we observe the outcome and measurements for a set of objects. Using this data we build a prediction model, or \textbf{learner}, which will enable us to predict the outcome for new unseen objects. Predicting in the presence of the outcome variable is called \textbf{supervised learning}, which is judged based on how accurately the predictor predicts outcomes. In \textbf{unsupervised learning}, we observe only the features and have no measurements of the outcome.
+
+Supervised learning can generally be split in two different sets of problems. The \textbf{regression problem} is the problem of predicting a continuous quantity output. The \textbf{classification problem} is the problem of predicting a discrete class label output. More generally, regression is referenced when we predict quantitative outputs, and classification is referenced when we predict qualitative outputs.
+
+### Notation
+
+The mathematical notation takes the following form
+\begin{itemize}
+\item Vectors of length $n$ appear in lower case bold such as $\mathbf{y}$. Vectors that are not of length $n$ (and hence scalars) appear in lower case normal font such as $a$. Matrices appear in capitalized bold such as $\mathbf{X}$. Random variables appear in capitalized normal font such as $A$ (regardless of their dimensions).
+\item $\mathbf{X}$ denotes the input variable(s). Thus, $\mathbf{X}\in\mathbb{R}^{N\times p}$ is a matrix with $N$ rows (or observations) and $p$ columns (or variables).
+\item The $j$th column of matrix $\mathbf{X}$ is denoted as $\mathbf{x}_j$ such that $\mathbf{x}_j\in\mathbb{R}^{N}$ and
+$$\mathbf{X}=\begin{bmatrix}| & | &  & | \\ \mathbf{x}_1 & \mathbf{x}_2 & \dots & \mathbf{x}_p\\ | & | &  & |\end{bmatrix}$$
+\item The $i$th row of matrix $\mathbf{X}$ is denoted as $x_i^T$ such that $x_i\in\mathbb{R}^{p}$ and
+$$\mathbf{X}=\begin{bmatrix}- & x_1^T & - \\ - & x_2^T & - \\ & \vdots & \\ - & x_N^T & - \\ \end{bmatrix}$$
+\item $y_i$ denotes the $i$th observation of the output variable. Hence, the set of all $n$ observations can be written in vector form as
+$$\mathbf{y}=\begin{bmatrix}y_1 \\ y_2 \\ \vdots \\ y_n\end{bmatrix}$$
+\end{itemize}
+Recall from matrix algebra that the $i$th row and $j$th column of the product of $\mathbf{A}\in\mathbb{R}^{r\times d}$ and $\mathbf{B}\in\mathbb{R}^{d\times s}$ equates to
+$$(\mathbf{A}\mathbf{B})_{ij}=\sum_{k=1}^{d}a_{ik}b_{kj}$$
+
+# Chapter 2
+
+## Notes
+
+### Types of Variables
+
+In statistical learning, \textbf{input variables} are used to build predictive methods and are generally denoted using the symbol $X$, or $X_j$ when referring to the $j$th input variable. The inputs go by different names, such as \textbf{predictors}, \textbf{independent variables}, \textbf{features} or sometimes just variables. On the other hand, \textbf{output variables} are generally denoted by $Y$ and also commonly referred to as \textbf{responses} or \textbf{dependent variables}.
+
+In total, if we observe a quantitative response $Y$ and $p$ different predictors, $X_1, X_2,\dots,X_p$, we assume that there is some relationship between $Y$ and $X = (X_1, X_2,\dots,X_p)$, which can be generally written as
+$$Y=f(X)+\epsilon,$$
+where $f$ is some fixed (but unknown) function of $X$ and $\epsilon$ is a random \textbf{error term}, which is independent of $X$ and has a zero mean. Thus, $f$ represents the \textbf{systematic} information that $X$ provides about $Y$. Since $f$ is unknown, we often wish to estimate $f$. Overall, statistical learning refers to a set of approaches for estimating $f$ in hopes of achieving accurate \textbf{prediction} and/or \textbf{inference}.
+
+### Prediction
+
+In many situations, a set of inputs $X$ are readily available, but the output $Y$ cannot be easily obtained. In this setting, since the error term averages to zero, we can predict $Y$ using
+$$\hat{Y}=\hat{f}(X),$$
+where $\hat{Y}$ represents the prediction of $Y$ and $\hat{f}$ represents our estimate for $f$ and is often treated as a \textbf{blackbox} since we're typically unconcerned with the form of $\hat{f}$ but rather how accurately it predicts $Y$. The accuracy of $\hat{Y}$ as a prediction for $Y$ depends on two quantities, which we will refer to as the \textbf{reducible error} and the \textbf{irreducible error}. Reducible error refers to error that can be reduced by using the most most appropriate statistical learning technique to estimate $f$. Irreducible error refers to error that is irreducible since $Y$ is also a function of $\epsilon$, which cannot be predicted using $X$. If we suppose that both $\hat{f}$ and $X$ are fixed, then
+$$E(Y-\hat{Y})^2=E\left[(f(X)+\epsilon-\hat{f}(X))^2\right]$$
+$$=E\left[(f(X)+\epsilon-\hat{f}(X))^2\right]$$
+$$=E\left[f(X)^2+\hat{f}(X)^2+\epsilon^2+2\epsilon f(X)-2\epsilon\hat{f}(X)-2f(X)\hat{f}(X)\right]$$
+$$=E\left[f(X)^2-2f(X)\hat{f}(X)+\hat{f}(X)^2\right]+E\left[\epsilon^2\right]+E\left[2\epsilon f(X)\right]-E\left[2\epsilon\hat{f}(X)\right]$$
+$$=E\left[(f(X)-\hat{f}(X))^2\right]+\left(E\left[\epsilon^2\right]-E\left[\epsilon\right]^2\right)+2f(X)E\left[\epsilon \right]-2\hat{f}(X)E\left[\epsilon\right]$$
+$$=\underbrace{\left[f(X)-\hat{f}(X)\right]^2}_{\text{Reducible}}+\underbrace{\text{Var}(\epsilon)}_{\text{Irreducible}}$$
+
+### Inference
+
+In circumstances where we're interested in understanding the association between $Y$ and $X_1,\dots,X_p$, we are still interested in $\hat{f}$. However, unlike the case with prediction, $\hat{f}$ can no longer be treated as a black box as we need to know its exact form. In general, inference allows us to try to answer whether predictors are associated with the response and get an understanding of the nature and shape of such  associations.
+
+### Estimating $f$
+
+In estimating $f$, we use a set of observations called the \textbf{training data} to train, or teach, our method how to estimate $f$. Broadly speaking, most statistical learning methods can be characterized as \textbf{parametric} or \textbf{non-parametric} and have the goal of finding a function $\hat{f}$ such that $Y\approx\hat{f}(X)$.
+
+Parametric methods involve a two-step model-based approach in which we make an assumption about the functional form, or shape, of $f$ and then using the training data to fit or train the model. For example, we may use a linear model in which we assume that $f$ is linear (i.e., $f(X)=\beta_0+\beta_1X_1+\dots+\beta_pX_p$) and then we may use \textbf{ordinary least squares (OLS)} criteria to fit the model. This methodology is called parametric because it reduces the problem of estimating f down to one of estimating a set of parameters (e.g., $\beta_0,\beta_1,\dots,\beta_p$). Unfortunately, the parametric approach generally will lead to an estimated function that does not match the true unknown form of $f$. Thus, if the chosen model is too far from the true $f$, then our estimate will be poor. In attempts to make more flexible models, we generally need to estimate more parameters; however, this can lead to \textbf{overfitting} the data, which essentially means they follow the errors, or \textbf{noise}, too closely.
+
+Non-parametric methods, on the other hand, do  not make explicit assumptions about the functional form of $f$. Instead they seek an estimate of $f$ that gets as close to the data points as possible without being too rough or wiggly. While non-parametric approaches have the potential to accurately fit a wider range of possible shapes for $f$, they require far more observations that is needed for a parametric approach in order to obtain an estimate for $f$.
+
+### Measuring the Quality of Fit
+
+In evaluating the performance of a statistical learning method on a given data set, we need some way to measure how well its predictions match the observed data. In the regression setting, the most commonly-used measure is the \textbf{mean squared error (MSE)}, which can written as
+$$\text{MSE}=\frac{1}{n}\sum_{i=1}^{n}\left(y_i-\hat{f}(x_i)\right)^2,$$
+where $\hat{f}(x_i)$ is the predicted value of $y_i$. This definition of MSE is computed using the training data and is thus more accurately referred to as the \textbf{training MSE}. In general, we're more interested in minimizing our \textbf{test MSE}, rather than our training MSE. Thus, if we had a large number of test observations, we'd be interested in minimizing the average squared prediction error
+$$\text{Ave}\left(y_0-\hat{f}(x_0)\right)^2,$$
+where $(x_0, y_0)$ is a previously unseen test observation not used to train the statistical learning method. While it may seem that minimizing the test and training MSE should give similar results, in many applications the training set MSE can be quite small, but the test MSE is often much larger. In general, the training MSE decreases monotonically with fewer \textbf{degrees of freedom}, which is a quantity that summarizes the flexibility of a curve. On the other hand, the test MSE displays a U-shape relationship with flexibility. A fundamental property of statistical learning is that, as model flexibility increases, training MSE will decrease, but the test MSE may not. When a given method yields a small training MSE but a large test MSE, we are said to be overfitting the data because our statistical learning procedure is working too hard to find patterns in the training data, and may be picking up some patterns that are just caused by random chance rather than by true properties of the unknown function $f$. In practice, there are a variety of approaches that can be used to estimate the minimal test MSE. One important method is \textbf{cross-validation}, which is a method for estimating test MSE using the training data.
+
+It turns out that the U-shape relationship between flexibility and test MSE is a result of the two competing properties in statistical learning methods: bias and variance. Decomposing the expected test MSE at $x_0$, we find
+$$E\left(y_0-\hat{f}(x_0)\right)^2=E\left[y_0^2-2y_0\hat{f}(x_0)+\hat{f}(x_0)^2\right]$$
+$$=E\left[y_0^2-2y_0\hat{f}(x_0)+\hat{f}(x_0)^2\right]$$
+$$=E\left[(f(x_0)+\epsilon_0)^2-2(f(x_0)+\epsilon_0)\hat{f}(x_0)+\hat{f}(x_0)^2\right]$$
+$$=E\left[f(x_0)^2+2\epsilon_0 f(x_0)+\epsilon_0^2-2f(x_0)\hat{f}(x_0)-2\epsilon_0\hat{f}(x_0)+\hat{f}(x_0)^2\right]$$
+$$=E\left[f(x_0)^2\right]+2E\left[\epsilon_0 f(x_0)\right]-2E\left[f(x_0)\hat{f}(x_0)\right]-2E\left[\epsilon_0\hat{f}(x_0)\right]+E\left[\hat{f}(x_0)^2\right]+E\left[\epsilon_0^2\right]$$
+$$=f(x_0)^2+2f(x_0)E\left[\epsilon_0\right]-2f(x_0)E\left[\hat{f}(x_0)\right]-2E\left[\epsilon_0\hat{f}(x_0)\right]+E\left[\hat{f}(x_0)\right]^2+\left(E\left[\hat{f}(x_0)^2\right]-E\left[\hat{f}(x_0)\right]^2\right)+\left(E\left[\epsilon_0^2\right]-E\left[\epsilon_0\right]^2\right)$$
+$$=\left(E\left[\hat{f}(x_0)\right]^2-2f(x_0)E\left[\hat{f}(x_0)\right]+f(x_0)^2\right)-2E\left[\epsilon_0\hat{f}(x_0)\right]+\text{Var}\left(\hat{f}(x_0)\right)+\text{Var}(\epsilon_0)$$
+$$=\left(\left(E\left[\hat{f}(x_0)\right]-f(x_0)\right)^2\right)-2E\left[\epsilon_0\hat{f}(x_0)\right]+\text{Var}\left(\hat{f}(x_0)\right)+\text{Var}(\epsilon_0)$$
+$$=\left[\text{Bias}\left(\hat{f}(x_0)\right)\right]^2-2E\left[\epsilon_0\hat{f}(x_0)\right]+\text{Var}\left(\hat{f}(x_0)\right)+\text{Var}(\epsilon_0)$$
+$$=\left[\text{Bias}\left(\hat{f}(x_0)\right)\right]^2+\text{Var}\left(\hat{f}(x_0)\right)+\text{Var}(\epsilon_0)$$
+because we assume $E[\epsilon_0\hat{f}(x_0)]=E[\epsilon_0]E[\hat{f}(x_0)]=0$ [This assumption comes from the fact that $\epsilon_0$ did not contribute to constructing $\hat{f}$ because it is not part of the training set in addition to the assumption that $x_0$ is independent of $\epsilon_0$ and the observations are independent]. It should be noted that $\text{Var}(\hat{f}(x_0))$ refers to the amount by which $\hat{f}$ would change if we estimated it using a different training data set. As a general rule, as we use more flexible methods, the variance will increase and the bias will decrease.
+
+Many of the same concepts, such as the bias-variance trade-off, transfer over to the classification setting with a few modifications. One of these modifications is how we quantify the accuracy of our estimate $\hat{f}$. The most common approach for this process is the \textbf{training error rate}, which is the proportion of mistakes that mare made if we apply our estimate $\hat{f}$ to the training observations, written out as
+$$\frac{1}{n}\sum_{i=1}^{n}I(y_i\neq\hat{y}_i)$$
+Here $\hat{y}_i$ is the predicted class label for the $i$th observation and $I(y_i\neq\hat{y}_i)$ is an \textbf{indicator variable} that equals 1 if $y_i\neq\hat{y}_i$ and 0 if $y_i=\hat{y}_i$. Similarly, the \textbf{test error rate} with a set of test observations $(x_0,y_0)$ is given by
+$$\text{Ave}\left(I(y_0\neq\hat{y}_0)\right)$$
+
+### Bayes Classifier
+
+It turns out the test error rate is minimized, on average, by a very simple classifier that assigns each observation to the most likely class, given its predictor values, called the \textbf{Bayes classifier}. This means we should assign a test observation with predictor vector $x_0$ to the class $j$ which maximizes
+$$\text{Pr}(Y=j|X=x_0)$$
+The Bayes classifier’s prediction is determined by the \textbf{Bayes decision boundary} and the error rate corresponding to the Bayes classifier is called the \textbf{Bayes error rate}. Since the Bayes classifier will always choose the class for which $\text{Pr}(Y=j|X=x_0)$ is largest, the error rate will be
+$$1-\max_{j}\text{Pr}(Y=j|X=x_0)$$
+and the overall Bayes error rate is given by
+$$1-E\left(\max_{j}\text{Pr}(Y=j|X)\right)$$
+where the expectation averages the probability over all possible values of $X$. The Bayes error rate is analogous to the irreducible error.
+
+In theory, the Bayes classifier is the gold standard. However, for real data, we do not know the conditional distribution of $Y$ given $X$, and so computing the Bayes classifier is impossible. One approach for estimating the conditional distribution of $Y$ given $X$ is the $\boldsymbol{K}$-\textbf{nearest neighbors (KNN)} classifier. The KNN classifier attempts at estimating the condition probability of $Y$ for class $j$ by
+$$\frac{1}{K}\sum_{i\in\mathcal{N}_0}I(y_i=j),$$
+where $\mathcal{N}_0$ is the \emph{neighborhood} for $x_0$. Generally, we use Euclidean distance to define the neighborhood for $x_0$ and thus $\mathcal{N}_0$ is the set of $K$ points in the training data that are closest to $x_0$. Finally, KNN classifies the test observation $x_0$ to the class with the largest probability in the form above.
+
+Just as in the regression setting, there is not a strong relationship between the training error rate and the test error rate. With $K=1$, the KNN training error rate is 0, but the test error rate may be quite high. In general, as we use more flexible classification methods, the training error rate will decline but the test error rate may not.
+
+## Exercises
+
+### Conceptual
+
+\begin{enumerate}
+\item For each of parts (a) through (d), indicate whether we would generally expect the performance of a flexible statistical learning method to be better or worse than an inflexible method. Justify your answer.
+\begin{enumerate}
+\item The sample size $n$ is extremely large, and the number of predictors $p$ is small.
+
+A flexible method would be better because situations with large sample sizes and small numbers of predictors are not highly susceptible to large amounts of variance. Meanwhile, flexible methods will be less prone to bias than those that are inflexible.
+
+\item The number of predictors $p$ is extremely large, and the number of observations $n$ is small.
+
+An inflexible method would be better because situations with small $n$ and large $p$ (the curse of dimensionality) are susceptible to large amounts of variance. Using a flexible method is thus prone to this issue and the greater variance will overwhelm any gains we must receive from using flexible methods.
+
+\item The relationship between the predictors and response is highly non-linear.
+
+We would expect a flexible statistical learning method to be better since more flexible methods allow for estimating non-linear relationships better.
+
+\item The variance of the error terms, i.e. $\sigma^2=\text{Var}(\epsilon)$, is extremely high.
+
+We would expect an inflexible method to be better because they are less susceptible to the issue of overfitting. Overfitting, in this circumstance, would lead to following the large variability in $\epsilon$.
+\end{enumerate}
+\item Explain whether each scenario is a classification or regression problem, and indicate whether we are most interested in inference or prediction. Finally, provide $n$ and $p$.
+\begin{enumerate}
+\item  We collect a set of data on the top 500 firms in the US. For each firm we record profit, number of employees, industry and the CEO salary. We are interested in understanding which factors affect CEO salary.
+
+This is a regression problem because the output variable, CEO salary, is quantitative. We are most interested in inference because we are interested in understanding which factors affect CEO salary rather than predicting CEO salaries based on inputs. $n=500,\ p=3$
+\item  We are considering launching a new product and wish to know whether it will be a success or a failure. We collect data on 20 similar products that were previously launched. For each product we have recorded whether it was a success or failure, price charged for the product, marketing budget, competition price, and ten other variables.
+
+This is a classification problem because the output variable, \emph{success} or \emph{failure}, is qualitative (binary). We are most interested in prediction because we are interested in predicting whether the product will succeed or not. $n=20,\ p=13$
+\item  We are interested in predicting the \% change in the USD/Euro exchange rate in relation to the weekly changes in the world stock markets. Hence we collect weekly data for all of 2012. For each week we record the \% change in the USD/Euro, the % change in the US market, the % change in the British market, and the \% change in the German market.
+
+This is a regression problem because the output variable, the \% change in the USD/Euro exchange rate in relation to the weekly changes in the world stock markets, is quantitative. We are most interested in prediction because we are interested in predicting the \% change in the USD/Euro exchange rate in relation to the weekly changes in the world stock markets. $n=52,\ p=3$
+\end{enumerate}
+\item We now revisit the bias-variance decomposition.
+\begin{enumerate}[series=ch2ex3]
+\item Provide a sketch of typical (squared) bias, variance, training error, test error, and Bayes (or irreducible) error curves, on a single plot, as we go from less flexible statistical learning methods towards more flexible approaches. The $x$-axis should represent the amount of flexibility in the method, and the $y$-axis should represent the values for each curve. There should be five curves. Make sure to label each one.
+\end{enumerate}
+\end{enumerate}
+```{r Chapter 2 Exercise 3 plot, include=TRUE, echo=FALSE,fig.align='center', fig.height= 3, fig.width=4}
+ch2_ex3 <- tibble(flexibility = 1:20,
+                  sq_bias = 15 / flexibility^2,
+                  var_f = flexibility^2 / 200,
+                  irr_err = rep(1, 20),
+                  train_err = 3 - log((seq(1,20))),
+                  test_err = sq_bias + var_f + irr_err)
+
+ggplot(ch2_ex3, aes(flexibility, sq_bias)) +
+    geom_line(aes(color = "Bias"), size = 0.75) +
+    geom_line(aes(y = var_f, color = "Var"), size = 0.75) +
+    geom_line(aes(y = irr_err, color = "Irr. Err."), linetype = "dashed", size = 0.75) +
+    geom_line(aes(y = train_err, color = "Train Err."), size = 0.75) +
+    geom_line(aes(y = test_err, color = "Test Err."), size = 0.75) +
+    theme_classic() +
+    labs(x = "Flexibility") +
+    scale_color_manual(values = c("Bias" = "blue", "Var" = "orange", "Irr. Err." = "grey", "Train Err." = "green", "Test Err." = "purple")) +
+    theme(panel.border = element_rect(fill = NA),
+          axis.title.y = element_blank(),
+          legend.position = c(0.95, 0.95),
+          legend.justification = c("right", "top"),
+          legend.box.just = "right",
+          legend.key.size = unit(1, "mm"),
+          legend.margin = margin(t = -0.5, unit='cm'),
+          legend.title = element_blank())
+
+invisible(rm(list = ls()))
+invisible(gc())
+```
+\begin{enumerate}
+\item[] 
+\begin{enumerate}[resume=ch2ex3]
+\item Explain why each of the five curves has the shape displayed in part (a).
+\begin{itemize}
+\item Bias (Squared): Bias decreases monotonically with increased flexibility because more flexibility allows us to trace or follow $f$ more precisely.
+\item Variance: The variance increases with increased flexibility because our method is more prone to changes in the data set (i.e., $\hat{f}$ is subject to change more when the method is more flexible).
+\item Bayes (Irreducible) Error: The irreducible error term is represented by the horizontal dashed grey line and is not a function of the flexibility.
+\item Training Error: Training error decreases monotonically with increased flexibility because methods are generally designed to minimize training error, and thus, increasing the flexibility can only improve the training error.
+\item Test Error: With more flexible methods, the variance will increase and the bias will decrease. The relative rate of change of these two quantities determines whether the test MSE increases or decreases. As we increase the flexibility of a class of methods, the bias tends to initially decrease faster than the variance increases.
+\end{itemize}
+\end{enumerate}
+\setcounter{enumi}{3}
+\item You will now think of some real-life applications for statistical learning.
+\begin{enumerate}
+\item Describe three real-life applications in which classification might be useful. Describe the response, as well as the predictors. Is the goal of each application inference or prediction? Explain your answer.
+\begin{itemize}
+\item Predicting whether an individual is likely to commit a crime. The response is binary, which takes a value of 1 if the person is more likely to commit a crime than not and 0 otherwise. Some predictors may include age, health, criminal history, childhood factors, wealth, and location of residence. The goal is as an application of prediction as we'd like to predict whether an individual is likely to commit a crime.
+\item Understanding what factors influence brand preferences. The response is the brand of choice (e.g., Nike, Adidas, or Under Armour). Some predictors may include wealth, hobbies, location of residence, and occupation. The goal is as an application of inference as we'd like to understand associations between the response and the predictors.
+\item Predicting the outcome of a football game. The response is binary and indicates the winning team. Some predictors may include roster salaries, coaching salaries, team records, strengths of schedules, game location, and weather. The goal is as an application of prediction as we'd like to predict which team will win the game.
+\end{itemize}
+\item Describe three real-life applications in which regression might be useful. Describe the response, as well as the predictors. Is the goal of each application inference or prediction? Explain your answer.
+\begin{itemize}
+\item Predicting a stock's price. The response is stock price. Some predictors may include CEO salary, return on equity, price to equity ratio, sales, profits, previous stock performance,and macroeconomic factors. The goal is as an application of prediction as we'd like to predict a future stock price.
+\item Understanding what factors are associated with wages. The response is wage. Some predictors may include parents' wealth, hobbies, location of residence, education level, and experience. The goal is as an application of inference as we'd like to determine which of the predictors impact wage and how those predictors influence wage.
+\item Understanding what factors influence a car's fuel economy. The response is fuel economy (such as miles per gallon). Some predictors may include the drivetrain, the number of cylinders, the weight of the car, the type of injection system, and whether the car is naturally aspirated. The goal is as an application of inference as we'd like to determine which of the predictors impact fuel economy and how those predictors influence a vehicle's fuel efficiency.
+\end{itemize}
+\item Describe three real-life applications in which cluster analysis might be useful.
+\begin{itemize}
+\item Clustering individuals to understand similarities in behavior.
+\item Filtering spam emails or fake accounts.
+\item Detecting faulty or poor quality products.
+\end{itemize}
+\end{enumerate}
+\item As discussed earlier, as flexibility of the method increases, the variance will increase and the bias will decrease. The relative rate of change of these two quantities determines whether the test MSE increases or decreases. As we increase the flexibility of a class of methods, the bias tends to initially decrease faster than the variance increases. Some circumstances where a flexible method would be better include cases where the sample size is large, the number of predictors is small, or the true $f$ is non-linear. On the other hand, a less flexible approach might be preferred when dealing with a small sample size, a large number of predictors, or when there is a variance in the error term.
+\item Parametric methods involve an approach in which we make an assumption about the functional form, or shape, of $f$ while non-parametric methods make no such assumption. Parametric methods make estimating $f$ more simple and don't require as large of samples as non-parametric methods; however, they can lead to inaccurate results when our assumption about the functional form of $f$ fails.
+\item The table below provides a training data set containing six observations, three predictors, and one qualitative response variable.
+
+Suppose we wish to use this data set to make a prediction for $Y$ when $X_1 = X_2 = X_3 = 0$ using $K$-nearest neighbors.
+\begin{enumerate}
+\item Compute the Euclidean distance between each observation and the test point, $X_1 = X_2 = X_3 = 0$.
+\begin{center}
+\begin{tabular}{l|cccl|c}
+\hline
+Obs. & $X_1$ & $X_2$ & $X_3$ & $Y$ & Euc. Dis.\\
+\hline
+1 & 0 & 3 & 0 & Red & 3\\
+2 & 2 & 0 & 0 & Red & 2\\
+3 & 0 & 1 & 3 & Red & $\sqrt{10}$\\
+4 & 0 & 1 & 2 & Green & $\sqrt{5}$\\
+5 & -1 & 0 & 1 & Green & $\sqrt{2}$\\
+6 & 1 & 1 & 1 & Red & $\sqrt{3}$\\
+\hline
+\end{tabular}
+\end{center}
+\item What is our prediction with $K = 1$? Why?
+
+Our prediction for $Y$ is green because the $5^{th}$ observation is closest to the desired point.
+\item What is our prediction with $K = 3$? Why?
+
+Our prediction for $Y$ is red because the three observations closest to the desired point are observations 2, 5, and 6. Of these observations, 2/3 of them are red, so we predict red.
+\item If the Bayes decision boundary in this problem is highly non-linear, then would we expect the best value for $K$ to be large or small? Why?
+
+We would expect the best value for $K$ to be small because smaller values for $K$ allow for more rigid boundaries that may better account for the non-linearity.
+\end{enumerate}
+\end{enumerate}
+
+### Applied
+```{r Chapter 2 Exercise 8, include=TRUE,echo=TRUE,comment=NA,fig.align='center', fig.height= 3, fig.width=4}
+head(College)
+
+summary(College)
+
+pairs(College[,2:10])
+
+ggplot(College, aes(Private, Outstate)) +
+  geom_boxplot()
+
+College$Elite <- as.factor(if_else(College$Top10perc > 50, "Yes", "No"))
+
+summary(College$Elite)
+
+ggplot(College, aes(Elite, Outstate)) +
+  geom_boxplot()
+
+ggplot(College, aes(Outstate)) +
+  geom_histogram(bins = 100)
+
+ggplot(College, aes(Apps)) +
+  geom_histogram(bins = 50)
+
+ggplot(College, aes(Grad.Rate)) +
+  geom_histogram(bins = 30)
+```
+
+```{r Chapter 2 Exercise 9, include=TRUE,echo=TRUE,comment=NA,fig.align='center', fig.height= 3, fig.width=4}
+sapply(Auto[, c(1,3,4,5,6)], range)
+sapply(Auto[, c(1,3,4,5,6)], mean)
+sapply(Auto[, c(1,3,4,5,6)], sd)
+
+sapply(Auto[-(10:85), c(1,3,4,5,6)], range)
+sapply(Auto[-(10:85), c(1,3,4,5,6)], mean)
+sapply(Auto[-(10:85), c(1,3,4,5,6)], sd)
+
+pairs(Auto[, c(1,3,4,5,6)])
+```
+
+```{r Chapter 2 Exercise 10, include=TRUE,echo=TRUE,comment=NA,fig.align='center',fig.height=3,fig.width=4}
+nrow(Boston)
+ncol(Boston)
+
+pairs(Boston[, c(3,6,10,11,12,13)])
+
+cor(Boston$crim, Boston[,-1])
+
+sapply(Boston, range)
+
+sum(Boston$chas)
+
+median(Boston$ptratio)
+
+which(Boston$medv == min(Boston$medv))
+
+Boston[which(Boston$medv == min(Boston$medv)), ]
+
+sum(Boston$rm > 7)
+sum(Boston$rm > 8)
+```
+
+# Chapter 3
+
+## Notes
+
+### Simple Linear Regression
+
+\textbf{Simple linear regression (SLR)} is a simple approach for predicting a quantitative response $Y$ on the basis of a single predictor variable $X$. It assumes that there is approximately a linear relationship between $X$ and $Y$ such that
+$$Y\approx\beta_0+\beta_1X$$
+$\beta_0$ and $\beta_1$ are two unknown constants that represent the intercept and slope terms in the linear model. Together, $\beta_0$ and $\beta_1$ are as the model \textbf{coefficients} or \textbf{parameters}. Using training data, we can produce estimators $\hat{\beta}_0$ and $\hat{\beta}_1$ to predict $Y$ on the basis $X=x$. We write this as
+$$\hat{y}=\hat{\beta}_0+\hat{\beta}_1x,$$
+where $\hat{y}$ indicates a prediction of $Y$ at $X=x$. While there are a number of ways of estimating the coefficient estimators, the most common approach involves minimizing the \textbf{least squares} criterion. Let $e_i=y_i-\hat{y}_i$ be the \textbf{residual} or difference between the observed and predicted values for the $i$th observation. Least squares criterion chooses $\hat{\beta}_0$ and $\hat{\beta}_1$ such that the \textbf{residual sum of squares (RSS)} is minimized. Mathematically,
+$$\text{RSS}=\sum_{i=1}^{n}e_i^2=\sum_{i=1}^{n}(y_i-\hat{\beta}_0-\hat{\beta}_1 x_i)^2$$
+If we differentiate with respect to $\hat{\beta}_0$ and $\hat{\beta}_1$, we obtain
+$$\hat{\beta}_1=\frac{\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})}{\sum_{i=1}^{n}(x_i-\bar{x})^2}$$
+$$\hat{\beta}_0=\bar{y}-\hat{\beta}_1\bar{x}$$
+\underline{Derivation}
+$$\frac{\partial\text{RRS}}{\partial\hat{\beta}_0}=\sum_{i=1}^{n}-2(y_i-\hat{\beta}_0-\hat{\beta}_1 x_i)=0$$
+$$\to \sum_{i=1}^{n}(y_i-\hat{\beta}_0-\hat{\beta}_1 x_i)=0$$
+$$\to n\bar{y}-n\hat{\beta}_0-n\hat{\beta}_1\bar{x}=0$$
+$$\to \bar{y}=\hat{\beta}_0+\hat{\beta}_1\bar{x}$$
+$$\to \hat{\beta}_0=\bar{y}-\hat{\beta}_1\bar{x}$$
+\small
+\textit{Note:} The significance of this first order condition is that, using least squares criterion, our line of best fit runs through the sample means $\bar{y}$ and $\bar{x}$.
+\normalsize
+
+$$\frac{\partial\text{RRS}}{\partial\hat{\beta}_1}=\sum_{i=1}^{n}-2x_i(y_i-\hat{\beta}_0-\hat{\beta}_1 x_i)=0$$
+$$\to\sum_{i=1}^{n}x_i(y_i-\hat{\beta}_0-\hat{\beta}_1 x_i)=0$$
+$$\to\sum_{i=1}^{n}(x_iy_i-\hat{\beta}_0x_i-\hat{\beta}_1 x_i^2)=0$$
+$$\to\sum_{i=1}^{n}x_iy_i=\sum_{i=1}^{n}\left(\hat{\beta}_0x_i+\hat{\beta}_1 x_i^2\right)$$
+$$\to\sum_{i=1}^{n}x_iy_i=\sum_{i=1}^{n}\left((\bar{y}-\hat{\beta}_1\bar{x})x_i+\hat{\beta}_1 x_i^2\right)$$
+$$\to\sum_{i=1}^{n}x_iy_i=\sum_{i=1}^{n}\left(\bar{y}x_i-\hat{\beta}_1\bar{x}x_i+\hat{\beta}_1 x_i^2\right)$$
+$$\to\sum_{i=1}^{n}x_iy_i=n\bar{x}\bar{y}+\hat{\beta_1}\sum_{i=1}^{n}(x_i^2-\bar{x}x_i)$$
+$$\to\sum_{i=1}^{n}(x_iy_i)-n\bar{x}\bar{y}=\hat{\beta}_1\sum_{i=1}^{n}x_i(x_i-\bar{x})$$
+$$\to\sum_{i=1}^{n}(x_iy_i-\bar{x}y_i)=\hat{\beta}_1\sum_{i=1}^{n}x_i(x_i-\bar{x})$$
+$$\to\hat{\beta}_1=\frac{\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})}{\sum_{i=1}^{n}(x_i-\bar{x})^2}$$
+
+
+Recalling that we assume the true functional form between $Y$ and $X$ is $Y=f(X)+\epsilon$, we obtain the \textbf{population regression line}
+$$Y=\beta_0+\beta_1X+\epsilon,$$
+where $\beta_0$ is the intercept term (or the expected value of $Y$ when $X=0$) and $\beta_1$ is the slope (or the average increase in $Y$ associated with a one-unit increase in $X$). Plugging our estimators into the population regression line (and omitting the error term), we obtain the \textbf{least squares line} $\hat{y}=\hat{\beta}_0+\hat{\beta}_1x$.
+
+In general, we hope to find estimators of $\beta_0$ and $\beta_1$ that are \textbf{unbiased}. If we have an estimator $\hat{\theta}$ of a parameter $\theta$ the bias of the estimator is defined as
+$$\text{Bias}\left(\hat{\theta}\right)=E\left[\hat{\theta}\right]-\theta$$
+Thus, if $\hat{\theta}$ is an unbiased estimator of $\theta$, $\hat{\theta}$ might overestimate $\theta$, and on the basis of another set of observations, $\hat{\theta}$ might underestimate $\theta$. However, if we could average a huge number of estimates of $\theta$ obtained from a huge number of sets of observations, then this average would exactly equal $\theta$.
+
+A natural question is: how accurate is $\hat{\theta}$ as an estimator of $\theta$? In general, we answer this question by computing the standard error of $\hat{\theta}$, which can be written mathematically as
+$$\text{SE}(\hat{\theta})=\sqrt{\text{Var}(\hat{\theta})}=\sqrt{\frac{\hat{\sigma}^2}{n}}$$
+if the observations are uncorrelated, which holds under random sampling. Here, $\hat{\sigma}$ is the standard deviation of each of the realizations $y_i$ of $Y$. Roughly speaking, the standard error tells us the average amount that this estimator $\hat{\theta}$ differs from the actual value of $\theta$ [It actually gives an approximation of the square root of the expected squared difference between $\hat{\theta}$ and $\theta$]. Applying this framework to $\hat{\beta}_0$ and $\hat{\beta}_1$, we can compute
+$$\text{SE}\left(\hat{\beta}_0\right)^2=\sigma^2\left[\frac{1}{n}+\frac{\bar{x}^2}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\right]$$
+$$\text{SE}\left(\hat{\beta}_1\right)^2=\frac{\sigma^2}{\sum_{i=1}^{n}(x_i-\bar{x})^2},$$
+which hold under the assumptions of homoscedasticity such that $\text{Var}(\epsilon)=\text{Var}(\epsilon|X)=\sigma^2$ and random sampling.
+
+\underline{Derivation}
+$$\text{SE}\left(\hat{\beta}_1\right)^2=\text{Var}\left(\hat{\beta}_1\right)$$
+$$=\text{Var}\left(\frac{\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\right)$$
+$$=\text{Var}\left(\frac{\sum_{i=1}^{n}y_i(x_i-\bar{x})}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\right)$$
+$$=\text{Var}\left(\frac{\sum_{i=1}^{n}(\beta_0+\beta_1x_i+\epsilon_i)(x_i-\bar{x})}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\right)$$
+$$=\text{Var}\left(\frac{\beta_0\sum_{i=1}^{n}(x_i-\bar{x})+\beta_1\sum_{i=1}^{n}x_i(x_i-\bar{x})+\sum_{i=1}^{n}\epsilon_i(x_i-\bar{x})}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\right)$$
+$$=\text{Var}\left(\frac{\beta_0\cdot 0+\beta_1\sum_{i=1}^{n}(x_i-\bar{x})^2+\sum_{i=1}^{n}\epsilon_i(x_i-\bar{x})}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\right)$$
+$$=\text{Var}\left(\beta_1+\frac{\sum_{i=1}^{n}\epsilon_i(x_i-\bar{x})}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\right)$$
+$$=\left[\frac{1}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\right]^2\text{Var}\left(\sum_{i=1}^{n}\epsilon_i(x_i-\bar{x})\right)$$
+$$=\left[\frac{1}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\right]^2\sum_{i=1}^{n}\text{Var}\left(\epsilon_i(x_i-\bar{x})\right)$$
+$$=\left[\frac{1}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\right]^2\sum_{i=1}^{n}(x_i-\bar{x})^2\text{Var}\left(\epsilon_i\right)$$
+$$=\left[\frac{1}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\right]^2\sum_{i=1}^{n}(x_i-\bar{x})^2\sigma^2$$
+$$=\frac{\sigma^2}{\left[\sum_{i=1}^{n}(x_i-\bar{x})^2\right]^2}\sum_{i=1}^{n}(x_i-\bar{x})^2$$
+$$=\frac{\sigma^2}{\sum_{i=1}^{n}(x_i-\bar{x})^2}$$
+$$\text{SE}\left(\hat{\beta}_0\right)^2=\text{Var}\left(\hat{\beta}_0\right)$$
+$$=\text{Var}\left(\bar{y}-\hat{\beta}_1\bar{x}\right)$$
+$$=\text{Var}\left(\beta_0+\beta_1\bar{x}+\bar{\epsilon}-\beta_1\bar{x}+\frac{\sum_{i=1}^{n}\epsilon_i(x_i-\bar{x})}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\bar{x}\right)$$
+$$=\text{Var}\left(\bar{\epsilon}+\frac{\sum_{i=1}^{n}\epsilon_i(x_i-\bar{x})}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\bar{x}\right)$$
+$$=\text{Var}\left(\bar{\epsilon}\right)+\text{Var}\left(\frac{\sum_{i=1}^{n}\epsilon_i(x_i-\bar{x})}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\bar{x}\right)+2\text{Cov}\left(\bar{\epsilon},\frac{\sum_{i=1}^{n}\epsilon_i(x_i-\bar{x})}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\bar{x}\right)$$
+$$=\frac{\sigma^2}{n}+\bar{x}^2\text{Var}\left(\frac{\sum_{i=1}^{n}\epsilon_i(x_i-\bar{x})}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\right)+\frac{2\bar{x}}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\text{Cov}\left(\bar{\epsilon},\sum_{i=1}^{n}\epsilon_i(x_i-\bar{x})\right)$$
+$$=\frac{\sigma^2}{n}+\frac{\bar{x}^2}{\left(\sum_{i=1}^{n}(x_i-\bar{x})^2\right)^2}\text{Var}\left(\sum_{i=1}^{n}\epsilon_i(x_i-\bar{x})\right)+\frac{2\bar{x}\sum_{i=1}^{n}(x_i-\bar{x})}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\text{Cov}\left(\bar{\epsilon},\sum_{i=1}^{n}\epsilon_i\right)$$
+$$=\frac{\sigma^2}{n}+\frac{\bar{x}^2}{\left(\sum_{i=1}^{n}(x_i-\bar{x})^2\right)^2}\sum_{i=1}^{n}\text{Var}\left(\epsilon_i(x_i-\bar{x})\right)+\frac{2\bar{x}}{n\sum_{i=1}^{n}(x_i-\bar{x})^2}\text{Cov}\left(\sum_{i=1}^{n}\epsilon_i,\sum_{i=1}^{n}\epsilon_i(x_i-\bar{x})\right)$$
+$$=\frac{\sigma^2}{n}+\frac{\bar{x}^2}{\left(\sum_{i=1}^{n}(x_i-\bar{x})^2\right)^2}\sum_{i=1}^{n}(x_i-\bar{x})^2\text{Var}\left(\epsilon_i\right)+\frac{2\bar{x}}{n\sum_{i=1}^{n}(x_i-\bar{x})^2}\sum_{i=1}^{n}(x_i-\bar{x})\text{Cov}\left(\epsilon_i,\epsilon_i\right)$$
+$$=\frac{\sigma^2}{n}+\frac{\bar{x}^2}{\left(\sum_{i=1}^{n}(x_i-\bar{x})^2\right)^2}\sum_{i=1}^{n}(x_i-\bar{x})^2\sigma^2+\frac{2\bar{x}}{n\sum_{i=1}^{n}(x_i-\bar{x})^2}\sum_{i=1}^{n}(x_i-\bar{x})\sigma^2$$
+$$=\frac{\sigma^2}{n}+\frac{\sigma^2\bar{x}^2}{\left(\sum_{i=1}^{n}(x_i-\bar{x})^2\right)^2}\sum_{i=1}^{n}(x_i-\bar{x})^2+\frac{2\sigma^2\bar{x}}{n\sum_{i=1}^{n}(x_i-\bar{x})^2}\sum_{i=1}^{n}(x_i-\bar{x})$$
+$$=\frac{\sigma^2}{n}+\frac{\sigma^2\bar{x}^2}{\sum_{i=1}^{n}(x_i-\bar{x})^2}+\frac{2\sigma^2\bar{x}}{n\sum_{i=1}^{n}(x_i-\bar{x})^2}\cdot 0$$
+$$=\sigma^2\left[\frac{1}{n}+\frac{\bar{x}^2}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\right]$$
+\small
+\textit{Note:} In reality, these formulas give the \emph{standard deviations} of $\hat{\beta}_0$ and $\hat{\beta}_1$. The standard errors use $\hat{\sigma}^2$ in place of $\sigma^2$ since we do not observe the population standard deviation of $\epsilon$. Additionally, these derivations are conditional in the sense that we treat $X$ as non-random.
+\normalsize
+
+In practice we replace $\sigma$ with the \textbf{residual standard error}, the square root of an unbiased estimator of $\sigma^2$ (however, not unbiased for $\sigma$), given by
+$$\text{RSE}=\sqrt{\frac{\sum_{i=1}^{n}e_i^2}{(n-2)}}=\sqrt{\frac{\text{RSS}}{(n-2)}}$$
+In total, we write
+$$\hat{\text{SE}}(\hat{\beta_0})^2=\frac{\sum_{i=1}^{n}e_i^2/n(n-2)+\sum_{i=1}^{n}x_i^2}{\sum_{i=1}^{n}(x_i-\bar{x})^2}$$
+$$\hat{\text{SE}}(\hat{\beta_1})^2=\frac{\sum_{i=1}^{n}e_i^2/(n-2)}{\sum_{i=1}^{n}(x_i-\bar{x})^2}$$
+
+Standard errors can be used to compute \textbf{confidence intervals}. The 95\% confidence interval for $\beta_1$ takes the approximate form
+$$\hat{\beta}_1\pm 2\cdot\hat{\text{SE}}(\hat{\beta}_1)$$
+and has the property that, if we take repeated samples and construct the confidence interval for each sample, 95\% of the intervals will contain the true unknown value of the parameter $\beta_1$. Note that this interval only holds when the errors are Gaussian or there is a sufficient sample size to satisfy the asymptotic standard normal distribution.
+
+Standard errors can also be used to perform \textbf{hypothesis tests} on the coefficients. The most common hypothesis test involves testing the \textbf{null hypothesis} of
+$$H_0:\beta_1=0$$
+against the \textbf{alternative hypothesis}
+$$H_a:\beta_1\neq 0$$
+To test the null hypothesis, we need to determine whether $\hat{\beta}_1$ is sufficiently far from the hypothesized value for $\beta_1$ (zero in the above example) that we can be confident that the null hypothesis can be rejected in favor of the alternative. To determine whether we can reject the null, we compute a \textbf{$t$-statistic} given by
+$$t=\frac{\hat{\beta}_1-b_1}{\hat{\text{SE}}(\hat{\beta}_1)},$$
+where $b_1$ denotes the hypothesized value for $\beta_1$ in the null (again, zero in the case above). In practice, we also compute \textbf{$p$-values}, which is the probability of committing a type I error, or the probability of observing the results from our analysis given the null hypothesis is true.
+
+### Assessing the Accuracy of the Model
+
+Once we compute our estimates for the coefficients of interest and performed hypothesis testing, it is natural to want to quantify the extent to which the model fits the data. The quality of a linear regression fit is typically assessed using the residual standard error (RSE) and the \textbf{$R^2$ statistic} or \textbf{coefficient of determination}.
+
+Recall that the residual standard error (also commonly called the standard error of regression) is given by
+$$\text{RSE}=\sqrt{\frac{\sum_{i=1}^{n}e_i^2}{(n-2)}}=\sqrt{\frac{\text{RSS}}{(n-2)}}$$
+and is an estimator of the standard deviation of $\epsilon$. Another way to think about this is that, even if we knew the true values of $\beta_0$ and $\beta_1$, any prediction of $Y$ on the basis of $X$ would be off by about the RSE on average. Thus, the RSE is considered a measure of the lack of fit of the model.
+
+A more common measure for the goodness-of-fit is the $R^2$ since it does not depend on the units of $Y$. The $R^2$ statistic is the proportion of variance in $Y$ explained by $X$ and is given by the squared correlation coefficient between the actual values of $Y$ and the predicted values $\hat{Y}$. To calculate the $R^2$ we use the formula
+$$R^2=\frac{\text{ESS}}{\text{TSS}}=\frac{\text{TSS}-\text{RSS}}{\text{TSS}}=1-\frac{\text{RSS}}{\text{TSS}},$$
+where RSS is the residual sum of squares, TSS is the \textbf{total sum of squares} given by $\sum_{i=1}^{n}(y_i-\bar{y})^2$, and ESS is the \textbf{explained sum of squares} given by $\sum_{i=1}^{n}(\hat{y}_i-\bar{y})^2$. In total,$$\text{TSS}=\text{ESS}+\text{RSS}$$
+
+\underline{Derivation}
+$$\text{ESS}+\text{RSS}=\sum_{i=1}^{n}(\hat{y}_i-\bar{y})^2+\sum_{i=1}^{n}(y_i-\hat{y}_i)^2$$
+$$=\sum_{i=1}^{n}(\hat{y}_i^2-2\bar{y}\hat{y}_i+\bar{y}^2)+\sum_{i=1}^{n}(y_i^2-2y_i\hat{y}_i+\hat{y}_i^2)$$
+$$=\left[\sum_{i=1}^{n}\hat{y}_i^2-2\bar{y}\sum_{i=1}^{n}\hat{y}_i+\sum_{i=1}^{n}\bar{y}^2\right]+\left[\sum_{i=1}^{n}y_i^2-2\sum_{i=1}^{n}y_i\hat{y}_i+\sum_{i=1}^{n}\hat{y}_i^2\right]$$
+$$=\left[\sum_{i=1}^{n}y_i^2-2n\bar{y}^2+\sum_{i=1}^{n}\bar{y}^2\right]+\left[\sum_{i=1}^{n}\hat{y}_i^2-2\sum_{i=1}^{n}y_i\hat{y}_i+\sum_{i=1}^{n}\hat{y}_i^2\right]$$
+$$=\left[\sum_{i=1}^{n}y_i^2-2\bar{y}\sum_{i=1}^{n}y_i+\sum_{i=1}^{n}\bar{y}^2\right]+\left[\sum_{i=1}^{n}(2\hat{y}_i^2-2y_i\hat{y}_i)\right]$$
+$$=\left[\sum_{i=1}^{n}(y_i^2-2\bar{y}y_i+\bar{y}^2)\right]+\left[\sum_{i=1}^{n}2\hat{y}_i(\hat{y}_i-y_i)\right]$$
+$$=\sum_{i=1}^{n}(y_i-\bar{y})^2-2\sum_{i=1}^{n}\hat{y}_i(e_i)$$
+$$=\text{TSS}-2\sum_{i=1}^{n}e_i(\hat{\beta}_0+\hat{\beta_1}x_i)$$
+$$=\text{TSS}-2\left[\hat{\beta}_0\sum_{i=1}^{n}e_i+\hat{\beta_1}\sum_{i=1}^{n}x_ie_i\right]$$
+$$=\text{TSS}$$
+
+Recall that the least squares first order conditions are solved such that $\sum_{i=1}^{n}e_i=0$ and $\sum_{i=1}^{n}x_ie_i=0$. 
+
+### Multiple Linear Regression
+
+We can extend the framework of simple linear regression to \textbf{multiple linear regression (MLR)} in which we have more than one regressor. In general, suppose we have $p$ distinct predictors. Then the multiple linear regression model takes the form
+$$Y=\beta_0+\beta_1X_1+\dots+\beta_pX_p+\epsilon,$$
+where $\beta_j$ is the ceteris paribus average effect on $Y$ of a one-unit increase in $X_j$. Just as with SLR, we choose our estimates of $\beta_0,\beta_1,\dots,\beta_p$ such that we minimize
+$$\text{RSS}=\sum_{i=1}^{n}(y_i-\hat{y}_i)^2$$
+Thus, if we form our predictions using
+$$\hat{y}=\hat{\beta}_0+\hat{\beta}_1x_1+\dots+\hat{\beta}_px_p$$
+$$\text{RSS}=\sum_{i=1}^{n}(y_i-\hat{\beta}_0+\hat{\beta}_1x_1+\dots+\hat{\beta}_px_p)^2$$
+In matrix form, this can be rewritten as
+$$\text{RSS}=e^Te=(Y-\mathbf{X}\hat{\beta})^T(Y-\mathbf{X}\hat{\beta}),$$
+where $Y\in\mathbb{R}^n$ is a vector of the $n$ observed values for the response variable, $\mathbf{X}\in\mathbb{R}^{n\times (p+1)}$ is a matrix of the $n$ observed values for the $p$ predictors and $n$ ones (for the intercept), and $\hat{\beta}\in\mathbb{R}^{(p+1)}$ is a vector of our $p+1$ estimators (i.e., $\hat{\beta}=(\hat{\beta}_0,\hat{\beta}_1,\dots,\hat{\beta}_p)^T$). Differentiating with respect to $\hat{\beta}$, we obtain
+$$\hat{\beta}=(\mathbf{X}^T\mathbf{X})^{-1}(\mathbf{X}^TY)$$
+
+\underline{Derivation}
+$$\text{RSS}=(Y-\mathbf{X}\hat{\beta})^T(Y-\mathbf{X}\hat{\beta})$$
+$$=(Y^T-\hat{\beta}^T\mathbf{X}^T)(Y-\mathbf{X}\hat{\beta})$$
+$$=Y^TY-Y^T\mathbf{X}\hat{\beta}-\hat{\beta}^T\mathbf{X}^TY+\hat{\beta}^T\mathbf{X}^T\mathbf{X}\hat{\beta}$$
+$$\frac{\partial{\text{RSS}}}{\partial{\hat{\beta}}}=\frac{\partial}{\partial{\hat{\beta}}}\left(Y^TY-Y^T\mathbf{X}\hat{\beta}-\hat{\beta}^T\mathbf{X}^TY+\hat{\beta}^T\mathbf{X}^T\mathbf{X}\hat{\beta}\right)=0$$
+$$\frac{\partial}{\partial{\hat{\beta}}}\left(Y^TY\right)-\frac{\partial}{\partial{\hat{\beta}}}\left(Y^T\mathbf{X}\hat{\beta}\right)-\frac{\partial}{\partial{\hat{\beta}}}\left(\hat{\beta}^T\mathbf{X}^TY\right)+\frac{\partial}{\partial{\hat{\beta}}}\left(\hat{\beta}^T\mathbf{X}^T\mathbf{X}\hat{\beta}\right)=0$$
+$$0-\mathbf{X}^TY-\mathbf{X}^TY+2\mathbf{X}^T\mathbf{X}\hat{\beta}=0$$
+$$\mathbf{X}^T\mathbf{X}\hat{\beta}=\mathbf{X}^TY$$
+$$\hat{\beta}=(\mathbf{X}^T\mathbf{X})^{-1}\mathbf{X}^TY$$
+
+To show the derivations of the partial derivatives:
+$$Y^T\mathbf{X}\hat{\beta}=\begin{bmatrix}y_1 & \cdots & y_n\end{bmatrix}\begin{bmatrix}1 & x_{11} & \cdots & x_{1p} \\ \vdots & \vdots &  \ddots & \vdots \\ 1 & x_{n1} & \cdots & x_{np} \end{bmatrix} \begin{bmatrix} \hat{\beta}_0 \\ \vdots \\ \hat{\beta}_p\end{bmatrix}$$
+$$=\begin{bmatrix}y_1 & \cdots & y_n \end{bmatrix} \begin{bmatrix} \hat{\beta}_0+\hat{\beta}_1x_{11}+\dots+\hat{\beta}_px_{1p}\\ \vdots \\ \hat{\beta}_0+\hat{\beta}_1x_{n1}+\dots+\hat{\beta}_px_{np} \end{bmatrix}$$
+$$=\left(\hat{\beta}_0y_1+\hat{\beta}_1x_{11}y_1+\dots+\hat{\beta}_px_{1p}y_1\right)+\dots+\left(\hat{\beta}_0y_n+\hat{\beta}_1x_{n1}y_n+\dots+\hat{\beta}_px_{np}y_n\right)$$
+$$\frac{\partial{Y^T\mathbf{X}\hat{\beta}}}{\partial{\hat{\beta}}}=\begin{bmatrix}\frac{\partial{Y^T\mathbf{X}\hat{\beta}}}{\partial{\hat{\beta}_0}} \\ \vdots \\ \frac{\partial{Y^T\mathbf{X}\hat{\beta}}}{\partial{\hat{\beta}_p}}\end{bmatrix}=\begin{bmatrix}y_1+\dots+y_n \\ \vdots \\ x_{1p}y_1+\dots+x_{np}y_n\end{bmatrix}=\mathbf{X}^TY$$
+
+$$\hat{\beta}^T\mathbf{X}^TY=\begin{bmatrix} \hat{\beta}_0 & \cdots & \hat{\beta}_p \end{bmatrix}\begin{bmatrix} 1 & \cdots & 1 \\ x_{11} & \cdots & x_{n1} \\ \vdots & \ddots & \vdots \\ x_{1p} & \cdots & x_{np}\end{bmatrix}\begin{bmatrix} y_1 \\ \vdots \\ y_n\end{bmatrix}$$
+$$=\begin{bmatrix} \hat{\beta}_0 & \cdots & \hat{\beta}_p \end{bmatrix}\begin{bmatrix} y_1+\dots+y_n \\ \vdots \\ x_{1p}y_1+\dots+x_{np}y_n\end{bmatrix}$$
+$$=\hat{\beta}_0(y_1+\dots+y_n)+\dots+\hat{\beta}_p(x_{1p}+\dots+x_{np}y_n)$$
+$$=\left(\hat{\beta}_0y_1+\hat{\beta}_1x_{11}y_1+\dots+\hat{\beta}_px_{1p}y_1\right)+\dots+\left(\hat{\beta}_0y_n+\hat{\beta}_1x_{n1}y_n+\dots+\hat{\beta}_px_{np}y_n\right)$$
+$$\frac{\partial{\hat{\beta}^T\mathbf{X}^TY}}{\partial{\hat{\beta}}}=\begin{bmatrix}\frac{\partial{\hat{\beta}^T\mathbf{X}^TY}}{\partial{\hat{\beta}_0}} \\ \vdots \\ \frac{\partial{\hat{\beta}^T\mathbf{X}^TY}}{\partial{\hat{\beta}_p}}\end{bmatrix}=\begin{bmatrix}y_1+\dots+y_n \\ \vdots \\ x_{1p}y_1+\dots+x_{np}y_n\end{bmatrix}=\mathbf{X}^TY$$
+$$\hat{\beta}^T\mathbf{X}^T\mathbf{X}\hat{\beta}=\begin{bmatrix} \hat{\beta}_0 & \cdots & \hat{\beta}_p \end{bmatrix}\begin{bmatrix} 1 & \cdots & 1 \\ x_{11} & \cdots & x_{n1} \\ \vdots & \ddots & \vdots \\ x_{1p} & \cdots & x_{np}\end{bmatrix}\begin{bmatrix}1 & x_{11} & \cdots & x_{1p} \\ \vdots & \vdots &  \ddots & \vdots \\ 1 & x_{n1} & \cdots & x_{np} \end{bmatrix} \begin{bmatrix} \hat{\beta}_0 \\ \vdots \\ \hat{\beta}_p\end{bmatrix}$$
+$$=\begin{bmatrix} \hat{\beta}_0 & \cdots & \hat{\beta}_p \end{bmatrix}\begin{bmatrix} 1 & \cdots & 1 \\ x_{11} & \cdots & x_{n1} \\ \vdots & \ddots & \vdots \\ x_{1p} & \cdots & x_{np}\end{bmatrix}\begin{bmatrix} \hat{\beta}_0+\hat{\beta}_1x_{11}+\dots+\hat{\beta}_px_{1p}\\ \vdots \\ \hat{\beta}_0+\hat{\beta}_1x_{n1}+\dots+\hat{\beta}_px_{np} \end{bmatrix}$$
+$$=\begin{bmatrix} \hat{\beta}_0+\hat{\beta}_1x_{11}+\dots+\hat{\beta}_px_{1p}\\ \vdots \\ \hat{\beta}_0+\hat{\beta}_1x_{n1}+\dots+\hat{\beta}_px_{np} \end{bmatrix}^T\begin{bmatrix} \hat{\beta}_0+\hat{\beta}_1x_{11}+\dots+\hat{\beta}_px_{1p}\\ \vdots \\ \hat{\beta}_0+\hat{\beta}_1x_{n1}+\dots+\hat{\beta}_px_{np} \end{bmatrix}$$
+$$=\left(\hat{\beta}_0+\hat{\beta}_1x_{11}+\dots+\hat{\beta}_px_{1p}\right)^2+\dots+\left(\hat{\beta}_0+\hat{\beta}_1x_{n1}+\dots+\hat{\beta}_px_{np}\right)^2$$
+$$\frac{\partial{\hat{\beta}^T\mathbf{X}^T\mathbf{X}\hat{\beta}}}{\partial{\hat{\beta}}}=\begin{bmatrix}\frac{\partial{\hat{\beta}^T\mathbf{X}^T\mathbf{X}\hat{\beta}}}{\partial{\hat{\beta}_0}} \\ \vdots \\ \frac{\partial{\hat{\beta}^T\mathbf{X}^T\mathbf{X}\hat{\beta}}}{\partial{\hat{\beta}_p}}\end{bmatrix}$$
+$$=\begin{bmatrix}(\hat{\beta}_0+\hat{\beta}_1x_{11}+\dots+\hat{\beta}_px_{1p})+\dots+(\hat{\beta}_0+\hat{\beta}_1x_{n1}+\dots+\hat{\beta}_px_{np}) \\ \vdots \\ x_{1p}(\hat{\beta}_0+\hat{\beta}_1x_{11}+\dots+\hat{\beta}_px_{1p})+\dots+x_{np}(\hat{\beta}_0+\hat{\beta}_1x_{n1}+\dots+\hat{\beta}_px_{np})\end{bmatrix}=2\mathbf{X}^T\mathbf{X}\hat{\beta}$$
+
+
+Similar to the setting of hypothesis testing in simple linear regression, we commonly want to test the null hypothesis that none of the predictors are associated with the response variable. We can write this mathematically as
+$$H_0: \beta_1=\dots=\beta_p=0$$
+Likewise, the alternative can be written as
+$$H_a:\text{ at least one }\beta_j\text{ is non-zero.}$$
+We test this hypothesis using the \textbf{$F$-statistic}, which is computed using the formula
+$$F=\frac{(\text{TSS}-\text{RSS})/p}{\text{RSS}/(n-p-1)}$$
+When $H_0$ is true and the errors $\epsilon_i$ have a normal distribution (or the sample size $n$ is sufficiently large), the $F$-statistic follows an $F$-distribution. Thus, we reject the null in favor of the alternative hypothesis if
+$$F>\mathcal{F}_{p,n-p-1},$$
+where $F$ is our calculated $F$-statistic and $\mathcal{F}$ represents the critical value derived from $F$-distribution with $p,n-p-1$ degrees of freedom and the chosen significance level.
+
+The above setting can be applied to more general joint hypotheses. Suppose we wish to test whether the last $q$ predictors are not associated with the response variable. The corresponding null hypothesis can be written as
+$$H_0:\beta_{p-q+1}=\dots=\beta_p=0$$
+In this case we fit a second model that uses all the variables except those last $q$ (i.e., we estimate $Y=\beta_0+\beta_1X_1+\dots+\beta_{p-q}$). Denoting the residual sum of squares for that model as $RSS_0$, the appropriate F-statistic is
+$$F=\frac{(\text{RSS}_0-\text{RSS})/q}{\text{RSS}/(n-p -1)}$$
+When we reject $H_0$ in favor of $H_a$, we naturally want to know which of the predictors is associated with the response. The task of determining which predictors are associated with the response, in order to fit a single model involving only those predictors, is referred to as \textbf{variable selection}. Generally, we wish to select the best model available to us, which can be determined by various statistics including \textbf{Mallow's $C_p$}, \textbf{Akaike information criterion (AIC)}, \textbf{Bayesian information criterion (BIC)}, and \textbf{adjusted $R^2$}. Unfortunately, testing each model available to us is unfeasible as there are $2^p$ possibilities (not including transformations of the predictors). Thus, we use three approaches for this task:
+\begin{itemize}
+\item  \textbf{Forward selection}: We begin with the \textbf{null model} (the model that contains an intercept but no predictors). We then fit $p$ simple linear regressions and add to the null model the variable that results in the lowest RSS. We then add to that model the variable that results in the lowest RSS for the new two-variable model. This process is continued until some stopping rule is satisfied.
+\item \textbf{Backward selection}: We start with all variables in the model and remove the variable is the least statistically significant. The new $(p-1)$-variable model is fit, and the variable with the largest $p$-value is removed. This procedure continues until a stopping rule is reached. For instance, we may stop when all remaining variables have a $p$-value below some threshold.
+\item \textbf{Mixed selection}: We start with no variables in the model and, as with forward selection, add the variable that provides the best fit. We continue to add variables one-by-one. The $p$-values for variables can become larger as new predictors are added to the model. Hence, if at any point the $p$-value for one of the variables in the model rises above a certain threshold, then we remove that variable from the model. We continue to perform these forward and backward steps until all variables in the model have a sufficiently low $p$-value, and all variables outside the model would have a large $p$-value if added to the model.
+\end{itemize}
+
+Just as we did in the SLR case, we generally use $R^2$ and RSE to measure how well our model fits the observed data. While $R^2$ can still be calculated using
+$$R^2=\frac{\text{ESS}}{\text{TSS}}=\frac{\text{TSS}-\text{RSS}}{\text{TSS}}=1-\frac{\text{RSS}}{\text{TSS}},$$
+the RSE takes its more general form
+$$\text{RSE}=\sqrt{\frac{\sum_{i=1}^{n}e_i^2}{(n-p-1)}}=\sqrt{\frac{\text{RSS}}{(n-p-1)}}$$
+by adjusting for the additional predictors.
+
+### Prediction
+
+When we would like to predict values of $Y$ using our estimated model, there are three sorts of uncertainty associated with such predictions. The first sort of uncertainty stems from the reducible error due to the fact that $\hat{\beta}_0,\dots,\hat{\beta}_p$ are estimates of $\beta_0,\dots,\beta_p$. The second sort of uncertainty stems from \textbf{model bias}, which is another source of reducible error but comes from our underlying assumption that $f(X)$ is truly linear. The final sort of uncertainty comes from the error term $\epsilon$ or the irreducible error. The irreducible error makes it such that, even if we knew $\beta_0,\dots,\beta_p$, our predictions remain imperfect. Because of these levels of uncertainty, we use \textbf{confidence intervals} and \textbf{prediction intervals} to make predictions. More specifically, we use a confidence interval to quantify the uncertainty surrounding the \emph{average} $Y$ given the values of $X$ and a prediction to quantify the uncertainty surrounding a \emph{particular} $Y$ given the values of $X$. In other words, prediction intervals are always wider than confidence intervals, because they incorporate both the error in the estimate for $f(X)$ (the reducible error) and the uncertainty as to how much an individual point will differ from the population regression plane (the irreducible error).
+
+### Regression with Qualitative Predictors
+
+Our framework for multiple regression can also be applied in the case where we have a \textbf{factor}, or qualitative predictor. To incorporate factors, we introduce an indicator or \textbf{dummy variable} that takes on one if the corresponding value evaluates to true and zero otherwise. We can also use dummy variables in the circumstance where a qualitative predictor has more than two levels. Suppose we have a qualitative predictor $x$ with $\ell$ levels, then we write our regression equation as
+$$y_i=\beta_0+\beta_1x_{i1}+\dots+\beta_{\ell-1}x_{i(\ell-1)}+\epsilon_i,$$
+where $x_1,\dots,x_{i(\ell-1)}$ are $\ell-1$ dummy variables representing the different levels of the factor. Note that we only use $\ell-1$ to avoid perfect collinearity. The level with no dummy variable is referred to as the \textbf{baseline}. Thus, $\beta_0$ is the average $y$ for the baseline, and $\beta_j$ is the average difference between the baseline and the $j$th level of the factor.
+
+### Non-Linear Models
+
+Two of our assumptions regarding linear models up to this point are:
+\begin{itemize}
+\item The additivity assumption: The association between a predictor $X_j$ and the response $Y$ does not depend on the values of the other predictors.
+\item The linearity assumption: The change in the response $Y$ associated with a one-unit change in $X_j$ is constant, regardless of the value of $X_j$.
+\end{itemize}
+These assumptions can be relaxed using some common classical approaches for extending the linear model.
+
+To relax the additivity assumption, we often use \textbf{interaction terms}. Consider the case where there are two regressors $X_1$ and $X_2$. A model constructed using an interaction term would take the form
+$$Y=\beta_0+\beta_1X_1+\beta_2X_2+\beta_3X_1X_2+\epsilon,$$
+where $X_1X_2$ is the interaction term between our original predictors $X_1$ and $X_2$. Interaction terms are beneficial to our model when there is an interaction effect, meaning the effect of one regressor on the response fluctuates with the relative quantity of another regressor. When using an interaction term, the \textbf{hierarchical principle} states that we should always include the variables that make up the interaction term ($X_1$ and $X_2$ in the above example), even if the $p$-values associated with their coefficients are not significant.
+
+Relaxing the linearity assumption is similar to that of the additivity model. In general, we use \textbf{polynomial regression} to accommodate non-linear relationships between the regressors and the response variables. Consider the case in which we have one regressor $X_1$. A model constructed using a \textbf{quadratic} would take the form
+$$Y=\beta_0+\beta_1X_1+\beta_2X_1^2+\epsilon,$$
+
+### Issues Pertaining to Linear Models
+
+When we fit a linear regression model to a particular data set, many problems may occur. Most common among these are the following:
+\begin{enumerate}
+\item Non-linearity of the Response-Predictor Relationships: If the true relationship between the predictors and the response is non-linear in its parameters, all of the conclusions that we draw from the fit are suspect, and the prediction accuracy of the model can be significantly reduced. \textbf{Resiudal plots}, where we plot the residuals $e_i$ against the fitted values $\hat{y}_i$, are a useful graphical tool for identifying non-linearity.
+\item Correlation of the Error Terms: An important assumption of the linear regression model is that the error terms, $\epsilon_1,\dots,\epsilon_n$, are uncorrelated (we also state this as there is no \textbf{serial correlation} or \textbf{autocorrelation}). This means that knowing the value for $\epsilon_i$ provides no information about $\epsilon_{i+1}$. Generally, this assumption is satisfied under the assumption random sampling, which is commonly used with \textbf{cross-sectional data}. However, serial correlation frequently occurs in the context of \textbf{time series} data, which consists of observations for which measurements are obtained at discrete points in time. Often, it's the case that observations obtained at adjacent time points will have positively correlated errors. Since the error terms are unobserved, in practice, we check for \textbf{tracking} in the residuals, where adjacent residuals have similar values.
+\item Non-constant Variance of Error Terms: Another important assumption of the linear regression model is that the error terms have a constant variance such that $\text{Var}(\epsilon_i)=\text{Var}(\epsilon_i|X)=\sigma^2$ (this is also known as \textbf{homoscedasticity}). Cases in which there exist non-constant variances in the errors are said to display \textbf{heteroscedasticity}. One remedy to the presence of heteroscedasticity is using \textbf{weighted least squares}, where weights given to each observation are proportional to the variances.
+\item Outliers: An \textbf{outlier} is a point for which $y_i$ is far from the value predicted by the model $\hat{y}_i$. Typically, an outlier that does not have an unusual predictor value has little effect on the least squares fit; however, it can cause other problems such as a significant increase in the RSE. If we believe that an outlier is a result of a data collection error, one solution is to simply remove the observation. However, one should be cautious of such actions, since an outlier may instead indicate a deficiency with the model.
+\item High Leverage Points: Observations classed as \textbf{high leverage} are those with an unusual value for $x_i$. Generally, removing a high leverage observation has a much more substantial impact on the least squares line than removing an outlier (i.e., high leverage observations tend to have a sizable impact on the estimated regression line). In order to quantify an observation’s leverage, we compute the leverage statistic given by
+$$h_i=\frac{1}{n}+\frac{(x_i-\bar{x})^2}{\sum_{i'=1}^{n}(x_{i'}-\bar{x})^2}$$
+in the SLR case, where an $h_i$ close to one indicates an observation with high leverage.
+\item Collinearity: \textbf{Collinearity} refers to the situation in which two or more predictor variables are closely related to one another. High but imperfect correlation between two or more independent variables leads to large values for $\text{Var}\left(\hat{\beta}_j\right)$. Worrying about high degrees of correlation among the independent variables in the sample is really no different from worrying about a small sample size as both work to increase $\text{Var}(\hat{\beta}_j)$. The circumstance in which collinearity exists between three or more variables is called \textbf{multicollinearity}. Because it is possible for collinearity to exist between three or more variables even if no pair of variables has a particularly high correlation, we use the \textbf{variance inflation factor (VIF)} to assess the level of collinearity in a model. We can compute this value by using the formula
+$$\text{VIF}(\hat{\beta}_j)=\frac{1}{1-R_{X_j|X_{-j}}^2},$$
+where $R_{X_j|X_{-j}}^2$ is the $R^2$ from regressing $X_j$ onto all other predictors.
+\end{enumerate}
+
+### $K$-Nearest Neighbors Regression
+
+While linear regression is a \emph{parametric} approach to estimating $f$ (since it assumes $f$ is linear), one of the simplest and best-known \emph{non-parametric} methods is \textbf{$K$-nearest neighbors regression (KNN regression)}, which is closely related to the KNN classifier. Given a value for $K$ and a prediction point $x_0$, KNN regression identifies the $K$ training observations that are closest to $x_0$, represented by $\mathcal{N}_0$. It then estimates $f(x_0)$ using the average of all the training responses in $\mathcal{N}_0$. Written mathematically,
+$$\hat{f}(x_0)=\frac{1}{K}\sum_{x\in\mathcal{N}_0}y_i$$
+The optimal value for $K$ will depend on the bias-variance tradeoff. Small values for $K$ provides the most flexible fit, which will have low bias but high variance due to the fact that the prediction in a given region is entirely dependent on just one observation. On the other hand, larger values for $K$ provide a smoother and less variable fit since the prediction is an average of several points, and so changing one observation has a smaller effect. However, the smoothing may cause bias by masking some of the structure in $f(X)$.
+
+In general, a parametric approach will outperform a non-parametric approach if the parametric approach that has been selected is close to the true form of $f$. This is the case because if the underlying parametric assumption is close to true, a non-parametric approach incurs a cost in variance that is not offset by a reduction in bias.  In a real life situation in which the true relationship is unknown, one might suspect that KNN should be favored over linear regression because it will at worst be slightly inferior to linear regression if the true relationship is linear, and may give substantially better results if the true relationship is non-linear. But in reality, even when the true relationship is highly non-linear, KNN may still provide inferior results to linear regression. This is because, in higher dimensions, KNN often performs worse than linear regression, a phenomenon called the \textbf{curse of dimensionality}. Roughly speaking for a given sample size, as the number of dimensions $p$ increases, the $K$ observations that are nearest to a given test observation $x_0$ tend to be further away from $x_0$, leading to a poorer predictions of $f(x_0)$ and hence a poor KNN fit. Thus, it's the case that parametric methods will tend to outperform non-parametric approaches when there is a small number of observations per predictor.
+
+## Lab
+\begin{itemize}
+\item The \texttt{names()} function can be used to find the names of the pieces of an object (such as an \texttt{lm} object). Although we can extract these pieces by name using \texttt{\$} (e.g., \texttt{lm.fit\$coefficients}), it is safer to use extractor functions (e.g., \texttt{coef(lm.fit)}).
+\item The command \texttt{confint()} can be used to produce confidence intervals for the coefficient estimates.
+\item The \texttt{predict()} function can be used to produce confidence intervals and prediction intervals for $Y$ given a value (or set of values) for $X$.
+\item We can use \texttt{grid.arrange()} from the package \texttt{gridExtra} to group plots together (side-by-side and/or on top of each other).
+
+Alternatively, using R's base graphics, we can use \texttt{par(mfrow = )} to achieve the same goal.
+\item The function \texttt{rstudent()} will return studentized residuals.
+\item Leverage statistics can be computed for any number of predictors using the \texttt{hatvalues()} function.
+\item The \texttt{vif()} function, part of the \texttt{car} package, can be used to compute variance inflation factors.
+\item \texttt{lm(Y $\sim$ . - X\_j)} (where the \texttt{X\_j} is optional) can be used to regress $Y$ on all of the predictors except for $X_j$.
+\item \texttt{lm.fit <- update(lm.fit, $\sim$ ...)} can be used to update a model with a new specification.
+\item We can use \texttt{X\_1:X\_2} in the \texttt{lm()} function to include an interaction term. However, it's better to use \texttt{X\_1 * X\_2}, which will include $X_1,X_2$, and $X_1X_2$ in the model.
+\item We can use \texttt{I(X\^{}n)} to include $X^n$ in our model. Alternatively, we can use \texttt{poly(X, n, raw = TRUE)} to include $X, X^2,\dots,X^{n-1},X^n$ in our model.
+\end{itemize}
+
+## Exercises
+
+### Conceptual
+
+\begin{enumerate}
+\item Describe the null hypotheses to which the $p$-values given in Table 3.4 correspond. Explain what conclusions you can draw based on these p-values. Your explanation should be phrased in terms of \texttt{sales}, \texttt{TV}, \texttt{radio}, and \texttt{newspaper}, rather than in terms of the coefficients of the linear model.
+
+Each $p$-value corresponds to the probability of committing a type I error under the null hypothesis that the corresponding predictor individually has no effect on \texttt{sales}. Thus, looking at the $p$-value for \texttt{TV}, we reject the null that \texttt{TV} has no effect on \texttt{sales} in favor of the alternative at every conventional significance level. The same concept applies for \texttt{radio}. On the other hand, the $p$-value corresponding to \texttt{newspaper} does not provide such convincing evidence. Thus, we fail to reject the null hypothesis that \texttt{newspaper} has no individual effect on \texttt{sales}.
+\item Carefully explain the differences between the KNN classifier and KNN regression methods.
+
+The KNN classifier method is a classification method in which the response variable is qualitative Using the KNN classifier, our prediction for the response variable is that which occurs \emph{most frequently} in the $K$ nearest points to $x_0$, and thus, it takes on an already observed value. On the other hand, KNN regression is a regression problem in which the response variable is quantitative. Using the KNN regression method, our prediction for the response variable is the \emph{average} of the $K$ nearest points to $x_0$, and thus, it needn't take on an observed value.
+\item  Suppose we have a data set with five predictors, $X_1=\text{GPA}$, $X_2=\text{IQ}$, $X_3=\text{Level}$ (1 for College and 0 for High School), $X_4=\text{Interaction between GPA and IQ}$, and $X_5=\text{Interaction between GPA and Level}$. The response is starting salary after graduation (in thousands of dollars). Suppose we use least squares to fit the model, and get $\hat{\beta}_0=50$, $\hat{\beta}_1=20$, $\hat{\beta}_2=0.07$, $\hat{\beta}_3=35$, $\hat{\beta}_4=0.01$, $\hat{\beta}_5=-10$.
+\begin{enumerate}
+\item Which answer is correct, and why?
+\begin{enumerate}
+\item For a fixed value of IQ and GPA, high school graduates earn more, on average, than college graduates.
+\item For a fixed value of IQ and GPA, college graduates earn more, on average, than high school graduates.
+\item For a fixed value of IQ and GPA, high school graduates earn more, on average, than college graduates provided that the GPA is high enough.
+\item For a fixed value of IQ and GPA, college graduates earn more, on average, than high school graduates provided that the GPA is high enough.
+\end{enumerate}
+We can write the predicted model as $$\hat{y}=50+20\cdot\text{GPA}+0.07\cdot\text{IQ}+35\cdot\text{Level}+0.01\cdot\text{GPA}\times\text{IQ}-10\cdot\text{GPA}\times\text{Level}$$
+If we set $\text{Level}=1$, we obtain
+$$\hat{y}(\text{Level}=1)=50+20\cdot\text{GPA}+0.07\cdot\text{IQ}+35+0.01\cdot\text{GPA}\times\text{IQ}-10\cdot\text{GPA}$$
+And, if we set $\text{Level}=0$, we obtain
+$$\hat{y}(\text{Level}=0)=50+20\cdot\text{GPA}+0.07\cdot\text{IQ}+0.01\cdot\text{GPA}\times\text{IQ}$$
+Thus,
+$$\hat{y}(\text{Level}=1)>\hat{y}(\text{Level}=0)$$
+$$85+20\cdot\text{GPA}+0.07\cdot\text{IQ}+0.01\cdot\text{GPA}\times\text{IQ}-10\cdot\text{GPA}>50+20\cdot\text{GPA}+0.07\cdot\text{IQ}+0.01\cdot\text{GPA}\times\text{IQ}$$
+$$35-10\cdot\text{GPA}>0$$
+$$\text{GPA}<3.5$$
+Hence, we can conclude that (for our sample) iii. is correct since high school graduates earn more, on average, when $\text{GPA}>3.5$.
+\item Predict the salary of a college graduate with IQ of 110 and a GPA of 4.0.
+$$\hat{y}=50+20(4.0)+0.07(110)+35(1)+0.01(4.0)(110)-10(4.0)(1)=`r 50+20*4+0.07*110+35+0.01*4*110-10*4*1`$$
+or \$`r (50+20*4+0.07*110+35+0.01*4*110-10*4*1) * 1000`.
+\item True or false: Since the coefficient for the GPA/IQ interaction term is very small, there is very little evidence of an interaction effect. Justify your answer. 
+
+False, without knowing the corresponding standard error, we cannot derive the level of evidence against the null that the interaction term between GPA and IQ has no effect on the response variable. Roughly speaking, if the corresponding standard error is less than `r 0.01 / 2`, there actually would be strong evidence against the null.
+\end{enumerate}
+\item  I collect a set of data (n = 100 observations) containing a single predictor and a quantitative response. I then fit a linear regression model to the data, as well as a separate cubic regression, i.e. $Y=\beta_0+\beta_1X+\beta_2X^2+\beta_3X^3+\epsilon$.
+\begin{enumerate}
+\item  Suppose that the true relationship between $X$ and $Y$ is linear, i.e. $Y=\beta_0+\beta_1X+\epsilon$. Consider the training residual sum of squares (RSS) for the linear regression, and also the training RSS for the cubic regression. Would we expect one to be lower than the other, would we expect them to be the same, or is there not enough information to tell? Justify your answer.
+
+We would expect the cubic regression model to have a lower training RSS. Including additional regressors in a monotonically decreases the RSS because our coefficients estimators are chosen to minimize the training RSS. Thus, a model with a subset of the predictors from another model will always have a greater RSS.
+\item Answer (a) using test rather than training RSS.
+
+Changing the context to test RSS, we would now expect the test RSS for the linear regression model to be smaller. This is because the true relationship is linear and thus the cubic regression model will be subject to overfitting. In other words, there is no additional gain in unbiasedness from using the cubic model but additional variance is introduced.
+
+\item  Suppose that the true relationship between $X$ and $Y$ is not linear, but we don’t know how far it is from linear. Consider the training RSS for the linear regression, and also the training RSS for the cubic regression. Would we expect one to be lower than the other, would we expect them to be the same, or is there not enough information to tell? Justify your answer.
+
+The answer to part (a) still applies here. Adding additional predictors to a model only decreases the training RSS (if the same observations are used). Thus, we would always expect the cubic training regression model to have a lower training RSS.
+
+\item Answer (c) using test rather than training RSS.
+
+Changing the context to test RSS, it would be difficult to tell which should be lower without knowing the extent to which the relationship between $Y$ and $X$ is non-linear. If the relationship between $X$ and $Y$ is almost linear, we would likely expect the test RSS from the linear regression model to be lower. On the other hand, if the relationship between $X$ and $Y$ is very non-linear, we would likely expect the test RSS from the cubic regression model to be lower. In total, if the reduction in bias from using the cubic regression model outweighs any additional variance added to the model, the test RSS from the cubic regression model should be lower. Otherwise, the test RSS from the linear regression model should be lower.
+\end{enumerate}
+\item Consider the fitted values that result from performing linear regression without an intercept. In this setting, the $i$th fitted value takes the form
+$$\hat{y}_i=x_i\hat{\beta},$$
+where
+$$\hat{\beta}=\left(\sum_{i=1}^{n}x_iy_i\right)/\left(\sum_{i'=1}^{n}x_i'^2\right)$$
+Show that we can write
+$$\hat{y}_i=\sum_{i'=1}^{n}a_i'y_i'.$$
+What is $a_i'$?
+
+\textit{Note: We interpret this result by saying that the fitted values from linear regression are linear combinations of the response values.}
+
+Extending $\hat{\beta}$ makes it clearer to derive the desired relationship.
+$$\hat{\beta}=\frac{\sum_{i=1}^{n}x_iy_i}{\sum_{i'=1}^{n}x_i'^2}$$
+$$=\frac{x_1y_1+x_2y_2+\dots+x_ny_n}{\sum_{i'=1}^{n}x_i'^2}$$
+$$=\frac{x_1}{\sum_{i'=1}^{n}x_i'^2}y_1+\frac{x_2}{\sum_{i'=1}^{n}x_i'^2}y_2+\dots+\frac{x_n}{\sum_{i'=1}^{n}x_i'^2}y_n$$
+$$a_1'y_1'+a_2'y_2'+\dots+a_n'y_n'$$
+$$\sum_{i'=1}^{n}a_i'y_i',$$
+where $a_i'=\frac{x_i'}{\sum_{i'=1}^{n}x_i'^2}$.
+\item Using (3.4), argue that in the case of simple linear regression, the least squares line always passes through the point $(\bar{x},\bar{y})$.
+
+From (3.4), we have $\hat{\beta}_0=\bar{y}-\hat{\beta}_1\bar{x}$ and $\hat{\beta}_1=\frac{\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})}{\sum_{i=1}^{n}(x_i-\bar{x})^2}$. We only need the first part to show the least squares line always passes through the point $(\bar{x},\bar{y})$.
+
+$$\hat{\beta}_0=\bar{y}-\hat{\beta}_1\bar{x}$$
+$$\to\bar{y}=\hat{\beta}_0+\hat{\beta}_1\bar{x}$$
+From here, it's trivial to see that our predicted value for $\hat{y}$ at the point $\bar{x}$ is $\bar{y}$.
+\item It is claimed in the text that in the case of simple linear regression of $Y$ onto X, the $R^2$ statistic (3.17) is equal to the square of the correlation between $X$ and $Y$ (3.18). Prove that this is the case. For simplicity, you may assume that $\bar{y}=\bar{x}=0$.
+
+$$r^2_{xy}=\left(\frac{\hat{\sigma}_{xy}}{\sqrt{\hat{\sigma}_x\hat{\sigma}_y}}\right)^2$$
+$$=\left(\frac{\frac{1}{n-1}\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})}{\sqrt{\left(\frac{1}{n-1}\sum_{i=1}^{n}(x_i-\bar{x})^2\right)\left(\frac{1}{n-1}\sum_{i=1}^{n}(y_i-\bar{y})^2\right)}}\right)^2$$
+$$=\frac{\left[\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})\right]^2}{\sum_{i=1}^{n}(x_i-\bar{x})^2\sum_{i=1}^{n}(y_i-\bar{y})^2}$$
+$$=\left[\frac{\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})}{\sum_{i=1}^{n}(x_i-\bar{x})^2\sum_{i=1}^{n}(y_i-\bar{y})^2}\right]^2\sum_{i=1}^{n}(x_i-\bar{x})^2\sum_{i=1}^{n}(y_i-\bar{y})^2$$
+$$=\left[\frac{\hat{\beta}_1}{\sum_{i=1}^{n}(y_i-\bar{y})^2}\right]^2\sum_{i=1}^{n}(x_i-\bar{x})^2\sum_{i=1}^{n}(y_i-\bar{y})^2$$
+$$=\frac{\sum_{i=1}^{n}\hat{\beta}_1^2(x_i-\bar{x})^2}{\sum_{i=1}^{n}(y_i-\bar{y})^2}$$
+$$=\frac{\sum_{i=1}^{n}(\hat{\beta}_1x_i-\hat{\beta}_1\bar{x})^2}{\sum_{i=1}^{n}(y_i-\bar{y})^2}$$
+$$=\frac{\sum_{i=1}^{n}(\hat{\beta}_0+\hat{\beta}_1x_i-\hat{\beta}_0-\hat{\beta}_1\bar{x})^2}{\sum_{i=1}^{n}(y_i-\bar{y})^2}$$
+$$=\frac{\sum_{i=1}^{n}(\hat{y}_i-\bar{y})^2}{\sum_{i=1}^{n}(y_i-\bar{y})^2}$$
+$$=\frac{\text{ESS}}{\text{TSS}}$$
+$$=R^2$$
+\end{enumerate}
+
+### Applied
+
+```{r Chapter 3 Exercise 8, include=TRUE,echo=TRUE,comment=NA,fig.align='center'}
+lm.fit <- lm(mpg ~ horsepower, data = Auto)
+summary(lm.fit)
+predict(lm.fit, data.frame(horsepower = 98))
+predict(lm.fit, data.frame(horsepower = 98), interval = "confidence")
+predict(lm.fit, data.frame(horsepower = 98), interval = "prediction")
+
+ggplot(Auto, aes(horsepower, mpg)) +
+  geom_point(color = "blue") +
+  geom_smooth(color = "red", method = "lm", formula = y ~ x, se = F)
+
+g1 <- ggplot(mapping = aes(predict(lm.fit), residuals(lm.fit))) +
+  geom_point() +
+  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+g2 <- ggplot(mapping = aes(predict(lm.fit), rstudent(lm.fit))) +
+  geom_point() +
+  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+
+grid.arrange(g1, g2, ncol = 2, newpage = F)
+```
+
+```{r Chapter 3 Exercise 9, include=TRUE,echo=TRUE,comment=NA,fig.align='center'}
+pairs(Auto)
+cor(Auto[,-which(colnames(Auto) == "name")])
+
+lm.fit <- lm(mpg ~ . - name, data = Auto)
+summary(lm.fit)
+
+g1 <- ggplot(mapping = aes(predict(lm.fit), residuals(lm.fit))) +
+  geom_point() +
+  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+g2 <- ggplot(mapping = aes(predict(lm.fit), rstudent(lm.fit))) +
+  geom_point() +
+  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+g3 <- ggplot(mapping = aes(hatvalues(lm.fit), rstudent(lm.fit))) +
+  geom_point() +
+  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+
+grid.arrange(g1, g2, g3,ncol = 2, nrow = 2, newpage = T)
+
+round(coef(summary(lm(mpg ~ weight * year, data = Auto))), 10)
+
+round(coef(summary(lm(mpg ~ weight + I(weight^2), data = Auto))), 10)
+round(coef(summary(lm(mpg ~ poly(weight, degree = 3, raw = T), data = Auto))), 10)
+```
+
+```{r Chapter 3 Exercise 10, include=TRUE,echo=TRUE,comment=NA,fig.align='center'}
+lm.fit <- lm(Sales ~ Price + Urban + US, data = Carseats)
+
+round(coef(summary(lm.fit)), 10)
+
+lm.fit <- update(lm.fit, ~ . - Urban)
+
+confint(lm.fit)
+
+g1 <- ggplot(mapping = aes(predict(lm.fit), residuals(lm.fit))) +
+  geom_point() +
+  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+g2 <- ggplot(mapping = aes(predict(lm.fit), rstudent(lm.fit))) +
+  geom_point() +
+  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+g3 <- ggplot(mapping = aes(hatvalues(lm.fit), rstudent(lm.fit))) +
+  geom_point() +
+  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+
+grid.arrange(g1, g2, g3,ncol = 2, nrow = 2, newpage = T)
+```
+
+```{r Chapter 3 Exercise 11, include=TRUE,echo=TRUE,comment=NA,fig.align='center'}
+set.seed (1)
+x <- rnorm (100)
+y <- 2 * x + rnorm (100)
+round(coef(summary(lm(y ~ x + 0))), 10)
+round(coef(summary(lm(x ~ y + 0))), 10)
+
+round(coef(summary(lm(y ~ x))), 10)
+round(coef(summary(lm(x ~ y))), 10)
+```
+
+```{r Chapter 3 Exercise 12, include=TRUE,echo=TRUE,comment=NA}
+x <- rep(1, 100)
+y <- rep(2, 100)
+round(coef(summary(lm(y ~ x + 0))), 10)
+round(coef(summary(lm(x ~ y + 0))), 10)
+
+y <- rep(1, 100)
+round(coef(summary(lm(y ~ x + 0))), 10)
+round(coef(summary(lm(x ~ y + 0))), 10)
+```
+
+```{r Chapter 3 Exercise 13, include=TRUE,echo=TRUE,comment=NA}
+set.seed(1)
+x <- rnorm(100)
+eps <- rnorm(100, sd = 0.5)
+y <- -1 + 0.5 * x + eps
+
+ggplot(mapping = aes(x, y)) +
+  geom_point()
+
+round(coef(summary(lm(y ~ x))), 10)
+confint(lm(y ~ x))
+
+ggplot(mapping = aes(x, y)) +
+  geom_point() +
+  geom_smooth(aes(color = "OLS"), method = "lm", formula = y ~ x, se = F, linetype = "dashed") +
+  geom_abline(color = "blue", slope = 0.5, intercept = -1, linetype = "dashed") +
+  scale_color_manual(values = c("OLS" = "red", "Pop." = "blue")) +
+  theme_bw()
+
+round(coef(summary(lm(y ~ x + I(x^2)))), 10)
+
+eps <- rnorm(100, sd = 0.1)
+y <- -1 + 0.5 * x + eps
+
+round(coef(summary(lm(y ~ x))), 10)
+confint(lm(y ~ x))
+
+ggplot(mapping = aes(x, y)) +
+  geom_point() +
+  geom_smooth(aes(color = "OLS"), method = "lm", formula = y ~ x, se = F, linetype = "dashed") +
+  geom_abline(color = "blue", slope = 0.5, intercept = -1, linetype = "dashed") +
+  geom_smooth(aes(color = "Sq. Reg."), method = "lm", formula = y ~ x + I(x^2), se = F) +
+  scale_color_manual(values = c("OLS" = "red", "Pop." = "blue", "Sq. Reg." = "green")) +
+  theme_bw()
+
+round(coef(summary(lm(y ~ x + I(x^2)))), 10)
+
+eps <- rnorm(100, sd = 1)
+y <- -1 + 0.5 * x + eps
+
+round(coef(summary(lm(y ~ x))), 10)
+confint(lm(y ~ x))
+
+ggplot(mapping = aes(x, y)) +
+  geom_point() +
+  geom_smooth(aes(color = "OLS"), method = "lm", formula = y ~ x, se = F, linetype = "dashed") +
+  geom_abline(color = "blue", slope = 0.5, intercept = -1, linetype = "dashed") +
+  geom_smooth(aes(color = "Sq. Reg."), method = "lm", formula = y ~ x + I(x^2), se = F) +
+  scale_color_manual(values = c("OLS" = "red", "Pop." = "blue", "Sq. Reg." = "green")) +
+  theme_bw()
+
+round(coef(summary(lm(y ~ x + I(x^2)))), 10)
+```
+
+```{r Chapter 3 Exercise 14, include=TRUE,echo=TRUE,comment=NA}
+set.seed (1)
+x1 <- runif (100)
+x2 <- 0.5 * x1 + rnorm (100) / 10
+y <- 2 + 2 * x1 + 0.3 * x2 + rnorm (100)
+
+cor(x1, x2)
+ggplot(mapping = aes(x1, x2)) +
+  geom_point()
+
+lm.fit <- lm(y ~ x1 + x2)
+round(coef(summary(lm.fit)), 10)
+
+lm.fit <- update(lm.fit, ~ . - x2)
+round(coef(summary(lm.fit)), 10)
+
+lm.fit <- lm(y ~ x2)
+round(coef(summary(lm.fit)), 10)
+
+x1 <- c(x1 , 0.1)
+x2 <- c(x2 , 0.8)
+y <- c(y, 6)
+
+lm.fit <- lm(y ~ x1 + x2)
+round(coef(summary(lm.fit)), 10)
+
+lm.fit <- update(lm.fit, ~ . - x2)
+round(coef(summary(lm.fit)), 10)
+
+lm.fit <- lm(y ~ x2)
+round(coef(summary(lm.fit)), 10)
+
+g1 <- ggplot(mapping = aes(predict(lm.fit), residuals(lm.fit))) +
+  geom_point() +
+  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+g2 <- ggplot(mapping = aes(predict(lm.fit), rstudent(lm.fit))) +
+  geom_point() +
+  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+g3 <- ggplot(mapping = aes(hatvalues(lm.fit), rstudent(lm.fit))) +
+  geom_point() +
+  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+
+grid.arrange(g1, g2, g3,ncol = 2, nrow = 2, newpage = T)
+```
+
+```{r Chapter 3 Exercise 15, include=TRUE,echo=TRUE,comment=NA}
+x <- vector("numeric")
+
+for (colname in colnames(Boston[, -1])) {
+  lm.uni <- lm(as.formula(paste("crim ~ ", colname, sep = "")), data = Boston)
+  print(round(coef(summary(lm.uni)), 10))
+  x <- append(x, coef(lm.uni)[[2]])
+}
+
+lm.fit <- lm(crim ~ . , data = Boston)
+round(coef(summary(lm.fit)), 10)
+
+ggplot(mapping = aes(x, unname(coef(lm.fit)[-1]))) +
+  geom_point(color = "blue") +
+  theme_bw()
+
+for (colname in colnames(Boston[, -c(which(colnames(Boston) == "crim"), which(colnames(Boston) == "chas"))])) {
+  print(round(coef(summary(lm(as.formula(paste("crim ~ poly(", colname, ", 3)", sep = "")), data = Boston))), 10))
+}
+```
+
+\newpage
+
+# Chapter 4
+
+## Notes
+
+### An Introduction to Classification
+
+It's often the case that we wish to predict a qualitative or \textbf{categorical} response variable, a process called \textbf{classification}. A classification technique is called a \textbf{classifier} (since it involves assigning the observation to a category, or class). Some classifiers include: \textbf{logistic regression}, linear discriminant analysis, quadratic discriminant analysis, naive Bayes,} and \textbf{$K$-nearest neighbors}.
+
+Generally speaking, we do not use regression methods for classification problems for two reasons:
+\begin{enumerate}
+\item A regression method cannot accommodate a qualitative response with more than two classes because such qualitative responses generally lack cardinality.
+\item A regression method will not (always) provide meaningful estimates of $\text{Pr}(Y|X)$, even with just two classes (some probabilities may fall out of the [0,1] range).
+\end{enumerate}
+ Thus, we prefer using classification methods that are truly suited for qualitative response values.
+
+### Simple Logistic Regression
+
+Rather than modeling this response $Y$ directly, \textbf{logistic regression} models the probability that $Y$ belongs to a particular category. Since logistic regression is well-suited for the case of a binary qualitative response, this can be written mathematically as
+$$p(X)=\text{Pr}(Y=1|X)$$
+To model $p(X)$ in logistic regression, we use the \textbf{logistic function},
+$$p(X)=\frac{e^{\beta_0+\beta_1X}}{1+e^{\beta_0+\beta_1X}}$$
+The logistic function always produces an S-shaped curve. Thus, regardless of the value of X, we will obtain a sensible prediction between 0 and 1. From the logistic function, we can also derive the \textbf{odds}
+$$\frac{p(X)}{1-p(X)}=e^{\beta_0+\beta_1X},$$
+which can take on any value between 0 (an indication of a low $\text{Pr}(Y=1|X)$) and $\infty$ (an indication of a high $\text{Pr}(Y=1|X)$). Thus, if we know a particular subset of the sample has an odds of $c$, then
+$$\frac{p(X)}{1-p(X)}=c,$$
+which can be manipulated to show
+$$p(X)=\frac{c}{c+1}$$
+Returning to the logistic function, if we take the (natural) logarithm of both sides, we obtain
+$$\log\left(\frac{p(X)}{1-p(X)}\right)=\beta_0+\beta_1X,$$
+where the left-hand side is called the \textbf{log odds} or \textbf{logit}, which is linear in $X$. Thus, increasing $X$ by one-unit increases the log odds by $\beta_1$ (or equivalently, it multiplies the odds by $e^{\beta_1}$). However, $\beta_1$ does not correspond to the change in $p(X)$ for a one-unit increase in $X$. Instead, the change in $p(X)$ depends on the current value of $X$. Nevertheless, if $\beta_1>0$, $p(X)$ increases with $X$, and if $\beta_1<0$, $p(X)$ decreases with $X$.
+
+To fit a logistic regression model we use a method called \textbf{maximum likelihood}, where we choose $\hat{\beta}_0$ and $\hat{\beta}_1$ to maximize the \textbf{likelihood function}
+$$L(\beta_0,\beta_1)=\prod_{i:y_i=1}p(x_i)\prod_{i':y_i'=0}(1-p(x_i))$$
+After computing estimates for $\beta_0$ and $\beta_1$, predicting $\text{Pr}(Y=1|X)$ is derived from
+$$\hat{p}(X)=\frac{e^{\hat{\beta}_0+\hat{\beta}_1X}}{1+e^{\hat{\beta}_0+\hat{\beta}_1X}}$$
+
+### Multiple Logistic Regression
+
+The same framework from simple logistic regression can be applied to multiple logistic regression. Considering the case of $p$ predictors where
+$$p(X)=\frac{e^{\beta_0+\beta_1X_1+\dots+\beta_pX_p}}{1+e^{\beta_0+\beta_1X_1+\dots+\beta_pX_p}}$$
+we again use the maximum likelihood method to derive estimators for $\beta_0,\beta_1,\dots,\beta_p$.
+
+\underline{Derivation of Maximum Likelihood Estimators (MLE)}
+
+Recall the likelihood function
+$$L(\beta)=\prod_{i:y_i=1}p(x_i)\prod_{i':y_i'=0}(1-p(x_i))=\prod_{i=1}^{n}p(x_i)^{y_i}(1-p(x_i))^{1-y_i}$$
+In general, since maximizing both relative to $\beta$ results in the same estimators, it's easier to work with the \textbf{log-likelihood function}
+$$\ell(\beta)=\log\left(\prod_{i=1}^{n}p(x_i)^{y_i}(1-p(x_i))^{1-y_i}\right)$$
+$$=\sum_{i=1}^{n}\left[\log\left(p(x_i)^{y_i}(1-p(x_i))^{1-y_i}\right)\right]$$
+$$=\sum_{i=1}^{n}y_i\log(p(x_i))+(1-y_i)\log(1-p(x_i))$$
+$$=\sum_{i=1}^{n}y_i\log\left(\frac{1}{1+e^{-z_i}}\right)+(1-y_i)\log\left(\frac{e^{-z_i}}{1+e^{-z_i}}\right),$$
+where $z_i=\sum_{j=0}^{p}\beta_jx_{ij}$.
+$$=\sum_{i=1}^{n}y_i\left[\log\left(\frac{1}{1+e^{-z_i}}\right)-\log\left(\frac{e^{-z_i}}{1+e^{-z_i}}\right)\right]+\log\left(\frac{e^{-z_i}}{1+e^{-z_i}}\right)$$
+$$=\sum_{i=1}^{n}y_i\left[-\log\left(1+e^{-z_i}\right)-\log\left(e^{-z_i}\right)+\log\left(1+e^{-z_i}\right)\right]+\log\left(\frac{e^{-z_i}}{1+e^{-z_i}}\right)$$
+$$=\sum_{i=1}^{n}y_i\left(-\log(e^{-z_i}\right)+\log\left(\frac{1}{1+e^{z_i}}\right)$$
+$$=\sum_{i=1}^{n}y_iz_i-\log\left(1+e^{z_i}\right)$$
+$$\frac{\partial{\ell(\beta)}}{\partial{\beta}}=\frac{\partial}{\partial{\beta}}\left[\sum_{i=1}^{n}y_iz_i-\log(1+e^{z_i})\right]=\vec{0}$$
+$$=\begin{bmatrix}\sum_{i=1}^{n}\frac{\partial}{\partial{\beta_0}}\left[y_i\sum_{j=0}^{p}\left(\beta_jx_{ij}\right)-\log(1+e^{\sum_{j=0}^{p}\beta_jx_{ij}})\right] \\ \vdots \\ \sum_{i=1}^{n}\frac{\partial}{\partial{\beta_p}}\left[y_i\sum_{j=0}^{p}\left(\beta_jx_{ij}\right)-\log(1+e^{\sum_{j=0}^{p}\beta_jx_{ij}})\right]\end{bmatrix}=\begin{bmatrix} 0 \\ \vdots \\ 0 \end{bmatrix}$$
+$$=\begin{bmatrix}\sum_{i=1}^{n}\left(y_i-\frac{1}{1+e^{-\sum_{j=0}^{p}\beta_jx_{ij}}}\right) \\ \vdots \\ \sum_{i=1}^{n}\left(x_{ip}y_i-\frac{x_{ip}}{1+e^{-\sum_{j=0}^{p}\beta_jx_{ij}}}\right)\end{bmatrix}=\begin{bmatrix} 0 \\ \vdots \\ 0 \end{bmatrix}$$
+$$=\begin{bmatrix}\sum_{i=1}^{n}\left(y_i-\frac{1}{1+e^{-z_i}}\right) \\ \vdots \\ \sum_{i=1}^{n}x_{ip}\left(y_i-\frac{1}{1+e^{-z_i}}\right)\end{bmatrix}=\begin{bmatrix} 0 \\ \vdots \\ 0 \end{bmatrix}$$
+$$=\begin{bmatrix}\sum_{i=1}^{n}\left(y_i-p(x_i)\right) \\ \vdots \\ \sum_{i=1}^{n}x_{ip}\left(y_i-p(x_i)\right)\end{bmatrix}=\begin{bmatrix} 0 \\ \vdots \\ 0 \end{bmatrix}$$
+$$=\begin{bmatrix}\sum_{i=1}^{n}\left(y_i-p(x_i)\right) \\ \vdots \\ \sum_{i=1}^{n}x_{ip}\left(y_i-p(x_i)\right)\end{bmatrix}=\begin{bmatrix} 0 \\ \vdots \\ 0 \end{bmatrix}$$
+$$=\begin{bmatrix}(\mathbf{y}-\mathbf{p}) \\ \vdots \\ \mathbf{x}_p^T(\mathbf{y}-\mathbf{p})\end{bmatrix}=\begin{bmatrix} 0 \\ \vdots \\ 0 \end{bmatrix}$$
+$$=\mathbf{X}^T(\mathbf{y}-\mathbf{p})=\begin{bmatrix} 0 \\ \vdots \\ 0 \end{bmatrix}$$
+Unfortunately, we cannot solve for these equality analytically. Instead, we turn to the Newton Raphson numerical iteration method to approximate the equality. From the Newton Raphson Method
+$$\nabla_{\beta}\ell(\beta_{(k+1)})=\nabla_{\beta}\ell(\beta_{(k)})+(\beta_{(k+1)}-\beta_{(k)})\nabla_{\beta\beta}\ell(\beta_{(k)})=0$$
+$$\beta_{(k+1)}\nabla_{\beta\beta}\ell(\beta_{(k)})=-\nabla_\beta\ell(\beta_{(k)})+\beta_{(k)}\nabla_{\beta\beta}\ell(\beta_{(k)})$$
+$$\beta_{(k+1)}=\beta_{(k)}-\frac{\nabla_\beta\ell(\beta_{(k)})}{\nabla_{\beta\beta}\ell(\beta_{(k)})}$$
+We solved for $\nabla_\beta\ell(\beta)$ as
+$$\nabla_\beta\ell(\beta)=\begin{bmatrix}\sum_{i=1}^{n}\left(y_i-p(x_i)\right) \\ \vdots \\ \sum_{i=1}^{n}x_{ip}\left(y_i-p(x_i)\right)\end{bmatrix}$$
+Thus, we can solve for the Hermitian of the log-likelihood.
+$$\nabla_{\beta\beta}\ell(\beta)=\begin{bmatrix} \frac{\partial^2\ell(\beta)}{\partial{\beta_0^2}} & \dots & \frac{\partial^2\ell(\beta)}{\partial{\beta_0\beta_p}} \\ \vdots & \ddots & \vdots \\ \frac{\partial^2\ell(\beta)}{\partial{\beta_p\beta_0}} & \dots & \frac{\partial^2\ell(\beta)}{\partial{\beta_p^2}}\end{bmatrix}$$
+$$=\begin{bmatrix} \frac{\partial}{\partial{\beta_0}}\left(\sum_{i=1}^{n}\left(y_i-p(x_i)\right)\right) & \dots & \frac{\partial}{\partial{\beta_p}}\left(\sum_{i=1}^{n}\left(y_i-p(x_i)\right)\right) \\ \vdots & \ddots & \vdots \\ \frac{\partial}{\partial{\beta_0}}\left(\sum_{i=1}^{n}x_{ip}\left(y_i-p(x_i)\right)\right) & \dots & \frac{\partial}{\partial{\beta_p}}\left(\sum_{i=1}^{n}x_{ip}\left(y_i-p(x_i)\right)\right)\end{bmatrix}$$
+$$=\begin{bmatrix} \sum_{i=1}^{n}\frac{e^{-\sum_{j=0}^{p}\beta_jx_{ij}}}{\left(1+e^{-\sum_{j=0}^{p}\beta_jx_{ij}}\right)^2} & \dots & \sum_{i=1}^{n}\frac{x_{ip}e^{-\sum_{j=0}^{p}\beta_jx_{ij}}}{\left(1+e^{-\sum_{j=0}^{p}\beta_jx_{ij}}\right)^2} \\ \vdots & \ddots & \vdots \\ \sum_{i=1}^{n}\frac{x_{ip}e^{-\sum_{j=0}^{p}\beta_jx_{ij}}}{\left(1+e^{-\sum_{j=0}^{p}\beta_jx_{ij}}\right)^2} & \dots & \sum_{i=1}^{n}\frac{x_{ip}^2e^{-\sum_{j=0}^{p}\beta_jx_{ij}}}{\left(1+e^{-\sum_{j=0}^{p}\beta_jx_{ij}}\right)^2}\end{bmatrix}$$
+$$=\begin{bmatrix} \sum_{i=1}^{n}p(x_i)\left(1-p(x_i)\right) & \dots & \sum_{i=1}^{n}x_{ip}p(x_i)\left(1-p(x_i)\right) \\ \vdots & \ddots & \vdots \\ \sum_{i=1}^{n}x_{ip}p(x_i)\left(1-p(x_i)\right) & \dots & \sum_{i=1}^{n}x_{ip}^2p(x_i)\left(1-p(x_i)\right) \end{bmatrix}$$
+$$=\mathbf{X}^T\mathbf{W}\mathbf{X},$$
+where $\mathbf{W}\in\mathbb{R}^{n\times n}=\text{diag}\big\{p(x_i)\left(1-p(x_i)\right), \dots, p(x_i)\left(1-p(x_i)\right)\big\}$
+
+Finally, the steps to estimate $\beta$ using the Newton-Raphson iteration method are:
+\begin{enumerate}
+\item Input the initial estimate $\beta_0$.
+\item To obtain estimates on the $(k+1)$th iteration, calculate
+$$\beta_{(k+1)}=\beta_{(k)}+(\mathbf{X}^T\mathbf{W}\mathbf{X})^{-1}\mathbf{X}^T(\mathbf{y}-\mathbf{p})$$
+\item The iteration is continued until $\beta_{(k+1)}\approx\beta_{(k)}$.
+\end{enumerate}
+
+### Multinomial Logistic Regression
+
+In cases in which we wish to use logistic regression with non-binary responses (response variables that have more than two classes), we use \textbf{multinomial logisitic regression}. To begin, we choose the $K$th class to serve as our \textbf{baseline}. Then, the multinomial logistic function takes the form
+$$\text{Pr}(Y=k|X=x)=\frac{e^{\beta_{k0}+\beta_{k1}x_1+\dots+\beta_{kp}x_p}}{1+\sum_{l=1}^{K-1}e^{\beta_{l0}+\beta_{l1}x_1+\dots+\beta_{lp}x_p}}$$
+for $k=1,\dots,K-1$, and
+$$\text{Pr}(Y=K|X=x)=\frac{1}{1+\sum_{l=1}^{K-1}e^{\beta_{l0}+\beta_{l1}x_1+\dots+\beta_{lp}x_p}}$$
+Thus, we can obtain the log odds or logit between any pair of classes by
+$$\log\left(\frac{\text{Pr}(Y=k|X=x)}{\text{Pr}(Y=K|X=x)}\right)=\log\left(\frac{e^{\beta_{k0}+\beta_{k1}x_1+\dots+\beta_{kp}x_p}}{1+\sum_{l=1}^{K-1}e^{\beta_{l0}+\beta_{l1}x_1+\dots+\beta_{lp}x_p}}\right)-\log\left(\frac{1}{1+\sum_{l=1}^{K-1}e^{\beta_{l0}+\beta_{l1}x_1+\dots+\beta_{lp}x_p}}\right)$$
+$$=\log\left(e^{\beta_{k0}+\beta_{k1}x_1+\dots+\beta_{kp}x_p}\right)-\log\left(1+\sum_{l=1}^{K-1}e^{\beta_{l0}+\beta_{l1}x_1+\dots+\beta_{lp}x_p}\right)+\log\left(1+\sum_{l=1}^{K-1}e^{\beta_{l0}+\beta_{l1}x_1+\dots+\beta_{lp}x_p}\right)$$
+$$=\beta_{k0}+\beta_{k1}x_1+\dots+\beta_{kp}x_p$$
+An alternative coding for multinomial logistic regression, known as the \textbf{softmax} coding treats all $K$ classes symmetrically and assumes that, for $k=1,\dots,K$,
+$$\text{Pr}(Y=k|X=x)=\frac{e^{\beta_k0+\beta_{k1}x_1+\dots\beta_{kp}x_p}}{1+\sum_{l=1}^{K}e^{\beta_l0+\beta_{l1}x_1+\dots\beta_{lp}x_p}}$$
+
+### Generative Models for Classification
+
+For $K\geq 2$, let $\pi_k$ be the \textbf{prior} probability that a randomly chosen observation comes from the $k$th class (i.e. $\text{Pr}(Y=k)$) and $f_k(X)\equiv \text{Pr}(X|Y=k)$ denote the \text{density function} of $X$ for an observation that comes from the $k$th class. Then \textbf{Bayes' Theorem} states
+$$\text{Pr}(Y=k|X=x)=\frac{\pi_k f_k(X)}{\sum_{l=1}^{K}\pi_l f_l(X)},$$
+which is the \textbf{posterior} probability that an observation $X=x$ belongs to the $k$th class (this is also denoted $p_k(x)$). Using a random sample, estimating $\pi_k$ is simple as we just compute the faction of the training observations from the $k$th class. Unfortunately, estimating the density function $f_k(X)$ is much more difficult. We know that the Bayes classifier, which classifies an observation $x$ to the class for which $p_k(x)$ is largest, has the lowest possible error rate out of all classifiers. Therefore, if we can find a way to estimate $f_k(x)$, then we can plug it into Bayes' Theorem in order to approximate the Bayes classifier. Three classifiers that use different estimates of $f_k(x)$ to approximate the Bayes classifier include: linear discriminant analysis, quadratic discriminant analysis, and naive Bayes.
+
+### Linear Discriminant Analysis
+
+For a moment, assume we have one predictor and that $f_k(x)$ is \textbf{normal} or \textbf{Gaussian}. Mathematically, we write this as
+$$f_k(x)=\frac{1}{\sigma_k\sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{x-\mu_k}{\sigma_k}\right)^2},$$
+where $\mu_k$ and $\sigma_k$ are parameters for the $k$th class. If we assume a common standard deviation among the $k$ classes (i.e., $\sigma_k=\sigma$), we can plug the previous equation into the formula for Bayes' Theorem and obtain
+$$p_k(x)=\frac{\pi_k\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{x-\mu_k}{\sigma}\right)^2}}{\sum_{l=1}^{K}\pi_l\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{x-\mu_l}{\sigma}\right)^2}}$$
+Recall that $\pi_k=\text{Pr}(Y=k)\neq\pi\approx 3.14159$. Taking the natural logarithm of the previous expression,
+$$\log\left(p_k(x)\right)=\log\left(\frac{\pi_k\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{x-\mu_k}{\sigma}\right)^2}}{\sum_{l=1}^{K}\pi_l\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{x-\mu_l}{\sigma}\right)^2}}\right)$$
+Since we're concerned about maximizing this value by assigning it to the $k$th class and since $\log\left(\sum_{l=1}^{K}\pi_l\frac{1}{\sigma_l\sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{x-\mu_l}{\sigma_l}\right)^2}\right)$ (under some nonrestrictive assumptions) does not vary with $k$, we write
+$$\log\left(\pi_k\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{x-\mu_k}{\sigma}\right)^2}\right)=\log(\pi_k)-\log(\sigma\sqrt{2\pi})+\log\left(e^{-\frac{1}{2}\left(\frac{x-\mu_k}{\sigma}\right)^2}\right)$$
+$$=\log(\pi_k)-\log(\sigma\sqrt{2\pi})-\frac{1}{2}\left(\frac{x-\mu_k}{\sigma}\right)^2$$
+$$=\log(\pi_k)-\log(\sigma)-\log(\sqrt{2\pi})-\frac{1}{2}\left(\frac{x^2-2x\mu_k+\mu_k^2}{\sigma^2}\right)$$
+$$=\log(\pi_k)-\log(\sigma)-\log(\sqrt{2\pi})-\frac{x^2}{2\sigma^2}+\frac{x\mu_k}{\sigma^2}-\frac{\mu_k^2}{2\sigma^2}$$
+Since $\log(\sqrt{2\pi})$, $\log(\sigma)$, and $x^2/2\sigma^2$ do not vary with $k$ (recall we are treating $x$ as fixed), we obtain
+$$\delta_k(x)=x\cdot\frac{\mu_k}{\sigma^2}-\frac{\mu_k^2}{2\sigma^2}+\log(\pi_k),$$
+which is maximized when the above equation for $p_k(x)$ is maximized. This equation tells us which class the Bayes classifier assigns an observation to. Thus, if $K=2$, then the Bayes decision boundary is the point where $\delta_1(x)=\delta_2(x)$. Unfortunately, in real life situations, we (generally) do not observe population parameters, and thus, we are unable to calculate the Bayes classifier.
+
+Using the \textbf{linear discriminant analysis (LDA)} method, we approximate the parameters using their estimators. Thus, the LDA classifier uses the following \textbf{discriminant functions}
+$$\hat{\delta}_k(x)=x\cdot\frac{\hat{\mu}_k}{\hat{\sigma}^2}-\frac{\hat{\mu}_k^2}{2\hat{\sigma}^2}+\log(\hat{\pi}_k),$$
+where, if $n$ is the total number of observations in the training data and $n_k$ is the number of observations belonging to the $k$th class in the training data,
+
+$$\hat{\pi}_k=\frac{n_k}{n}$$
+$$\hat{\mu}_k=\frac{1}{n_k}\sum_{i:y_i=k}x_i$$
+$$\hat{\sigma}^2=\frac{1}{n-K}\sum_{k=1}^{K}\sum_{i:y_i=k}(x_i-\hat{\mu}_k)^2$$
+
+We can extend the LDA classifier to the case of multiple predictors. Now, we will assume that $X=(X_1,X_2,\dots,X_p)$ is drawn from a \textbf{multivariate Gaussian} (or \textbf{multivariate normal}) distribution, with a class-specific multivariate mean vector and a common covariance matrix. Mathematically, to indicate a $p$-dimensional random variable $X$ has a multivariate Gaussian distribution, we write $X\sim\mathcal{N}(\mu,\mathbf{\Sigma})$, where $E(X)=\mu$ is the mean of $X$ [$\mu=[E(X_1), \dots, E(X_p)]^T$], and $\text{Cov}(X)=\mathbf{\Sigma}$ is the $p\times p$ covariance matrix of $X$. Formally, the multivariate Gaussian density is defined as
+$$f(x)=\frac{1}{(2\pi)^{p/2}|\mathbf{\Sigma}|^{1/2}}e^{-\frac{1}{2}(x-\mu)^T\mathbf{\Sigma}^{-1}(x-\mu)}$$
+Thus, the LDA classifier assumes that the observations in the $k$th class are drawn from a multivariate Gaussian distribution $\mathcal{N}(\mu_k,\mathbf{\Sigma})$, where $\mu_k$ is a class-specific mean vector, and $\mathbf{\Sigma}$ is a shared covariance matrix between the $K$ classes. Taking the numerator of Bayes' Theorem and applying a similar logic to our derivation of the Bayes classifier from the case where $p=1$
+$$\log\left(\pi_k\frac{1}{(2\pi)^{p/2}|\mathbf{\Sigma}|^{1/2}}e^{-\frac{1}{2}(x-\mu_k)^T\mathbf{\Sigma}^{-1}(x-\mu_k)}\right)=\log(\pi_k)-\log\left((2\pi)^{p/2}\right)-\log\left(|\mathbf{\Sigma}|^{1/2}\right)+\log\left(e^{-\frac{1}{2}(x-\mu_k)^T\mathbf{\Sigma}^{-1}(x-\mu_k)}\right)$$
+$$=\log(\pi_k)-\log\left((2\pi)^{p/2}\right)-\log\left(|\mathbf{\Sigma}|^{1/2}\right)-\frac{1}{2}(x-\mu_k)^T\mathbf{\Sigma}^{-1}(x-\mu_k)$$
+Again, since $\log(\sqrt{2\pi})$, $\log(\sigma)$, and $x^2/2\sigma^2$ do not vary with $k$ (recall we are treating $x$ as fixed), we obtain
+$$\log(\pi_k)-\frac{1}{2}(x^T-\mu_k^T)(\mathbf{\Sigma}^{-1}x-\mathbf{\Sigma}^{-1}\mu_k)$$
+$$=\log(\pi_k)-\frac{1}{2}x^T\mathbf{\Sigma}^{-1}x+\frac{1}{2}x^T\mathbf{\Sigma}^{-1}\mu_k+\frac{1}{2}\mu_k^T\mathbf{\Sigma}^{-1}x-\frac{1}{2}\mu_k^T\mathbf{\Sigma}^{-1}\mu_k$$
+Removing the term that doesn't vary with $k$ ($\frac{1}{2}x^T\mathbf{\Sigma}^{-1}x$) and realizing that $x^T\mathbf{\Sigma}^{-1}\mu_k=\mu_k^T\mathbf{\Sigma}^{-1}x$ (since scalars are symmetric), we obtain
+$$\delta_k(x)=x^T\mathbf{\Sigma}^{-1}\mu_k-\frac{1}{2}\mu_k^T\mathbf{\Sigma}^{-1}\mu_k+\log(\pi_k)$$
+Once again, as we did in the case where $p=1$, we derive the discriminant functions ($\hat{\delta}_k$) by using the estimators for $\pi_1,\dots,\pi_K$, $\mu_1,\dots,\mu_K$, and $\mathbf{\Sigma}$.
+
+Recall that the Bayes classifier chooses the class $k$ that maximizes the posterior probability and $\delta_k$. Likewise, linear discriminant analysis chooses the class $k$ that maximizes $\hat{\delta}_k$. Thus, using LDA methodology, we classify an observation to class $k$ if
+$$\widehat{\text{Pr}}(Y=k|X=x)>\frac{1}{K},$$
+where $\widehat{\text{Pr}}(Y=k|X=x)$ is the approximated conditional probability using LDA methodology. Thus, the default threshold for assigning an observation to class $k$ is $1/K$. In some circumstances, however, we may be particularly concerned with minimizing incorrect predictions for a certain class (such as minimizing the number of false negatives a test gives). In these cases, we can simply adjust the threshold to better meet our goals. Generally, if we move the threshold to be more stringent toward our goal, we can expect the overall test error to increase but the test error regarding our interest to decrease.
+
+### Quadratic Discriminant Analysis
+
+Another approach for estimating the Bayes classifier is \textbf{quadratic discriminant analysis (QDA)}. Like LDA, the QDA classifier results from assuming that the observations from each class are drawn from a Gaussian distribution, and plugging estimates for the parameters into Bayes' theorem in order to perform prediction. However, unlike LDA, QDA assumes that each class has its own covariance matrix. In other words, an observation from the $k$th class is of the form $X\sim\mathcal{N}(\mu_k,\mathbf{\Sigma_k})$, where $\mathbf{\Sigma}_k$ is a covariance matrix for the $k$th class. Under this assumption, we can take the numerator from Bayes' Theorem and apply a similar logic to our derivation of the Bayes classifier from the case of LDA
+$$\log\left(\pi_k\frac{1}{(2\pi)^{p/2}|\mathbf{\Sigma}_k|^{1/2}}e^{-\frac{1}{2}(x-\mu_k)^T\mathbf{\Sigma}_k^{-1}(x-\mu_k)}\right)=\log(\pi_k)-\log\left((2\pi)^{p/2}\right)-\log\left(|\mathbf{\Sigma}_k|^{1/2}\right)+\log\left(e^{-\frac{1}{2}(x-\mu_k)^T\mathbf{\Sigma}_k^{-1}(x-\mu_k)}\right)$$
+$$=\log(\pi_k)-\log\left((2\pi)^{p/2}\right)-\log\left(|\mathbf{\Sigma}_k|^{1/2}\right)-\frac{1}{2}(x-\mu_k)^T\mathbf{\Sigma}_k^{-1}(x-\mu_k)$$
+$$=\log(\pi_k)-\log\left((2\pi)^{p/2}\right)-\frac{1}{2}\log\left(|\mathbf{\Sigma}_k|\right)-\frac{1}{2}(x^T-\mu_k^T)(\mathbf{\Sigma}_k^{-1}x-\mathbf{\Sigma}_k^{-1}\mu_k)$$
+$$=\log(\pi_k)-\log\left((2\pi)^{p/2}\right)-\frac{1}{2}\log\left(|\mathbf{\Sigma}_k|\right)-\frac{1}{2}(x^T\mathbf{\Sigma}_k^{-1}x-x^T\mathbf{\Sigma}_k^{-1}\mu_k-\mu_k^T\mathbf{\Sigma}_k^{-1}x+\mu_k^T\mathbf{\Sigma}_k^{-1}\mu_k)$$
+Removing the term that doesn't vary with $k$ ($\log\left((2\pi)^{p/2}\right)$), we obtain
+$$\delta_k(x)=-\frac{1}{2}x^T\mathbf{\Sigma}_k^{-1}x+\frac{1}{2}x^T\mathbf{\Sigma}_k^{-1}\mu_k+\frac{1}{2}\mu_k^T\mathbf{\Sigma}_k^{-1}x-\frac{1}{2}\mu_k^T\mathbf{\Sigma}_k^{-1}\mu_k-\frac{1}{2}\log\left(|\mathbf{\Sigma}_k|\right)+\log(\pi_k)$$
+$$\delta_k(x)=-\frac{1}{2}x^T\mathbf{\Sigma}_k^{-1}x+x^T\mathbf{\Sigma}_k^{-1}\mu_k-\frac{1}{2}\mu_k^T\mathbf{\Sigma}_k^{-1}\mu_k-\frac{1}{2}\log\left(|\mathbf{\Sigma}_k|\right)+\log(\pi_k)$$
+Once again, as we did in the case of LDA, we derive the discriminant functions ($\hat{\delta}_k$) by using the estimators for $\pi_1,\dots,\pi_K$, $\mu_1,\dots,\mu_K$, and $\mathbf{\Sigma}_1,\dots,\mathbf{\Sigma}_K$.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
