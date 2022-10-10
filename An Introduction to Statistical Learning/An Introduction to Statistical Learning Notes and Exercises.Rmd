@@ -5,18 +5,44 @@ header-includes:
   - \pagenumbering{gobble}
   - \usepackage{amsmath}
   - \usepackage{enumitem}
+editor_options: 
+  chunk_output_type: console
 ---
 
 \newpage
 
 ```{r setup, include=FALSE,echo=FALSE}
-library(ISLR2)
-library(tidyverse)
+
+# Set global chunk options
+knitr::opts_chunk$set(include = TRUE, echo = TRUE, comment = NA, fig.align = 'center', fig.height = 3, fig.width = 4)
+
+# Load required packages
+library(data.table)
+library(collapse)
+library(ggplot2)
+library(foreach)
 library(gridExtra)
 library(MASS)
 library(e1071)
 library(class)
+library(boot)
+library(ISLR2)
+
+# Set scientific notation limit
 options(scipen = 99999999)
+
+# Cast required data to a data.table
+College_dt <- data.table(College)
+Auto_dt <- data.table(Auto)
+Boston_dt <- data.table(Boston)
+Weekly_dt <- data.table(Weekly)
+Default_dt <- data.table(Default)
+
+# Prepare cluster
+cl <- parallel::makeCluster(parallel::detectCores() - 2L)
+doParallel::registerDoParallel(cl)
+parallel::clusterExport(cl, c("Boston_dt", "Default_dt"))
+
 ```
 
 
@@ -28,7 +54,7 @@ options(scipen = 99999999)
 
 In statistical learning, we often wish to predict an outcome based on a set of features. We have a \emph{training set of data}, in which we observe the outcome and measurements for a set of objects. Using this data, we build a prediction model, or \textbf{learner}, which will enable us to predict the outcome for new, unseen objects. Predicting in the presence of the outcome variable is called \textbf{supervised learning}, which is judged based on how accurately the predictor predicts outcomes. In \textbf{unsupervised learning}, we observe only the features and have no measurements of the outcome.
 
-Supervised learning can generally be split in two different sets of problems. The \textbf{regression problem} is the problem of predicting a continuous quantity output. The \textbf{classification problem} is the problem of predicting a discrete class label output. More generally, regression is referenced when we predict quantitative outputs, and classification is referenced when we predict qualitative outputs.
+Supervised learning can generally be split into two different sets of problems. The \textbf{regression problem} is the problem of predicting a continuous quantity output. The \textbf{classification problem} is the problem of predicting a discrete class label output. More generally, regression is referenced when we predict quantitative outputs, and classification is referenced when we predict qualitative outputs.
 
 ### Notation
 
@@ -74,13 +100,13 @@ $$=\underbrace{\left[f(X)-\hat{f}(X)\right]^2}_{\text{Reducible}}+\underbrace{\t
 
 ### Inference
 
-In circumstances where we're interested in understanding the association between $Y$ and $X_1,\dots,X_p$, we are still interested in $\hat{f}$. However, unlike the case with prediction, $\hat{f}$ should no longer be treated as a black box since we need to know its exact form. In general, inference allows us to attempt answering whether predictors are associated with the response and get an understanding of the nature and shape of such associations.
+In circumstances where we're interested in understanding the association between $Y$ and $X_1,\dots,X_p$, we are still interested in $\hat{f}$. However, unlike the case with prediction, $\hat{f}$ should no longer be treated as a blackbox since we need to know its exact form. In general, inference allows us to attempt answering whether predictors are associated with the response and get an understanding of the nature and shape of such associations.
 
 ### Estimating $f$
 
 In estimating $f$, we use a set of observations called the \textbf{training data} to train, or teach, our method how to estimate $f$. Broadly speaking, most statistical learning methods can be characterized as \textbf{parametric} or \textbf{non-parametric} and have the goal of finding a function $\hat{f}$ such that $Y\approx\hat{f}(X)$.
 
-Parametric methods involve a two-step model-based approach in which we make an assumption about the functional form, or shape, of $f$ and then using the training data to fit or train the model. For example, we may use a linear model in which we assume that $f$ is linear (i.e., $f(X)=\beta_0+\beta_1X_1+\dots+\beta_pX_p$) and then we may use \textbf{ordinary least squares (OLS)} criteria to fit the model. This methodology is called parametric because it reduces the problem of estimating $f$ down to one of estimating a set of parameters (e.g., $\beta_0,\beta_1,\dots,\beta_p$). Unfortunately, the parametric approach generally will lead to an estimated function that does not match the true unknown form of $f$. Thus, if the chosen model is too far from the true $f$, then our estimate will be poor. In attempts to make more flexible models, we generally need to estimate more parameters; however, this can lead to \textbf{overfitting} the data, which essentially means our estimators follow the errors, or \textbf{noise}, too closely.
+Parametric methods involve a two-step approach in which we make an assumption about the functional form, or shape, of $f$ and then using the training data to fit or train the model. For example, we may use a linear model in which we assume that $f$ is linear (i.e., $f(X)=\beta_0+\beta_1X_1+\dots+\beta_pX_p$) and then we may use \textbf{ordinary least squares (OLS)} criteria to fit the model. This methodology is called parametric because it reduces the problem of estimating $f$ down to one of estimating a set of parameters (e.g., $\beta_0,\beta_1,\dots,\beta_p$). Unfortunately, the parametric approach generally will lead to an estimated function that does not match the true unknown form of $f$. Thus, if the chosen model is too far from the true $f$, then our estimate will be poor. In attempts to make more flexible models, we generally need to estimate more parameters; however, this can lead to \textbf{overfitting} the data, which essentially means our estimators follow the errors, or \textbf{noise}, too closely.
 
 Non-parametric methods, on the other hand, do  not make explicit assumptions about the functional form of $f$. Instead they seek an estimate of $f$ that gets as close to the data points as possible without being too rough or wiggly. While non-parametric approaches have the potential to accurately fit a wider range of possible shapes for $f$, they require far more observations than what's needed for a parametric approach.
 
@@ -137,19 +163,19 @@ Just as in the regression setting, there is not a strong relationship between th
 \begin{enumerate}
 \item The sample size $n$ is extremely large, and the number of predictors $p$ is small.
 
-A flexible method should be better because situations with large sample sizes and small numbers of predictors are not highly susceptible to large amounts of variance. Meanwhile, flexible methods will be less prone to bias than those that are inflexible.
+A flexible method should perform better because situations with large sample sizes and small numbers of predictors are not highly susceptible to large amounts of variance. Meanwhile, flexible methods will be less prone to bias than those that are inflexible.
 
 \item The number of predictors $p$ is extremely large, and the number of observations $n$ is small.
 
-An inflexible method should be better because situations with small $n$ and large $p$ (the curse of dimensionality) are susceptible to large amounts of variance. Using a flexible method is thus prone to this issue and the greater variance will overwhelm any gains we might receive from using flexible methods.
+An inflexible method will likely perform better because situations with small $n$ and large $p$ (recall the curse of dimensionality) are susceptible to large amounts of variance. A flexible method is prone to the greater variance, which will likely overwhelm any gains we might receive from using flexible methods.
 
 \item The relationship between the predictors and response is highly non-linear.
 
-We would expect a flexible statistical learning method to be better since more flexible methods allow for estimating non-linear relationships better.
+We would expect a flexible method to be perform better since more flexible methods allow for better estimations of non-linear relationships.
 
 \item The variance of the error terms, i.e. $\sigma^2=\text{Var}(\epsilon)$, is extremely high.
 
-We would expect an inflexible method to be better because they are less susceptible to the issue of overfitting. Overfitting, in this circumstance, would lead to following the large variability in $\epsilon$.
+We would expect an inflexible method to perform better because they are less susceptible to the issue of overfitting. In this circumstance, overfitting would lead to following the large variability in $\epsilon$.
 \end{enumerate}
 \item Explain whether each scenario is a classification or regression problem, and indicate whether we are most interested in inference or prediction. Finally, provide $n$ and $p$.
 \begin{enumerate}
@@ -168,13 +194,13 @@ This is a regression problem because the output variable, the \% change in the U
 \item Provide a sketch of typical (squared) bias, variance, training error, test error, and Bayes (or irreducible) error curves, on a single plot, as we go from less flexible statistical learning methods towards more flexible approaches. The $x$-axis should represent the amount of flexibility in the method, and the $y$-axis should represent the values for each curve. There should be five curves. Make sure to label each one.
 \end{enumerate}
 \end{enumerate}
-```{r Chapter 2 Exercise 3 plot, include=TRUE, echo=FALSE,fig.align='center', fig.height= 3, fig.width=5}
-ch2_ex3 <- tibble(flexibility = 1:20,
-                  sq_bias = 15 / flexibility^2,
-                  var_f = flexibility^2 / 200,
-                  irr_err = rep(1, 20),
-                  train_err = 3 - log((seq(1,20))),
-                  test_err = sq_bias + var_f + irr_err)
+```{r Chapter 2 Exercise 3 plot, echo = FALSE, fig.width = 5}
+ch2_ex3 <- data.table(flexibility = seq_len(20L), irr_err = rep(1, 20))
+
+ch2_ex3[, sq_bias := 15 / flexibility^2][
+  , var_f := flexibility^2 / 200][
+    , train_err := 3 - log(flexibility)][
+      , test_err := sq_bias + var_f + irr_err]
 
 ggplot(ch2_ex3, aes(flexibility, sq_bias)) +
     geom_line(aes(color = "Bias"), size = 0.75) +
@@ -200,7 +226,7 @@ ggplot(ch2_ex3, aes(flexibility, sq_bias)) +
 \item Explain why each of the five curves has the shape displayed in part (a).
 \begin{itemize}
 \item Bias (Squared): Bias decreases monotonically with increased flexibility because more flexibility allows us to trace or follow $f$ more precisely.
-\item Variance: The variance increases with increased flexibility because our method is more prone to changes in the data set (i.e., $\hat{f}$ is subject to change more when the method is more flexible).
+\item Variance: The variance increases with increased flexibility because our method is more prone to changes in the data set (i.e., $\hat{f}$ is subject to change more to different data when the method is more flexible).
 \item Bayes (Irreducible) Error: The irreducible error is represented by the horizontal dashed grey line and is not a function of the flexibility.
 \item Training Error: Training error decreases monotonically with increased flexibility because methods are generally designed to minimize training error, and thus, increasing the flexibility can only improve the training error.
 \item Test Error: With more flexible methods, the variance will increase and the bias will decrease. The relative rate of change of these two quantities determines whether the test MSE increases or decreases. As we increase the flexibility of a class of methods, the bias tends to initially decrease faster than the variance increases.
@@ -269,65 +295,66 @@ We would expect the best value for $K$ to be small because smaller values for $K
 \end{enumerate}
 
 ### Applied
-```{r Chapter 2 Exercise 8, include=TRUE,echo=TRUE,comment=NA,fig.align='center', fig.height= 3, fig.width=4}
-head(College)
+```{r Chapter 2 Exercise 8}
 
-summary(College)
+head(College_dt)
 
-pairs(College[,2:10])
+summary(College_dt)
 
-ggplot(College, aes(Private, Outstate)) +
+pairs(ss(College_dt, , 2:10))
+
+ggplot(College_dt, aes(Private, Outstate)) +
   geom_boxplot()
 
-College$Elite <- as.factor(if_else(College$Top10perc > 50, "Yes", "No"))
+College_dt[, Elite := as.factor(fifelse(Top10perc > 50, "Yes", "No"))]
 
-summary(College$Elite)
+summary(College_dt[["Elite"]])
 
-ggplot(College, aes(Elite, Outstate)) +
+ggplot(College_dt, aes(Elite, Outstate)) +
   geom_boxplot()
 
-ggplot(College, aes(Outstate)) +
+ggplot(College_dt, aes(Outstate)) +
   geom_histogram(bins = 100)
 
-ggplot(College, aes(Apps)) +
+ggplot(College_dt, aes(Apps)) +
   geom_histogram(bins = 50)
 
-ggplot(College, aes(Grad.Rate)) +
+ggplot(College_dt, aes(Grad.Rate)) +
   geom_histogram(bins = 30)
 ```
 
-```{r Chapter 2 Exercise 9, include=TRUE,echo=TRUE,comment=NA,fig.align='center', fig.height= 3, fig.width=4}
-sapply(Auto[, c(1,3,4,5,6)], range)
-sapply(Auto[, c(1,3,4,5,6)], mean)
-sapply(Auto[, c(1,3,4,5,6)], sd)
+```{r Chapter 2 Exercise 9}
 
-sapply(Auto[-(10:85), c(1,3,4,5,6)], range)
-sapply(Auto[-(10:85), c(1,3,4,5,6)], mean)
-sapply(Auto[-(10:85), c(1,3,4,5,6)], sd)
+vapply(ss(Auto_dt, , c(1L, 3L, 4L, 5L, 6L)), range, numeric(2L))
+vapply(ss(Auto_dt, , c(1L, 3L, 4L, 5L, 6L)), mean, numeric(1L))
+vapply(ss(Auto_dt, , c(1L, 3L, 4L, 5L, 6L)), sd, numeric(1L))
 
-pairs(Auto[, c(1,3,4,5,6)])
+vapply(ss(Auto_dt, -(10:85), c(1L, 3L, 4L, 5L, 6L)), range, numeric(2L))
+vapply(ss(Auto_dt, -(10:85), c(1L, 3L, 4L, 5L, 6L)), mean, numeric(1L))
+vapply(ss(Auto_dt, -(10:85), c(1L, 3L, 4L, 5L, 6L)), sd, numeric(1L))
+
+pairs(ss(Auto_dt, , c(1L, 3L, 4L, 5L, 6L)))
 ```
 
-```{r Chapter 2 Exercise 10, include=TRUE,echo=TRUE,comment=NA,fig.align='center',fig.height=3,fig.width=4}
-nrow(Boston)
-ncol(Boston)
+```{r Chapter 2 Exercise 10}
 
-pairs(Boston[, c(3,6,10,11,12,13)])
+fnrow(Boston)
+fncol(Boston)
 
-cor(Boston$crim, Boston[,-1])
+pairs(ss(Boston, , c(3L, 6L, 10L, 11L, 12L, 13L)))
 
-sapply(Boston, range)
+cor(Boston[["crim"]], ss(Boston, , -1L))
 
-sum(Boston$chas)
+vapply(Boston, range, numeric(2L))
 
-median(Boston$ptratio)
+fsum(Boston[["chas"]])
 
-which(Boston$medv == min(Boston$medv))
+fmedian(Boston[["ptratio"]])
 
-Boston[which(Boston$medv == min(Boston$medv)), ]
+Boston[which.min(Boston[["medv"]]), ]
 
-sum(Boston$rm > 7)
-sum(Boston$rm > 8)
+fsum(Boston[["rm"]] > 7)
+fsum(Boston[["rm"]] > 8)
 ```
 
 \newpage
@@ -377,7 +404,7 @@ In general, we hope to find estimators of $\beta_0$ and $\beta_1$ that are \text
 $$\text{Bias}\left(\hat{\theta}\right)=E\left[\hat{\theta}\right]-\theta$$
 Thus, if $\hat{\theta}$ is an unbiased estimator of $\theta$, $\hat{\theta}$ might overestimate $\theta$, and on the basis of another set of observations, $\hat{\theta}$ might underestimate $\theta$. However, if we could average a huge number of estimates of $\theta$ obtained from a huge number of sets of observations, then this average would exactly equal $\theta$.
 
-Roughly speaking, the standard error tells us the average amount that an estimator $\hat{\theta}$ differs from the actual value of $\theta$ [It actually gives an approximation of the square root of the expected squared difference between $\hat{\theta}$ and $\theta$]. Applying this framework to $\hat{\beta}_0$ and $\hat{\beta}_1$, we can compute
+Roughly speaking, the standard error tells us the average amount that an estimator $\hat{\theta}$ differs from the actual value of $\theta$. Applying this framework to $\hat{\beta}_0$ and $\hat{\beta}_1$, we can compute
 $$\text{SE}\left(\hat{\beta}_0\right)^2=\sigma^2\left[\frac{1}{n}+\frac{\bar{x}^2}{\sum_{i=1}^{n}(x_i-\bar{x})^2}\right]$$
 $$\text{SE}\left(\hat{\beta}_1\right)^2=\frac{\sigma^2}{\sum_{i=1}^{n}(x_i-\bar{x})^2},$$
 which hold under the assumptions of homoscedasticity such that $\text{Var}(\epsilon)=\text{Var}(\epsilon|X)=\sigma^2$ and random sampling.
@@ -428,13 +455,13 @@ Standard errors can also be used to perform \textbf{hypothesis tests} on the coe
 $$H_0:\beta_1=0$$
 against the \textbf{alternative hypothesis}
 $$H_a:\beta_1\neq 0$$
-To test the null hypothesis, we need to determine whether $\hat{\beta}_1$ is sufficiently far from the hypothesized value for $\beta_1$ (zero in the above example) such that we can confidently reject the null hypothesis in favor of the alternative. To determine whether we can reject the null, we compute a \textbf{$t$-statistic} given by
+To test the null hypothesis, we need to determine whether $\hat{\beta}_1$ is sufficiently far from the hypothesized value for $\beta_1$ (zero in the above example) such that we can confidently reject the null hypothesis in favor of the alternative. To determine whether we can reject the null, we compute a \textbf{$\boldsymbol{t}$-statistic} given by
 $$t=\frac{\hat{\beta}_1-b_1}{\hat{\text{SE}}(\hat{\beta}_1)},$$
-where $b_1$ denotes the hypothesized value for $\beta_1$ in the null (again, zero in the case above). In practice, we also compute \textbf{$p$-values}, which is the probability of committing a type I error, or the probability of observing the results from our analysis given the null hypothesis is true.
+where $b_1$ denotes the hypothesized value for $\beta_1$ in the null (again, zero in the case above). In practice, we also compute \textbf{$\boldsymbol{p}$-values}, which is the probability of committing a type I error, or the probability of observing the results from our analysis given the null hypothesis is true.
 
 ### Assessing the Accuracy of the Model
 
-Once we compute our estimates for the coefficients of interest and performed hypothesis testing, it is natural to want to quantify the extent to which the model fits the data. The quality of a linear regression fit is typically assessed using the residual standard error (RSE) and the \textbf{$R^2$ statistic} or \textbf{coefficient of determination}.
+Once we compute our estimates for the coefficients of interest and performed hypothesis testing, it is natural to want to quantify the extent to which the model fits the data. The quality of a linear regression fit is typically assessed using the residual standard error (RSE) and the \textbf{$\boldsymbol{R^2}$ statistic} or \textbf{coefficient of determination}.
 
 Recall that the residual standard error (also commonly called the standard error of regression) is given by
 $$\text{RSE}=\sqrt{\frac{\sum_{i=1}^{n}e_i^2}{(n-2)}}=\sqrt{\frac{\text{RSS}}{(n-2)}}$$
@@ -505,7 +532,7 @@ Similar to the setting of hypothesis testing in simple linear regression, we com
 $$H_0: \beta_1=\dots=\beta_p=0$$
 Likewise, the alternative can be written as
 $$H_a:\text{ at least one }\beta_j\text{ is non-zero.}$$
-We test this hypothesis using the \textbf{$F$-statistic}, which is computed using the formula
+We test this hypothesis using the \textbf{$\boldsymbol{F}$-statistic}, which is computed using the formula
 $$F=\frac{(\text{TSS}-\text{RSS})/p}{\text{RSS}/(n-p-1)}$$
 When $H_0$ is true and the errors $\epsilon_i$ have a normal distribution (or the sample size $n$ is sufficiently large), the $F$-statistic follows an $F$-distribution. Thus, we reject the null in favor of the alternative hypothesis if
 $$F>\mathcal{F}_{p,n-p-1},$$
@@ -572,11 +599,11 @@ where $R_{X_j|X_{-j}}^2$ is the $R^2$ from regressing $X_j$ onto all other predi
 
 ### $K$-Nearest Neighbors Regression
 
-While linear regression is a \emph{parametric} approach to estimating $f$ (since it assumes $f$ is linear), one of the simplest and best-known \emph{non-parametric} methods is \textbf{$K$-nearest neighbors regression (KNN regression)}, which is closely related to the KNN classifier. Given a value for $K$ and a prediction point $x_0$, KNN regression identifies the $K$ training observations that are closest to $x_0$, represented by $\mathcal{N}_0$. It then estimates $f(x_0)$ using the average of all the training responses in $\mathcal{N}_0$. Written mathematically,
+While linear regression is a \emph{parametric} approach to estimating $f$ (since it assumes $f$ is linear), one of the simplest and best-known \emph{non-parametric} methods is \textbf{$\boldsymbol{K}$-nearest neighbors regression (KNN regression)}, which is closely related to the KNN classifier. Given a value for $K$ and a prediction point $x_0$, KNN regression identifies the $K$ training observations that are closest to $x_0$, represented by $\mathcal{N}_0$. It then estimates $f(x_0)$ using the average of all the training responses in $\mathcal{N}_0$. Written mathematically,
 $$\hat{f}(x_0)=\frac{1}{K}\sum_{x\in\mathcal{N}_0}y_i$$
 The optimal value for $K$ will depend on the bias-variance tradeoff. Small values for $K$ provides the most flexible fit, which will tend to experience low amounts of bias and high amounts of variance due to the fact that the prediction in a given region is entirely dependent on just one observation. On the other hand, larger values for $K$ provide a smoother and less variable fit since the prediction is an average of several points, and so changing one observation has a smaller effect. However, the smoothing may contribute additional bias by masking some of the structure in $f(X)$.
 
-In general, a parametric approach will outperform a non-parametric approach if the parametric approach that has been selected is close to the true form of $f$. This is the case because, if the underlying parametric assumption is close to true, a non-parametric approach incurs a cost in variance that is not offset by a reduction in bias.  In a real life situation in which the true relationship is unknown, one might suspect that KNN should be favored over linear regression because it will at worst be slightly inferior to linear regression if the true relationship is linear and may give substantially better results if the true relationship is non-linear. But in reality, even when the true relationship is highly non-linear, KNN may still provide inferior results to linear regression. This is because, in higher dimensions, KNN often performs worse than linear regression, a phenomenon called the \textbf{curse of dimensionality}. Roughly speaking for a given sample size, as the number of dimensions $p$ increases, the $K$ observations that are nearest to a given test observation $x_0$ tend to be further away from $x_0$, leading to poorer predictions of $f(x_0)$ and hence a poor KNN fit. Thus, it's the case that parametric methods will tend to outperform non-parametric approaches when there is a small number of observations per predictor.
+In general, a parametric approach will outperform a non-parametric approach if the parametric approach that has been selected is close to the true form of $f$. This is the case because, if the underlying parametric assumption is close to true, a non-parametric approach incurs a cost in variance that is not offset by a reduction in bias.  In a real life situation in which the true relationship is unknown, one might suspect that KNN should be favored over linear regression because it will at worst perform slightly worse than linear regression if the true relationship is linear and may give substantially better results if the true relationship is non-linear. But in reality, even when the true relationship is highly non-linear, KNN may still provide worse results to those provided by linear regression. This is because, in higher dimensions, KNN often performs worse than linear regression, a phenomenon called the \textbf{curse of dimensionality}. Roughly speaking for a given sample size, as the number of dimensions $p$ increases, the $K$ observations that are nearest to a given test observation $x_0$ tend to be further away from $x_0$, leading to poorer predictions of $f(x_0)$ and hence a poor KNN fit. Thus, it's the case that parametric methods will tend to outperform non-parametric approaches when there is a small number of observations per predictor.
 
 ## Lab
 
@@ -654,20 +681,20 @@ Changing the context to test RSS, it would be difficult to tell which should be 
 \item Consider the fitted values that result from performing linear regression without an intercept. In this setting, the $i$th fitted value takes the form
 $$\hat{y}_i=x_i\hat{\beta},$$
 where
-$$\hat{\beta}=\left(\sum_{i=1}^{n}x_iy_i\right)/\left(\sum_{i'=1}^{n}x_i'^2\right)$$
+$$\hat{\beta}=\left(\sum_{i=1}^{n}x_iy_i\right)/\left(\sum_{i'=1}^{n}x_{i'}^2\right)$$
 Show that we can write
-$$\hat{y}_i=\sum_{i'=1}^{n}a_i'y_i'.$$
-What is $a_i'$?
+$$\hat{y}_i=\sum_{i'=1}^{n}a_{i'}y_{i'}.$$
+What is $a_{i'}$?
 
 \textit{Note: We interpret this result by saying that the fitted values from linear regression are linear combinations of the response values.}
 
 Extending $\hat{\beta}$ makes it clearer to derive the desired relationship.
-$$\hat{\beta}=\frac{\sum_{i=1}^{n}x_iy_i}{\sum_{i'=1}^{n}x_i'^2}$$
-$$=\frac{x_1y_1+x_2y_2+\dots+x_ny_n}{\sum_{i'=1}^{n}x_i'^2}$$
-$$=\frac{x_1}{\sum_{i'=1}^{n}x_i'^2}y_1+\frac{x_2}{\sum_{i'=1}^{n}x_i'^2}y_2+\dots+\frac{x_n}{\sum_{i'=1}^{n}x_i'^2}y_n$$
-$$a_1'y_1'+a_2'y_2'+\dots+a_n'y_n'$$
-$$\sum_{i'=1}^{n}a_i'y_i',$$
-where $a_i'=\frac{x_i}{\sum_{i'=1}^{n}x_i'^2}$.
+$$\hat{\beta}=\frac{\sum_{i=1}^{n}x_iy_i}{\sum_{i'=1}^{n}x_{i'}^2}$$
+$$=\frac{x_1y_1+x_2y_2+\dots+x_ny_n}{\sum_{i'=1}^{n}x_{i'}^2}$$
+$$=\frac{x_1}{\sum_{i'=1}^{n}x_{i'}^2}y_1+\frac{x_2}{\sum_{i'=1}^{n}x_{i'}^2}y_2+\dots+\frac{x_n}{\sum_{i'=1}^{n}x_{i'}^2}y_n$$
+$$a_{1'}y_{1'}+a_{2'}y_{2'}+\dots+a_{n'}y_{n'}$$
+$$\sum_{i'=1}^{n}a_{i'}y_{i'},$$
+where $a_{i'}=\frac{x_i}{\sum_{i'=1}^{n}x_{i'}^2}$.
 \item Using (3.4), argue that in the case of simple linear regression, the least squares line always passes through the point $(\bar{x},\bar{y})$.
 
 From (3.4), we have $\hat{\beta}_0=\bar{y}-\hat{\beta}_1\bar{x}$ and $\hat{\beta}_1=\frac{\sum_{i=1}^{n}(x_i-\bar{x})(y_i-\bar{y})}{\sum_{i=1}^{n}(x_i-\bar{x})^2}$. We only need the first part to show the least squares line always passes through the point $(\bar{x},\bar{y})$.
@@ -692,54 +719,62 @@ $$=R^2$$
 
 ### Applied
 
-```{r Chapter 3 Exercise 8, include=TRUE,echo=TRUE,comment=NA,fig.align='center'}
-lm.fit <- lm(mpg ~ horsepower, data = Auto)
+```{r Chapter 3 Exercise 8}   
+
+lm.fit <- lm(mpg ~ horsepower, data = Auto_dt)
+
 summary(lm.fit)
+
 predict(lm.fit, data.frame(horsepower = 98))
 predict(lm.fit, data.frame(horsepower = 98), interval = "confidence")
 predict(lm.fit, data.frame(horsepower = 98), interval = "prediction")
 
-ggplot(Auto, aes(horsepower, mpg)) +
+ggplot(Auto_dt, aes(horsepower, mpg)) +
   geom_point(color = "blue") +
-  geom_smooth(color = "red", method = "lm", formula = y ~ x, se = F)
+  geom_smooth(color = "red", method = "lm", formula = y ~ x, se = FALSE)
 
 g1 <- ggplot(mapping = aes(predict(lm.fit), residuals(lm.fit))) +
   geom_point() +
-  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+  geom_smooth(color = "red", se = FALSE, formula = y ~ x, method = "loess")
+
 g2 <- ggplot(mapping = aes(predict(lm.fit), rstudent(lm.fit))) +
   geom_point() +
-  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+  geom_smooth(color = "red", se = FALSE, formula = y ~ x, method = "loess")
 
-grid.arrange(g1, g2, ncol = 2, newpage = F)
+grid.arrange(g1, g2, ncol = 2, newpage = FALSE)
 ```
 
-```{r Chapter 3 Exercise 9, include=TRUE,echo=TRUE,comment=NA,fig.align='center'}
-pairs(Auto)
-cor(Auto[,-which(colnames(Auto) == "name")])
+```{r Chapter 3 Exercise 9}
 
-lm.fit <- lm(mpg ~ . - name, data = Auto)
+pairs(Auto_dt)
+
+cor(Auto_dt[, -"name"])
+
+lm.fit <- update(lm.fit, ~ . - name)
 summary(lm.fit)
 
 g1 <- ggplot(mapping = aes(predict(lm.fit), residuals(lm.fit))) +
   geom_point() +
-  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+  geom_smooth(color = "red", se = FALSE, formula = y ~ x, method = "loess")
 g2 <- ggplot(mapping = aes(predict(lm.fit), rstudent(lm.fit))) +
   geom_point() +
-  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+  geom_smooth(color = "red", se = FALSE, formula = y ~ x, method = "loess")
 g3 <- ggplot(mapping = aes(hatvalues(lm.fit), rstudent(lm.fit))) +
   geom_point() +
-  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+  geom_smooth(color = "red", se = FALSE, formula = y ~ x, method = "loess")
 
-grid.arrange(g1, g2, g3,ncol = 2, nrow = 2, newpage = T)
+grid.arrange(g1, g2, g3,ncol = 2, nrow = 2, newpage= TRUE)
 
-round(coef(summary(lm(mpg ~ weight * year, data = Auto))), 10)
+round(coef(summary(lm(mpg ~ weight * year, data = Auto_dt))), 10)
 
-round(coef(summary(lm(mpg ~ weight + I(weight^2), data = Auto))), 10)
-round(coef(summary(lm(mpg ~ poly(weight, degree = 3, raw = T), data = Auto))), 10)
+round(coef(summary(lm(mpg ~ weight + I(weight^2), data = Auto_dt))), 10)
+
+round(coef(summary(lm(mpg ~ poly(weight, degree = 3, raw= TRUE), data = Auto_dt))), 10)
 ```
 
-```{r Chapter 3 Exercise 10, include=TRUE,echo=TRUE,comment=NA,fig.align='center'}
-lm.fit <- lm(Sales ~ Price + Urban + US, data = Carseats)
+```{r Chapter 3 Exercise 10}
+
+lm.fit <- update(lm.fit, Sales ~ Price + Urban + US, data = Carseats)
 
 round(coef(summary(lm.fit)), 10)
 
@@ -749,18 +784,18 @@ confint(lm.fit)
 
 g1 <- ggplot(mapping = aes(predict(lm.fit), residuals(lm.fit))) +
   geom_point() +
-  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+  geom_smooth(color = "red", se = FALSE, formula = y ~ x, method = "loess")
 g2 <- ggplot(mapping = aes(predict(lm.fit), rstudent(lm.fit))) +
   geom_point() +
-  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+  geom_smooth(color = "red", se = FALSE, formula = y ~ x, method = "loess")
 g3 <- ggplot(mapping = aes(hatvalues(lm.fit), rstudent(lm.fit))) +
   geom_point() +
-  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+  geom_smooth(color = "red", se = FALSE, formula = y ~ x, method = "loess")
 
-grid.arrange(g1, g2, g3,ncol = 2, nrow = 2, newpage = T)
+grid.arrange(g1, g2, g3,ncol = 2, nrow = 2, newpage= TRUE)
 ```
 
-```{r Chapter 3 Exercise 11, include=TRUE,echo=TRUE,comment=NA,fig.align='center'}
+```{r Chapter 3 Exercise 11}
 set.seed (1)
 x <- rnorm (100)
 y <- 2 * x + rnorm (100)
@@ -771,7 +806,7 @@ round(coef(summary(lm(y ~ x))), 10)
 round(coef(summary(lm(x ~ y))), 10)
 ```
 
-```{r Chapter 3 Exercise 12, include=TRUE,echo=TRUE,comment=NA}
+```{r Chapter 3 Exercise 12}
 x <- rep(1, 100)
 y <- rep(2, 100)
 round(coef(summary(lm(y ~ x + 0))), 10)
@@ -782,7 +817,7 @@ round(coef(summary(lm(y ~ x + 0))), 10)
 round(coef(summary(lm(x ~ y + 0))), 10)
 ```
 
-```{r Chapter 3 Exercise 13, include=TRUE,echo=TRUE,comment=NA}
+```{r Chapter 3 Exercise 13}
 set.seed(1)
 x <- rnorm(100)
 eps <- rnorm(100, sd = 0.5)
@@ -796,7 +831,7 @@ confint(lm(y ~ x))
 
 ggplot(mapping = aes(x, y)) +
   geom_point() +
-  geom_smooth(aes(color = "OLS"), method = "lm", formula = y ~ x, se = F, linetype = "dashed") +
+  geom_smooth(aes(color = "OLS"), method = "lm", formula = y ~ x, se = FALSE, linetype = "dashed") +
   geom_abline(color = "blue", slope = 0.5, intercept = -1, linetype = "dashed") +
   scale_color_manual(values = c("OLS" = "red", "Pop." = "blue")) +
   theme_bw()
@@ -811,9 +846,9 @@ confint(lm(y ~ x))
 
 ggplot(mapping = aes(x, y)) +
   geom_point() +
-  geom_smooth(aes(color = "OLS"), method = "lm", formula = y ~ x, se = F, linetype = "dashed") +
+  geom_smooth(aes(color = "OLS"), method = "lm", formula = y ~ x, se = FALSE, linetype = "dashed") +
   geom_abline(color = "blue", slope = 0.5, intercept = -1, linetype = "dashed") +
-  geom_smooth(aes(color = "Sq. Reg."), method = "lm", formula = y ~ x + I(x^2), se = F) +
+  geom_smooth(aes(color = "Sq. Reg."), method = "lm", formula = y ~ x + I(x^2), se = FALSE) +
   scale_color_manual(values = c("OLS" = "red", "Pop." = "blue", "Sq. Reg." = "green")) +
   theme_bw()
 
@@ -827,16 +862,17 @@ confint(lm(y ~ x))
 
 ggplot(mapping = aes(x, y)) +
   geom_point() +
-  geom_smooth(aes(color = "OLS"), method = "lm", formula = y ~ x, se = F, linetype = "dashed") +
+  geom_smooth(aes(color = "OLS"), method = "lm", formula = y ~ x, se = FALSE, linetype = "dashed") +
   geom_abline(color = "blue", slope = 0.5, intercept = -1, linetype = "dashed") +
-  geom_smooth(aes(color = "Sq. Reg."), method = "lm", formula = y ~ x + I(x^2), se = F) +
+  geom_smooth(aes(color = "Sq. Reg."), method = "lm", formula = y ~ x + I(x^2), se = FALSE) +
   scale_color_manual(values = c("OLS" = "red", "Pop." = "blue", "Sq. Reg." = "green")) +
   theme_bw()
 
 round(coef(summary(lm(y ~ x + I(x^2)))), 10)
 ```
 
-```{r Chapter 3 Exercise 14, include=TRUE,echo=TRUE,comment=NA}
+```{r Chapter 3 Exercise 14}
+
 set.seed (1)
 x1 <- runif (100)
 x2 <- 0.5 * x1 + rnorm (100) / 10
@@ -846,60 +882,65 @@ cor(x1, x2)
 ggplot(mapping = aes(x1, x2)) +
   geom_point()
 
-lm.fit <- lm(y ~ x1 + x2)
+lm.fit <- update(lm.fit, y ~ x1 + x2, data = NULL)
 round(coef(summary(lm.fit)), 10)
 
 lm.fit <- update(lm.fit, ~ . - x2)
 round(coef(summary(lm.fit)), 10)
 
-lm.fit <- lm(y ~ x2)
+lm.fit <- update(lm.fit, ~ x2)
 round(coef(summary(lm.fit)), 10)
 
 x1 <- c(x1 , 0.1)
 x2 <- c(x2 , 0.8)
 y <- c(y, 6)
 
-lm.fit <- lm(y ~ x1 + x2)
+lm.fit <- update(lm.fit, ~ x1 + x2)
 round(coef(summary(lm.fit)), 10)
 
 lm.fit <- update(lm.fit, ~ . - x2)
 round(coef(summary(lm.fit)), 10)
 
-lm.fit <- lm(y ~ x2)
+lm.fit <- update(lm.fit, ~ x2)
 round(coef(summary(lm.fit)), 10)
 
 g1 <- ggplot(mapping = aes(predict(lm.fit), residuals(lm.fit))) +
   geom_point() +
-  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+  geom_smooth(color = "red", se = FALSE, formula = y ~ x, method = "loess")
 g2 <- ggplot(mapping = aes(predict(lm.fit), rstudent(lm.fit))) +
   geom_point() +
-  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+  geom_smooth(color = "red", se = FALSE, formula = y ~ x, method = "loess")
 g3 <- ggplot(mapping = aes(hatvalues(lm.fit), rstudent(lm.fit))) +
   geom_point() +
-  geom_smooth(color = "red", se = F, formula = y ~ x, method = "loess")
+  geom_smooth(color = "red", se = FALSE, formula = y ~ x, method = "loess")
 
-grid.arrange(g1, g2, g3,ncol = 2, nrow = 2, newpage = T)
+grid.arrange(g1, g2, g3,ncol = 2, nrow = 2, newpage= TRUE)
 ```
 
-```{r Chapter 3 Exercise 15, include=TRUE,echo=TRUE,comment=NA}
-x <- vector("numeric")
+```{r Chapter 3 Exercise 15}
 
-for (colname in colnames(Boston[, -1])) {
-  lm.uni <- lm(as.formula(paste("crim ~ ", colname, sep = "")), data = Boston)
-  print(round(coef(summary(lm.uni)), 10))
-  x <- append(x, coef(lm.uni)[[2]])
+parallel::clusterExport(cl, "lm.fit")
+
+lm.fit_slopes <- foreach(colname = colnames(Boston_dt[, -"crim"]), .combine = c) %dopar% {
+  lm.fit <- update(lm.fit, as.formula(paste0("crim ~ ", colname)), data = Boston_dt)
+  return(coef(lm.fit)[[2]])
 }
 
-lm.fit <- lm(crim ~ . , data = Boston)
+print(lm.fit_slopes)
+
+lm.fit <- lm(crim ~ ., data = Boston_dt)
 round(coef(summary(lm.fit)), 10)
 
-ggplot(mapping = aes(x, unname(coef(lm.fit)[-1]))) +
+ggplot(mapping = aes(lm.fit_slopes, unname(coef(lm.fit)[-1]))) +
   geom_point(color = "blue") +
-  theme_bw()
+  theme_bw() +
+  labs(x = "Univariate Coefficients", y = "Multivariate Coefficients")
 
-for (colname in colnames(Boston[, -c(which(colnames(Boston) == "crim"), which(colnames(Boston) == "chas"))])) {
-  print(round(coef(summary(lm(as.formula(paste("crim ~ poly(", colname, ", 3)", sep = "")), data = Boston))), 10))
+lm.fit_coef <- foreach(colname = colnames(Boston_dt[, -c("crim", "chas")]), .combine = rbind) %dopar% {
+  return(round(coef(summary(lm(as.formula(paste0("crim ~ poly(", colname, ", 3)")), data = Boston_dt))), 10))
 }
+
+print(lm.fit_coef)
 ```
 
 \newpage
@@ -936,7 +977,7 @@ $$\log\left(\frac{p(X)}{1-p(X)}\right)=\beta_0+\beta_1X,$$
 where the left-hand side is called the \textbf{log odds} or \textbf{logit}, which is linear in $X$. Thus, increasing $X$ by one-unit increases the log odds by $\beta_1$ (or equivalently, it multiplies the odds by $e^{\beta_1}$). However, $\beta_1$ does not correspond to the change in $p(X)$ for a one-unit increase in $X$. Instead, the change in $p(X)$ depends on the current value of $X$. Nevertheless, if $\beta_1>0$, $p(X)$ increases with $X$, and if $\beta_1<0$, $p(X)$ decreases with $X$.
 
 To fit a logistic regression model, we use a method called \textbf{maximum likelihood}, where we choose $\hat{\beta}_0$ and $\hat{\beta}_1$ to maximize the \textbf{likelihood function}
-$$L(\beta_0,\beta_1)=\prod_{i:y_i=1}p(x_i)\prod_{i':y_i'=0}(1-p(x_i))$$
+$$L(\beta_0,\beta_1)=\prod_{i:y_i=1}p(x_i)\prod_{i':y_{i'}=0}(1-p(x_{i'}))$$
 After computing estimates for $\beta_0$ and $\beta_1$, predicting $\text{Pr}(Y=1|X)$ is derived from
 $$\hat{p}(X)=\frac{e^{\hat{\beta}_0+\hat{\beta}_1X}}{1+e^{\hat{\beta}_0+\hat{\beta}_1X}}$$
 
@@ -1007,7 +1048,7 @@ $$\text{Pr}(Y=k|X=x)=\frac{e^{\beta_{k0}+\beta_{k1}x_1+\dots\beta_{kp}x_p}}{1+\s
 
 For $K\geq 2$, let $\pi_k$ be the \textbf{prior} probability that a randomly chosen observation comes from the $k$th class (i.e. $\text{Pr}(Y=k)$) and $f_k(X)\equiv \text{Pr}(X|Y=k)$ denote the \text{density function} of $X$ for an observation that comes from the $k$th class. Then \textbf{Bayes' theorem} states
 $$\text{Pr}(Y=k|X=x)=\frac{\pi_k f_k(x)}{\sum_{l=1}^{K}\pi_l f_l(x)},$$
-which is the \textbf{posterior} probability that an observation $X=x$ belongs to the $k$th class (this is also denoted $p_k(x)$). Using a random sample, estimating $\pi_k$ is simple as we just compute the faction of the training observations from the $k$th class. Unfortunately, estimating the density function $f_k(x)$ is much more difficult. We know that the Bayes classifier, which classifies an observation $x$ to the class for which $p_k(x)$ is largest, has the lowest possible error rate out of all classifiers. Therefore, if we can find a way to estimate $f_k(x)$, then we can plug it into Bayes' theorem in order to approximate the Bayes classifier. Three classifiers that use different estimates of $f_k(x)$ to approximate the Bayes classifier include: linear discriminant analysis, quadratic discriminant analysis, and naive Bayes.
+which is the \textbf{posterior} probability that an observation $X=x$ belongs to the $k$th class (this is also denoted $p_k(x)$). Using a random sample, estimating $\pi_k$ is simple as we just compute the fraction of the training observations from the $k$th class. Unfortunately, estimating the density function $f_k(x)$ is much more difficult. We know that the Bayes classifier, which classifies an observation $x$ to the class for which $p_k(x)$ is largest, has the lowest possible error rate out of all classifiers. Therefore, if we can find a way to estimate $f_k(x)$, then we can plug it into Bayes' theorem in order to approximate the Bayes classifier. Three classifiers that use different estimates of $f_k(x)$ to approximate the Bayes classifier include: linear discriminant analysis, quadratic discriminant analysis, and naive Bayes.
 
 ### Linear Discriminant Analysis
 
@@ -1015,7 +1056,7 @@ For a moment, assume we have one predictor and that $f_k(x)$ is \textbf{normal} 
 $$f_k(x)=\frac{1}{\sigma_k\sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{x-\mu_k}{\sigma_k}\right)^2},$$
 where $\mu_k$ and $\sigma_k$ are parameters for the $k$th class. If we assume a common standard deviation among the $k$ classes (i.e., $\sigma_k=\sigma$), we can plug the previous equation into the formula for Bayes' theorem and obtain
 $$p_k(x)=\frac{\pi_k\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{x-\mu_k}{\sigma}\right)^2}}{\sum_{l=1}^{K}\pi_l\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{x-\mu_l}{\sigma}\right)^2}}$$
-[Recall that $\pi_k=\text{Pr}(Y=k)\neq\pi\approx 3.14159$]. Taking the natural logarithm of the previous expression,
+[Recall that $\pi_k=\text{Pr}(Y=k)\neq\pi\approx `r pi`$]. Taking the natural logarithm of the previous expression,
 $$\log\left(p_k(x)\right)=\log\left(\frac{\pi_k\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{x-\mu_k}{\sigma}\right)^2}}{\sum_{l=1}^{K}\pi_l\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{x-\mu_l}{\sigma}\right)^2}}\right)$$
 Since we're concerned with maximizing this value by assigning it to the $k$th class and the denominator does not vary with $k$, we write
 $$\log\left(\pi_k\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{x-\mu_k}{\sigma}\right)^2}\right)=\log(\pi_k)-\log(\sigma\sqrt{2\pi})+\log\left(e^{-\frac{1}{2}\left(\frac{x-\mu_k}{\sigma}\right)^2}\right)$$
@@ -1024,11 +1065,11 @@ $$=\log(\pi_k)-\log(\sigma)-\log(\sqrt{2\pi})-\frac{1}{2}\left(\frac{x^2-2x\mu_k
 $$=\log(\pi_k)-\log(\sigma)-\log(\sqrt{2\pi})-\frac{x^2}{2\sigma^2}+\frac{x\mu_k}{\sigma^2}-\frac{\mu_k^2}{2\sigma^2}$$
 Since $\log(\sqrt{2\pi})$, $\log(\sigma)$, and $x^2/2\sigma^2$ do not vary with $k$ (recall we are treating $x$ as fixed), we obtain
 $$\delta_k(x)=x\cdot\frac{\mu_k}{\sigma^2}-\frac{\mu_k^2}{2\sigma^2}+\log(\pi_k),$$
-which is maximized when the above equation for $p_k(x)$ is maximized (with respect to the class $k$). This equation tells us which class the Bayes classifier assigns an observation to. Thus, if $K=2$, then the Bayes decision boundary is given by the points where $\delta_1(x)=\delta_2(x)$. Unfortunately, in real life situations, we (generally) do not observe population parameters, and thus, we are unable to calculate the Bayes classifier.
+which is maximized when the above equation for $p_k(x)$ is maximized (with respect to the class $k$). This equation tells us which class the Bayes classifier assigns an observation to under our assumptions of a normally distributed $x$ given $y=k$ and a common standard deviation for the $K$ classes. Thus, if $K=2$, then the Bayes decision boundary is given by the points where $\delta_1(x)=\delta_2(x)$. Unfortunately, in almost all real life situations, we do not observe population parameters, and thus, we are unable to calculate the Bayes classifier.
 
 Using the \textbf{linear discriminant analysis (LDA)} method, we approximate the parameters using their estimators. Thus, the LDA classifier uses the following \textbf{discriminant functions}
 $$\hat{\delta}_k(x)=x\cdot\frac{\hat{\mu}_k}{\hat{\sigma}^2}-\frac{\hat{\mu}_k^2}{2\hat{\sigma}^2}+\log(\hat{\pi}_k),$$
-where, if $n$ is the total number of observations in the training data and $n_k$ is the number of observations belonging to the $k$th class in the training data,
+where if $n$ is the total number of observations in the training data and $n_k$ is the number of observations belonging to the $k$th class in the training data,
 
 $$\hat{\pi}_k=\frac{n_k}{n}$$
 $$\hat{\mu}_k=\frac{1}{n_k}\sum_{i:y_i=k}x_i$$
@@ -1046,9 +1087,7 @@ Removing the term that doesn't vary with $k$ ($\frac{1}{2}x^T\mathbf{\Sigma}^{-1
 $$\delta_k(x)=x^T\mathbf{\Sigma}^{-1}\mu_k-\frac{1}{2}\mu_k^T\mathbf{\Sigma}^{-1}\mu_k+\log(\pi_k)$$
 Once again, as we did in the case where $p=1$, we derive the discriminant functions ($\hat{\delta}_k$) by using the estimators for $\pi_1,\dots,\pi_K$, $\mu_1,\dots,\mu_K$, and $\mathbf{\Sigma}$.
 
-Recall that the Bayes classifier chooses the class $k$ that maximizes the posterior probability and $\delta_k$. Likewise, linear discriminant analysis chooses the class $k$ that maximizes $\hat{\delta}_k$. Thus, using LDA, we classify an observation to class $k$ if
-$$\widehat{\text{Pr}}(Y=k|X=x)>\frac{1}{K},$$
-where $\widehat{\text{Pr}}(Y=k|X=x)$ is the approximated conditional probability using LDA. Thus, the default threshold for assigning an observation to class $k$ is $1/K$. In some circumstances, we may be particularly concerned with minimizing incorrect predictions for a certain class (such as minimizing the number of false negatives a test gives). In these cases, we can simply adjust the threshold to better meet our goals. Generally, if we move the threshold to be more stringent toward our goal, we can expect the overall test error rate to increase but the test error rate regarding our interest to decrease.
+Recall that the Bayes classifier chooses the class $k$ that maximizes the posterior probability and $\delta_k$. Likewise, linear discriminant analysis chooses the class $k$ that maximizes $\hat{\delta}_k$. In some circumstances, we may be particularly concerned with minimizing incorrect predictions for a certain class (such as minimizing the number of false negatives a test gives). In these cases, we can simply adjust the threshold to better meet our goals. Generally, if we move the threshold to be more stringent toward our goal, we can expect the overall test error rate to increase but the test error rate regarding our interest to decrease.
 
 ### Quadratic Discriminant Analysis
 
@@ -1085,8 +1124,8 @@ Generally speaking, we expect to see a greater pay-off to using naive Bayes rela
 \item \underline{Logistic Regression:} Comparatively, logistic regression may be preferred when $n$ is small and/or $p$ is large. It performs best when the Bayes decision boundary is linear in $x$. Logistic regression will compete with LDA in these circumstances but is preferred when the predictors are not normally distributed (within each class).
 \item \underline{Linear Discriminant Analysis:} Much like logistic regression, LDA may be preferred when $n$ is small and/or $p$ is large. It also performs best when the Bayes decision boundary is linear in $x$. LDA will compete with logistic regression in these circumstances but is preferred when the predictors are normally distributed (within each class).
 \item \underline{Quadratic Discriminant Analysis:} Generally speaking, QDA may be preferred when $n$ is large and/or $p$ is small. It'll tend to perform better than LDA and logistic regression when the Bayes decision boundary is non-linear in the predictors. However, QDA suffers greatly when the assumption regarding the normality of the predictors is broken.
-\item \underline{Naive Bayes:} Generally speaking, naive Bayes may be preferred when $n$ is small and/or $p$ is large. It performs better than LDA and QDA when reducing variance is a key issue. It tends to perform best when variance is an issue but the Bayes decision boundary is non-linear in the predictors. It should be noted that naive Bayes suffers drastically when the assumption regarding the independence between the predictors is broken.
-\item \underline{$K$-Nearest Neighbors (Cross-Validated):} KNN is a non-parametric method. Thus, it generally requires a relatively large $n$ and small $p$. KNN tends to be best when the Bayes decision boundary is a complicated non-linear function of the predictors. Generally speaking, KNN will be used when the gains in unbiasedness outweigh any additional variance introduced by using this method.
+\item \underline{Naive Bayes:} Generally speaking, naive Bayes may be preferred when $n$ is small and/or $p$ is large. It performs better than LDA and QDA when reducing variance is a key issue. It tends to perform best when variance is an issue but the Bayes decision boundary is non-linear in the predictors. It should be noted that naive Bayes suffers when the assumption regarding the independence between the predictors is broken.
+\item \underline{$K$-Nearest Neighbors (Cross-Validated):} KNN is a non-parametric method. Thus, it generally requires a relatively large $n$ and small $p$. KNN tends to perform best when the Bayes decision boundary is a complicated non-linear function of the predictors. Generally speaking, KNN will be used when the gains in unbiasedness outweigh any additional variance introduced by using this method.
 \end{itemize}
 
 ### Poisson Regression
@@ -1114,7 +1153,7 @@ where $\lambda(x_i)=e^{\beta_0+\beta_1x_{i1}+\dots+\beta_px_{ip}}$.
 \item Similarly, use the \texttt{qda() function} from the \texttt{MASS} library to fit a QDA model.
 \item Using the same syntax to that of the \texttt{lm()}, \texttt{lda()}, and \texttt{qda()} functions, use \texttt{naiveBayes()} from the \texttt{e1071} library to fit a naive Bayes model. By default, this implementation of the naive Bayes classifier models each quantitative feature using a Gaussian distribution, but a kernel density method can be used to estimate the distributions.
 \item To implement a KNN model, use the \texttt{knn()} function from the \texttt{class} library. This function requires four arguments: the training data, the test data, class labels, and a value for $K$.
-\item The \texttt{scale()} function standardizes data so that all variables are given a mean of zero and a standard deviation of one.
+\item The \texttt{scale()} function standardizes data so that all variables are given a mean of zero and a standard deviation of one. Alternatively, we can use \texttt{gknn()} from the \texttt{e1071} library to implement a standardized KNN model using similar syntax to that of \texttt{naiveBayes()}.
 \end{itemize}
 
 ## Exercises
@@ -1135,7 +1174,7 @@ $$=\log(\pi_k)-\log(\sigma)-\log(\sqrt{2\pi})-\frac{1}{2}\left(\frac{x^2-2x\mu_k
 $$=\log(\pi_k)-\log(\sigma)-\log(\sqrt{2\pi})-\frac{x^2}{2\sigma^2}+\frac{x\mu_k}{\sigma^2}-\frac{\mu_k^2}{2\sigma^2}$$
 Since $\log(\sqrt{2\pi})$, $\log(\sigma)$, and $x^2/2\sigma^2$ do not vary with $k$ (recall we are treating $x$ as fixed), we obtain
 $$\delta_k(x)=x\cdot\frac{\mu_k}{\sigma^2}-\frac{\mu_k^2}{2\sigma^2}+\log(\pi_k)$$
-\item  This problem relates to the QDA model, in which the observations within each class are drawn from a normal distribution with a class-specific mean vector and a class specific covariance matrix. We consider the simple case where $p=1$; i.e. there is only one feature.
+\item This problem relates to the QDA model, in which the observations within each class are drawn from a normal distribution with a class-specific mean vector and a class specific covariance matrix. We consider the simple case where $p=1$; i.e. there is only one feature.
 
 Suppose that we have $K$ classes, and that if an observation belongs to the $k$th class then $X$ comes from a one-dimensional normal distribution, $X\sim(\mu_k,\sigma_k^2)$. Recall that the density function for the one-dimensional normal distribution is given in (4.16). Prove that in this case, the Bayes classifier is not linear. Argue that it is in fact quadratic.
 
@@ -1204,7 +1243,7 @@ $$=\frac{0.8\left(e^{-(4-10)^2/72}\right)}{0.8\left(e^{-(4-10)^2/72}\right)+0.2\
 $$\approx`r (0.8 * exp(-.5)) / (0.8 * exp(-.5) + 0.2 * exp(-16 / 72))`$$
 \item Suppose that we take a data set, divide it into equally-sized training and test sets, and then try out two different classification procedures. First we use logistic regression and get an error rate of 20\% on the training data and 30\% on the test data. Next we use 1-nearest neighbors (i.e. $K=1$) and get an average error rate (averaged over both test and training data sets) of 18\%. Based on these results, which method should we prefer to use for classification of new observations? Why?
 
-When $K=1$, the training error rate is 0\%. Thus, if KNN gives an average error rate (over both the training and test data) of 18\% with $K=1$, then the test error rate must be 36\%. Thus, assuming we're interested in minimizing the test error rate since we're interested in accurate predictions for new observations, we should prefer the logistic regression model over the KNN model.
+When $K=1$, the training error rate for KNN is 0\%. Thus, if KNN gives an average error rate (over both the training and test data) of 18\% with $K=1$, then the test error rate must be 36\%. Assuming we're interested in minimizing the test error rate since we're interested in accurate predictions for new observations, we should prefer the logistic regression model over the KNN model.
 
 \item This problem has to do with \emph{odds}.
 \begin{enumerate}
@@ -1218,7 +1257,7 @@ $$\frac{p(X)}{1-p(X)}=\frac{0.16}{0.84}\approx `r round(.16/.84,4)`$$
 \end{enumerate}
 \item Equation 4.32 derived an expression for $\log(\frac{\text{Pr}(Y=k|X=x)}{\text{Pr}(Y=K|X=x)})$ in the setting where $p>1$, so that the mean for the $k$th class, $\mu_k$, is a $p$-dimensional vector, and the shared covariance matrix $\mathbf{\Sigma}$ is a $p\times p$ matrix. However, in the setting with $p=1$, (4.32) takes a simpler form, since the means $\mu_1,\dots,\mu_k$ and the variance $\sigma^2$ are scalars. In this simpler setting, repeat the calculation in (4.32), and provide expressions for $a_k$ and $b_{kj}$ in terms of $\pi_k,\pi_K,\mu_k,\mu_K$, and $\sigma^2$.
 
-$$\log(\frac{\text{Pr}(Y=k|X=x)}{\text{Pr}(Y=K|X=x)})=\log\left(\frac{\pi_kf_k(x)}{\pi_Kf_K(x)}\right)$$
+$$\log\left(\frac{\text{Pr}(Y=k|X=x)}{\text{Pr}(Y=K|X=x)}\right)=\log\left(\frac{\pi_kf_k(x)}{\pi_Kf_K(x)}\right)$$
 $$=\log\left(\frac{\pi_k\frac{1}{\sigma\sqrt{2\pi}}\exp\left(-\frac{1}{2\sigma^2}(x-\mu_k)^2\right)}{\pi_K\frac{1}{\sigma\sqrt{2\pi}}\exp\left(-\frac{1}{2\sigma^2}(x-\mu_K)^2\right)}\right)$$
 $$=\log\left(\frac{\pi_k}{\pi_K}\right)-\frac{1}{2\sigma^2}(x-\mu_k)^2+\frac{1}{2\sigma^2}(x-\mu_K)^2$$
 $$=\log\left(\frac{\pi_k}{\pi_K}\right)-\frac{1}{2\sigma^2}\left(x^2-2\mu_kx+\mu_k^2-x^2+2\mu_Kx-\mu_K^2\right)$$
@@ -1261,82 +1300,88 @@ I would expect the predicted class labels to always be the same between the two 
 
 ### Applied
 
-```{r Chapter 4 Exercise 13, include=TRUE,echo=TRUE,comment=NA,fig.align='center', fig.height= 3, fig.width=4}
-table(Weekly$Year)
-sapply(Weekly[,2:8], summary)
-table(Weekly$Direction)
+```{r Chapter 4 Exercise 13}
 
-lapply(names(Weekly[,2:8]),
+table(Weekly_dt[["Year"]])
+sapply(ss(Weekly_dt, , 2:8), summary)
+table(Weekly_dt[["Direction"]])
+
+lapply(colnames(ss(Weekly_dt, , 2:8)),
        function(variable)
-           ggplot(Weekly, aes_string("Direction", variable)) +
+           ggplot(Weekly_dt, aes_string("Direction", variable)) +
            geom_boxplot(color = "black", fill = "lightblue") +
            theme_bw())
 
-logistic.model <- glm(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume, data = Weekly, family = binomial)
+logistic.model <- glm(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume, data = Weekly_dt, family = binomial)
 
 summary(logistic.model)
 
-table(if_else(predict(logistic.model, type = "response") > 0.5, "Up", "Down"), Weekly$Direction)
+table(fifelse(predict(logistic.model, type = "response") > 0.5, "Up", "Down"), Weekly_dt[["Direction"]])
 
-logistic.model <- glm(Direction ~ Lag2, data = Weekly[Weekly$Year < 2009,], family = binomial)
+logistic.model <- glm(Direction ~ Lag2, data = Weekly_dt[Year < 2009, ], family = binomial)
 
-table(if_else(predict(logistic.model, newdata = Weekly[Weekly$Year > 2008,], type = "response") > 0.5, "Up", "Down"), Weekly[Weekly$Year > 2008,]$Direction)
+table(fifelse(predict(logistic.model, newdata = Weekly_dt[Year > 2008, ], type = "response") > 0.5, "Up", "Down"), Weekly_dt[Year > 2008, Direction])
 
-lda.model <- lda(Direction ~ Lag2, data = Weekly[Weekly$Year < 2009,])
+lda.model <- lda(Direction ~ Lag2, data = Weekly_dt[Year < 2009, ])
 
-table(predict(lda.model, newdata = Weekly[Weekly$Year > 2008,], type = "response")$class, Weekly[Weekly$Year > 2008,]$Direction)
+table(predict(lda.model, newdata = Weekly_dt[Year > 2008, ], type = "response")$class, Weekly_dt[Year > 2008, Direction])
 
-qda.model <- qda(Direction ~ Lag2, data = Weekly[Weekly$Year < 2009,])
+qda.model <- qda(Direction ~ Lag2, data = Weekly_dt[Year < 2009, ])
 
-table(predict(qda.model, newdata = Weekly[Weekly$Year > 2008,], type = "response")$class, Weekly[Weekly$Year > 2008,]$Direction)
+table(predict(qda.model, newdata = Weekly_dt[Year > 2008, ], type = "response")$class, Weekly_dt[Year > 2008, Direction])
 
-naiveBayes.model <- naiveBayes(Direction ~ Lag2, data = Weekly[Weekly$Year < 2009,])
+naiveBayes.model <- naiveBayes(Direction ~ Lag2, data = Weekly_dt[Year < 2009, ])
 
-table(predict(naiveBayes.model, newdata = Weekly[Weekly$Year > 2008,], type = "class"), Weekly[Weekly$Year > 2008,]$Direction)
+table(predict(naiveBayes.model, newdata = Weekly_dt[Year > 2008, ], type = "class"), Weekly_dt[Year > 2008, Direction])
 
-knn.pred <- knn(cbind(Weekly$Lag2[Weekly$Year < 2009]), cbind(Weekly$Lag2[Weekly$Year > 2008]), Weekly$Direction[Weekly$Year < 2009], k = 1)
+knn.model <- gknn(Direction ~ Lag2, data = Weekly_dt[Year < 2009, ], k = 1)
 
-table(knn.pred, Weekly$Direction[Weekly$Year > 2008])
+table(predict(knn.model, newdata = Weekly_dt[Year > 2008, ], type = "class"), Weekly_dt[Year > 2008, Direction])
 
-knn.pred <- knn(cbind(Weekly$Lag2[Weekly$Year < 2009]), cbind(Weekly$Lag2[Weekly$Year > 2008]), Weekly$Direction[Weekly$Year < 2009], k = 5)
+knn.model <- update(knn.model, k = 5)
 
-table(knn.pred, Weekly$Direction[Weekly$Year > 2008])
+table(predict(knn.model, newdata = Weekly_dt[Year > 2008, ], type = "class"), Weekly_dt[Year > 2008, Direction])
 
-knn.pred <- knn(cbind(Weekly$Lag2[Weekly$Year < 2009]), cbind(Weekly$Lag2[Weekly$Year > 2008]), Weekly$Direction[Weekly$Year < 2009], k = 10)
+knn.model <- update(knn.model, k = 10)
 
-table(knn.pred, Weekly$Direction[Weekly$Year > 2008])
+table(predict(knn.model, newdata = Weekly_dt[Year > 2008, ], type = "class"), Weekly_dt[Year > 2008, Direction])
 
-knn.pred <- knn(cbind(Weekly$Lag2[Weekly$Year < 2009]), cbind(Weekly$Lag2[Weekly$Year > 2008]), Weekly$Direction[Weekly$Year < 2009], k = 15)
+knn.model <- update(knn.model, k = 15)
 
-table(knn.pred, Weekly$Direction[Weekly$Year > 2008])
+table(predict(knn.model, newdata = Weekly_dt[Year > 2008, ], type = "class"), Weekly_dt[Year > 2008, Direction])
+
 ```
-```{r Chapter 4 Exercise 14, include=TRUE,echo=TRUE,comment=NA,fig.align='center', fig.height= 3, fig.width=4}
-Auto$mpg01 <- as.factor(as.integer(Auto$mpg > median(Auto$mpg)))
 
-lapply(names(select_if(Auto, is.numeric)),
+```{r Chapter 4 Exercise 14}
+
+Auto_dt[, mpg01 := as.factor(as.integer(Auto_dt[["mpg"]] > fmedian(Auto_dt[["mpg"]])))]
+
+lapply(colnames(Auto_dt[, .SD, .SDcols = is.numeric]),
        function(variable)
-           ggplot(Auto, aes_string("mpg01", variable)) +
+           ggplot(Auto_dt, aes_string("mpg01", variable)) +
            geom_boxplot(color = "black", fill = "lightblue") +
            theme_bw())
 
 set.seed(123)
-training_ind <- sample(seq(nrow(Auto)), size = floor(0.75 * nrow(Auto)))
 
-lda.model <- lda(mpg01 ~ cylinders + displacement + horsepower + weight, data = Auto, subset = training_ind)
+training_ind <- sample(seq_row(Auto_dt), size = floor(0.75 * fnrow(Auto_dt)))
 
-mean(Auto$mpg01[-training_ind] != predict(lda.model, newdata = Auto[-training_ind,], type = "response")$class)
+lda.model <- lda(mpg01 ~ cylinders + displacement + horsepower + weight, data = Auto_dt, subset = training_ind)
 
-qda.model <- qda(mpg01 ~ cylinders + displacement + horsepower + weight, data = Auto, subset = training_ind)
+mean(Auto_dt[-training_ind, mpg01] != predict(lda.model, newdata = Auto_dt[-training_ind,], type = "response")$class)
 
-mean(Auto$mpg01[-training_ind] != predict(qda.model, newdata = Auto[-training_ind,], type = "response")$class)
+qda.model <- qda(mpg01 ~ cylinders + displacement + horsepower + weight, data = Auto_dt, subset = training_ind)
 
-logistic.model <- glm(mpg01 ~ cylinders + displacement + horsepower + weight, data = Auto, subset = training_ind, family = binomial)
+mean(Auto_dt[-training_ind, mpg01] != predict(qda.model, newdata = Auto_dt[-training_ind,], type = "response")$class)
 
-mean(Auto$mpg01[-training_ind] != round(predict(logistic.model, newdata = Auto[-training_ind,], type = "response")))
+logistic.model <- glm(mpg01 ~ cylinders + displacement + horsepower + weight, data = Auto_dt, subset = training_ind, family = binomial)
+
+mean(Auto_dt[-training_ind, mpg01] != predict(logistic.model, newdata = Auto_dt[-training_ind,], type = "response"))
 
 best_error <- 1
-for(K in seq_along(Auto$mpg01[-training_ind])){
-  curr_error <- mean(knn(cbind(Auto[training_ind,which(colnames(Auto) == "cylinders" | colnames(Auto) == "displacement" | colnames(Auto) == "horsepower" | colnames(Auto) == "weight")]), cbind(Auto[-training_ind,which(colnames(Auto) == "cylinders" | colnames(Auto) == "displacement" | colnames(Auto) == "horsepower" | colnames(Auto) == "weight")]), Auto$mpg01[training_ind], k = K) != Auto$mpg01[-training_ind])
+
+for(K in seq_row(Auto_dt[-training_ind, ])){
+  curr_error <- mean(knn(Auto_dt[training_ind, c("cylinders", "displacement", "horsepower", "weight")], Auto_dt[-training_ind, c("cylinders", "displacement", "horsepower", "weight")], Auto_dt[training_ind, mpg01], k = K) != Auto_dt[-training_ind, mpg01])
   if(curr_error < best_error){
     best_K <- K
     best_error <- curr_error
@@ -1346,7 +1391,7 @@ best_K
 best_error
 ```
 
-```{r Chapter 4 Exercise 15, include=TRUE,echo=TRUE,comment=NA,fig.align='center', fig.height= 3, fig.width=4}
+```{r Chapter 4 Exercise 15}
 Power <- function(){
   print(2^3)
 }
@@ -1369,7 +1414,7 @@ Power3 <- function(x, a){
   return(x^a)
 }
 
-x <- seq(1,10)
+x <- seq_len(10L)
 y <- Power3(x, 2)
 
 ggplot(mapping = aes(x,y)) +
@@ -1378,21 +1423,21 @@ ggplot(mapping = aes(x,y)) +
   theme_bw() +
   labs(title = "Power3() Function Plot",
        x = "x",
-       y = "y = x-squared") +
-  scale_x_continuous(breaks = seq(1,10))
+       y = expression(x^2)) +
+  scale_x_continuous(breaks = seq_len(10L))
 
 PlotPower <- function(x, a){
   ggplot(mapping = aes(x, x^a)) +
   geom_point(color = "red") +
   geom_line(color = "blue") +
   theme_bw() +
-  labs(title = paste("PlotPower: f(x) = x^", a),
+  labs(title = "PlotPower() Function Plot",
        x = "x",
-       y = paste("y = x^", a)) +
+       y = expression(x^a)) +
   scale_x_continuous(breaks = x)
 }
 
-PlotPower(1:10, 3)
+PlotPower(seq_len(10L), 3)
 ```
 
 \newpage
@@ -1407,38 +1452,378 @@ PlotPower(1:10, 3)
 
 ### Cross-Validation
 
-One such technique is the \textbf{validation set approach} in which we randomly divide the available set of observations into two parts, a \textbf{training set} and a \textbf{validation} (or \textbf{hold-out}) \textbf{set}. The mode is fit on the training set, and the fitted model is used to predict the responses for the observations in the validation set. The resulting validation set error rate provides an estimate of the test error rate. Unfortunately, the validation set approach suffers from high degrees of variability in the test error rate. Another shortcoming to the validation set approach is that only a subset of the observations are used to fit the model. Since statistical methods tend to perform worse when trained on fewer observations, this suggests that the validation set error rate may tend to overestimate the test error rate for the model fit on the entire data set.
+One technique for estimating a test error rate is the \textbf{validation set approach} in which we randomly divide the available set of observations into two parts, a \textbf{training set} and a \textbf{validation} (or \textbf{hold-out}) \textbf{set}. The mode is fit on the training set, and the fitted model is used to predict the responses for the observations in the validation set. The resulting validation set error rate provides an estimate of the test error rate. Unfortunately, the validation set approach suffers from high degrees of variability in the test error rate. Another shortcoming to the validation set approach is that only a subset of the observations are used to fit the model. Since statistical methods tend to perform worse when trained on fewer observations, this suggests that the validation set error rate may tend to overestimate the test error rate for the model fit on the entire data set.
 
-\textbf{Cross-validation} is a refinement of the validation set approach that addresses these two issues and can be used to estimate the test error associated with a given statistical learning method in order to evaluate its performance or to select the appropriate level of flexibility.
+\textbf{Cross-validation} is a refinement of the validation set approach that addresses these two issues and can be used to estimate the test error associated with a given statistical learning method in order to evaluate its performance or to select the appropriate level of flexibility. \textbf{Leave-one-out cross validation} (\textbf{LOOCV}) is closely related to the validation set approach, but it attempts to overcome the previously discussed drawbacks. LOOCV splits the observations into a training set of $n-1$ observations and a single test observation. This process is repeated for each $n$ observations and provides an estimate for the test MSE through the equation
+$$\text{CV}_{(n)}=\frac{1}{n}\sum_{i=1}^{n}\text{MSE}_i=\frac{1}{n}\sum_{i=1}^{n}(y_i-\hat{y}_i)^2,$$
+where $\text{MSE}_i$ is the squared error between the $i$th actual and predicted response values. This method of estimating the test error rate significantly alleviates both drawbacks of the validation set approach. First, it has far less bias since $n-1$ observations are used to train the model instead of $n/2$. Second, variability that's introduced by randomly dividing the observations into two sets is removed since there is no longer any randomness in the training/validation set splits. While it can be computationally expensive to implement this approach by having to fit $n$ different models, this obstacle is overcome using the formula
+$$\text{CV}_{(n)}=\frac{1}{n}\sum_{i=1}^{n}\left(\frac{y_i-\hat{y}_i}{1-h_i}\right)^2$$
+in the case of least squares regression, where $\hat{y}_i$ is the $i$th fitted value from the model fit with all $n$ observations and $h_i$ is the previously defined leverage, which equals $\frac{1}{n}+\frac{(x_i-\bar{x})^2}{\sum_{i'=1}^{n}(x_{i'}-\bar{x})^2}$. Note that this is the same as the original MSE but the $i$th residual is divided by $0<1-h_i<1$. Hence, high-leverage points are appropriately inflated.
 
+A generalization of LOOCV is \textbf{$\boldsymbol{k}$-fold CV}. This approach involves randomly dividing the set of observations into $k$ roughly equal folds---or groups. One fold is treated as a validation fold, while the other $k-1$ folds are used as training folds. This process is repeated $k$ times and the MSE estimate is given by
+$$\text{CV}_{(k)}=\frac{1}{k}\sum_{i=1}^{k}\text{MSE}_i$$
+It's easy to see that LOOCV is a special case of $k$-fold CV in which $k=n$. In practice, $k$ is generally set to 5 or 10. While adding some randomness back that LOOCV had removed, $k$-fold CV (with $k<n$) is much less computationally expensive, while often producing very similar but more accurate results to those of LOOCV.
 
+Using LOOCV and $k$-fold CV, it's generally impossible to tell whether their test error estimates over or underestimate the true test error. For the purpose of model performance, this is an unfortunate reality. On the other hand, for the purpose of model specification, this is of little importance. Since the minimum points for the actual and estimated test error rates tend to be relatively close to each other, these techniques provide valuable guidance in selecting the most accurate model specification.
 
+### The Bootstrap
 
+The \textbf{bootstrap} is a statistical tool that can be used to quantify the uncertainty associated with a given estimator or statistical learning method. For an example, suppose there are two investments that yield returns $X$ and $Y$ in which we want to invest fractions of our fixed investment $\alpha$ and $1-\alpha$ respectively. If we want to minimize the variance of this portfolio, we calculate the following:
+$$\text{Var}\left(\alpha X+(1-\alpha)Y\right)=\alpha^2\sigma^2_X+2\alpha(1-\alpha)\sigma_{XY}+(1-\alpha)^2\sigma^2_Y$$
+$$\to\frac{\partial{\text{Var}\left(\alpha X+(1-\alpha)Y\right)}}{\partial{\alpha}}=2\alpha\sigma^2_X+2\sigma_{XY}-4\alpha\sigma_{XY}-2\sigma_Y^2+2\alpha\sigma_Y^2=0$$
+$$\alpha\sigma^2_X-2\alpha\sigma_{XY}+\alpha\sigma_Y^2=\sigma_Y^2-\sigma_{XY}$$
+$$\alpha^*=\frac{\sigma_Y^2-\sigma_{XY}}{\sigma_X^2-2\sigma_{XY}+\sigma_Y^2}$$
+Since we don't actually know the population parameters $\sigma_X^2,\sigma_{XY},\sigma_Y^2$, we can use method of moments estimation to calculate
+$$\hat{\alpha}^*=\frac{\hat{\sigma}_Y^2-\hat{\sigma}_{XY}}{\hat{\sigma}_X^2-2\hat{\sigma}_{XY}+\hat{\sigma}_Y^2}$$
+It's natural to want to know the variability related to $\hat{\alpha}^*$. Using the bootstrap method, we can estimate this uncertainty by repeatedly resampling $n$ observations \emph{with replacement} from the original data set of $n$ observations. Thus, it's possible that an observation $i$ is selected multiple times and an observation $j$ is not selected for each bootstrap data set. This process is repeated $B$ times, for some large value $B$, in order to produce $B$ bootstrap data sets and $B$ corresponding $\alpha$ estimates $\hat{\alpha}^{*1},\hat{\alpha}^{*2},\dots,\hat{\alpha}^{*B}$. Hence, we can compute the standard error of these estimates using
+$$\text{SE}_{B}(\hat{\alpha}^*)=\sqrt{\frac{1}{B-1}\sum_{i=1}^{B}\left(\hat{\alpha}^{*i}-\frac{1}{B}\sum_{i'=1}^{B}\hat{\alpha}^{*i'}\right)^2},$$
+which serves as an estimate for the standard error of $\hat{\alpha}^{*}$ from the original data set.
 
+## Lab
 
+\begin{itemize}
+\item The command \texttt{sample(n, m)} generates \texttt{m} integers ranging from 1 to \texttt{n}, which can be used as indices for splitting data into the training and test observations. The argument \texttt{replace = TRUE} will allow for replaced sampling.
+\item After creating a \texttt{glm} object (here \texttt{glm.fit}), we can use the command \texttt{cv.glm(data, glm.fit)} from the \texttt{boot} library to perform LOOCV. The \texttt{delta} vector contains the cross-validation results. Similarly we can use the command \texttt{cv.glm(data, glm.fit, K = k)} to perform $k$-fold CV.
+\item The command \texttt{boot(data, function, R = B)} from the \texttt{boot} library automates bootstrapping for $B$ estimates. Here \texttt{function} is a function that defines the estimator and returns estimates.
+\end{itemize}
 
+## Exercises
 
+### Conceptual
 
+\begin{enumerate}[series=ch5]
+\item Using basic statistical properties of the variance, as well as single-variable calculus, derive (5.6). In other words, prove that $\alpha$ given by (5.6) does indeed minimize $\text{Var}\left(\alpha X+(1-\alpha)Y\right)$.
+$$\text{Var}\left(\alpha X+(1-\alpha)Y\right)=\alpha^2\sigma^2_X+2\alpha(1-\alpha)\sigma_{XY}+(1-\alpha)^2\sigma^2_Y$$
+$$\to\frac{\partial{\text{Var}\left(\alpha X+(1-\alpha)Y\right)}}{\partial{\alpha}}=2\alpha\sigma^2_X+2\sigma_{XY}-4\alpha\sigma_{XY}-2\sigma_Y^2+2\alpha\sigma_Y^2=0$$
+$$\alpha\sigma^2_X-2\alpha\sigma_{XY}+\alpha\sigma_Y^2=\sigma_Y^2-\sigma_{XY}$$
+$$\alpha^*=\frac{\sigma_Y^2-\sigma_{XY}}{\sigma_X^2-2\sigma_{XY}+\sigma_Y^2}$$
+\item We will now derive the probability that a given observation is part of a bootstrap sample. Suppose that we obtain a bootstrap sample from a set of $n$ observations.
+\begin{enumerate}[series=ch5ex2]
+\item What is the probability that the first bootstrap observation is \emph{not} the $j$th observation from the original sample? Justify your answer.
 
+There are $n$ observations from the original data set which are all equally likely to be selected as the first bootstrap observation. Thus, the probability that the first bootstrap observation is not the $j$th observation is $(n-1)/n$ or $1-1/n$.
 
+\item What is the probability that the second bootstrap observation is \emph{not} the $j$th observation from the original sample?
 
+Since we replace the observations after selection using the bootstrap, this is the same answer as that from part (a) $1-1/n$.
 
+\item Argue that the probability that the $j$th observation is \emph{not} in the bootstrap sample is $(1-1/n)^n$.
 
+We can extend our answers from parts (a) and (b) to a more general case. Since we replace the observations after selection using the bootstrap, the probability that the $i$th bootstrap observation is not the $j$th observation is $1-1/n$. Assuming that the observations are drawn independent of one another, then the probability of the $j$th observation not being included in the bootstrap sample is $\prod_{i=1}^{n}(1-\frac{1}{n})=(1-1/n)^n$.
 
+\item When $n = 5$, what is the probability that the $j$th observation is in the bootstrap sample?
 
+$$1-\left(1-\frac{1}{5}\right)^5=`r 1 - (1 - 1/5)^5`$$
+\item When $n = 100$, what is the probability that the $j$th observation is in the bootstrap sample?
 
+$$1-\left(1-\frac{1}{100}\right)^100=`r 1 - (1 - 1/100)^100`$$
+\item When $n = 10,000$, what is the probability that the $j$th observation is in the bootstrap sample?
+$$1-\left(1-\frac{1}{10000}\right)^10000=`r 1 - (1 - 1/10000)^10000`$$
+\item Create a plot that displays, for each integer value of $n$ from $1$ to $100,000$, the probability that the $j$th observation is in the bootstrap sample. Comment on what you observe.
 
+\end{enumerate}
+\end{enumerate}
+```{r Ch5Ex2g, echo=FALSE}
+n <- seq_len(100000L)
 
+pjs <- vapply(n, function(x) 1 - (1 - 1/x)^x, FUN.VALUE = numeric(1))
 
+ggplot(mapping = aes(n, pjs)) +
+    geom_line(color = "blue") +
+    theme_bw() +
+    labs(y = "Probability of including j") +
+    scale_y_continuous(limits = c(0, 1)) +
+    theme(legend.position = "none")
+```
+\begin{enumerate}[resume=ch5]
+\item[] 
+\begin{enumerate}[resume=ch5ex2]
+\item[] The probability of including the $j$th observation when $n=1$ is 1 since there's only one observation to choose from. Following that, there is a sharp decline where the probabilities hover around `r mean(pjs[-1])` for all other values of $n$.
 
+\item We will now investigate numerically the probability that a bootstrap sample of size $n = 100$ contains the $j$th observation. Here $j = 4$. We repeatedly create bootstrap samples, and each time we record whether or not the fourth observation is contained in the bootstrap sample.
+\end{enumerate}
+\end{enumerate}
+```{r Ch5Ex2h}
 
+set.seed(1)
 
+store <- foreach(i = seq_len(10000L), .combine = c) %dopar% {
+    return(sum(sample(seq_len(100L), replace = TRUE) == 4) > 0)
+}
 
+mean(store)
+```
+\begin{enumerate}[resume=ch5]
+\item[] 
+\begin{enumerate}[resume=ch5ex2]
+\item[] Comment on the results obtained.
 
+The results are close those found in part (g). In part (g), we found that the expected probability of the 4th observation being included is `r pjs[100] * 100`\%. Here, we find the simulated samples included the 4th observation `r mean(store) * 100`\% of the time, a fairly minute difference of `r abs(pjs[100] - mean(store)) * 100`\%.
 
+\end{enumerate}
+\item We now review $k$-fold cross-validation.
+\begin{enumerate}
+\item Explain how $k$-fold cross-validation is implemented.
 
+$k$-fold cross-validation is a generalization of LOOCV. To start, we set a value for $k\in[1,n]$. We randomly divide the observations into $k$ roughly equally sized folds. Then we iterate through these folds, treating one as a test fold while the other $k-1$ folds are used to train the model. Finally, we average over the test error rates to estimate the true test error rate.
+\item What are the advantages and disadvantages of $k$-fold cross-validation relative to:
+\begin{enumerate}
+\item The validation set approach?
 
+Recall the primary downsides of the validation set approach: biasedness, randomness, and smaller training set sizes. $k$-fold CV improves on all of these shortcomings. While the validation set approach relies on a single randomly selected test set to estimate the test error, $k$-fold CV iterates over all of the folds and averages their respective test error rates to estimate the true test error rate. This results in less variability, less biasedness, and, for $k>2$, the training sets are larger. One downside of $k$-fold CV is that it's more computationally expensive than the validation set approach.
+\item LOOCV?
 
+Recall the primary downsides of LOOCV: very computationally expensive and large variance. Assuming $k<n$, $k$-fold CV improves on both of these shortcomings. While LOOCV requires fitting $n$ models (disregarding the linear regression model case), $k$-fold require $n-k$ fewer fits. Additionally, $k$-fold CV is less variable than LOOCV. This is a result of the fact that the $n$ different training sets are nearly identical and thus highly correlated. One downside of $k$-fold CV is that it introduces additional bias in comparison to LOOCV; however, this is generally made up for by the reduction in variance.
+\end{enumerate}
+\end{enumerate}
+\item Suppose that we use some statistical learning method to make a prediction for the response $Y$ for a particular value of the predictor $X$. Carefully describe how we might estimate the standard deviation of our prediction.
 
+We can use the bootstrap to estimate the standard deviation of our prediction. To start, we randomly select, with replacement, $n$ observations from our original data set. We use this boot strap data set to fit our model and use this model to make a prediction for the response $Y$ for a particular value of the predictor $X$. This process is repeated $B$, for some large $B\in\mathbb{Z}^{+}$. Finally, we can use the formula
+$$\text{SE}_{B}(\hat{Y})=\sqrt{\frac{1}{B-1}\sum_{i=1}^{B}\left(\hat{Y}_{i}-\frac{1}{B}\sum_{i'=1}^{B}\hat{Y}_{i'}\right)^2}$$
+to estimate the standard deviation of our prediction.
+\end{enumerate}
 
+### Applied
+
+```{r Chapter 5 Exercise 5}
+
+set.seed(7)
+
+logistic.model <- glm(default ~ income + balance, data = Default_dt, family = binomial)
+
+num_obs <- fnrow(Default_dt)
+training_ind <- sample(num_obs, num_obs / 2)
+test_ind <- seq_len(num_obs)[-training_ind]
+
+logistic.model_training <- glm(default ~ income + balance, Default_dt, family = binomial, subset = training_ind)
+val_set <- fifelse(predict.glm(logistic.model_training, newdata = Default_dt[test_ind, ], type = "response") > 0.5, "Yes", "No")
+
+fsum(Default_dt[test_ind, default] != val_set) / length(val_set)
+
+set.seed(100)
+
+parallel::clusterExport(cl, "num_obs")
+
+test_err_estimates <- foreach(i = seq_len(3L), .combine = c) %dopar% {
+  
+  training_ind <- sample(num_obs, num_obs / 2)
+  test_ind <- seq_len(num_obs)[-training_ind]
+  
+  logistic.model_training <- glm(formula = default ~ income + balance, data = Default_dt, family = binomial, subset = training_ind)
+  val_set <- ifelse(predict.glm(logistic.model_training, newdata = Default_dt[test_ind, ], type = "response") > 0.5, "Yes", "No")
+  
+  return(sum(Default_dt[test_ind, "default"] != val_set) / length(val_set))
+}
+
+logistic.model <- glm(default ~ income + balance + student, Default_dt, family = binomial)
+
+set.seed(123)
+training_ind <- sample(num_obs, num_obs / 2)
+test_ind <- seq_len(num_obs)[-training_ind]
+
+logistic.model_training <- glm(default ~ income + balance + student, Default_dt, family = binomial, subset = training_ind)
+val_set <- fifelse(predict.glm(logistic.model_training, newdata = Default_dt[test_ind, ], type = "response") > 0.5, "Yes", "No")
+
+fsum(Default_dt[test_ind, default] != val_set) / length(val_set)
+```
+
+```{r Chapter 5 Exercise 6}
+set.seed(123)
+
+summary(glm(default ~ income + balance, Default_dt, family = binomial))
+
+boot.fn <- function(data = Default_dt, indices){
+  coef(glm(default ~ income + balance, data, family = binomial, subset = indices))
+}
+
+boot(Default_dt, boot.fn, R = 100)
+```
+
+```{r Chapter 5 Exercise 7}
+
+logistic.model <- glm((as.integer(Direction) - 1) ~ Lag1 + Lag2, data = Weekly_dt[-1L,])
+
+test_errors <- foreach(i = seq_row(Weekly_dt), .combine = c) %do% {
+  return(fifelse(predict.glm(logistic.model, newdata = Weekly[i, ], type = "response") > 0.5, "Up", "Down") != Weekly[i, "Direction"])
+}
+
+mean(test_errors)
+```
+
+```{r Chapter 5 Exercise 8}
+set.seed(1)
+x <- rnorm(100)
+y <- x - 2 * 2 * x^2 + rnorm(100)
+
+ggplot(mapping = aes(x, y)) +
+  geom_point(color = "blue") +
+  theme_bw()
+
+set.seed(123)
+df <- data.table(x = x, y = y)
+cv.glm(df, glmfit = glm(y ~ x, data = df))$delta
+cv.glm(df, glmfit = glm(y ~ poly(x, 2, raw = TRUE), data = df))$delta
+cv.glm(df, glmfit = glm(y ~ poly(x, 3, raw = TRUE), data = df))$delta
+cv.glm(df, glmfit = glm(y ~ poly(x, 4, raw = TRUE), data = df))$delta
+```
+
+```{r Chapter 5 Exercise 9, include=TRUE,echo=TRUE,comment=NA,fig.align='center', fig.height= 3, fig.width=4}
+mu_hat <- fmean(Boston_dt[["medv"]])
+n <- fnrow(Boston_dt)
+fsd(Boston_dt[["medv"]]) / sqrt(n)
+set.seed(123)
+
+sample_mean <- function(x, indices){
+  fmean(x[indices])
+}
+
+boot_se <- boot(Boston_dt[["medv"]], sample_mean, R = 100)
+boot_se
+boot.ci(boot_se, type = "norm")
+
+t.test(Boston[["medv"]])
+
+sample_median <- function(x, indices){
+  fmedian(x[indices])
+}
+
+boot_se <- boot(Boston_dt[["medv"]], sample_mean, R = 100)
+boot_se
+boot.ci(boot_se, type = "norm")
+
+```
+
+\newpage
+
+# Chapter 6
+
+## Notes
+
+### Subset Selection
+
+In the regression setting, the standard linear model is given by
+$$Y=\beta_0+\beta_1X_1+\dots+\beta_pX_p+\epsilon$$
+Generally, these models are fit using least squares; however, in some scenarios, other procedures can produce better results in terms of prediction accuracy and model interpretability. Three important classes of methods include subset selection, shrinkage, and dimension reduction. 
+
+Subset selection involves identifying a subset of the $p$ predictors that we believe to be related to the response. We then fit a model using least squares on the reduced set of variables. To perform \textbf{best subset selection}, we fit a separate least squares regression for each possible combination of the $p$ predictors. Thus, we fit all $p$ models that contain one predictor, all ${p\choose2}=\frac{p(p-1)}{2}$ models with 2 predictors, all ${p\choose3}$ models with 3 predictors, and so on. Ultimately, without a transformation of the $p$ predictors, we end up with $2^p$ possibilities, and our goal is to select the best model. The following procedure depicts how the best model is chosen:
+\begin{enumerate}
+\item Start with the null model $\mathcal{M}_0$, which contains no predictors. Thus, it simply predicts the sample mean for each prediction.
+\item For $k=1,\dots,p$ fit all ${p\choose k}$ models with $k$ predictors and select the model with the lowest RSS/greatest $R^2$. Denote these models using $\mathcal{M}_k$.
+\item Select a single best model among $\mathcal{M}_0,\mathcal{M}_1,\dots,\mathcal{M}_p$ using the cross-validated prediction error, $C_p$ (AIC), BIC, or adjusted $R^2$.
+\end{enumerate}
+
+This procedure can be expanded beyond the case of linear regression to other types of models such as logistic regression. In these circumstances, instead of using RSS, we use \textbf{deviance}, which is negative two times the maximum log-likelihood and plays the role of RSS in these other models.
+
+Unfortunately, best subset selection is computationally limited. The graph below shows the number of models that need to be fit as a function of $p$. It's evident that best subset selection is computationally infeasible for large values of $p$. 
+
+```{r Best Subset Selection Graph, echo=FALSE}
+p <- 0:15
+ggplot(mapping = aes(p, 2^p)) +
+  geom_line(color = "red") +
+  ylab(expression(2^p)) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+```
+
+Due to this computational limitation and the possibility of overfitting in large search spaces, \emph{stepwise} methods are an attractive alternative to best subset selection. \textbf{Forward stepwise selection} is one such method that proceeds as follows:
+\begin{enumerate}
+\item Start with the null $\mathcal{M}_0$, which contains no predictors.
+\item For $k=1,\dots,p$, consider all $p-k$ models that augment the model $\mathcal{M}_{k-1}$ with the one additional predictor that improves the model (in terms of the $R^2$) the most.
+\item Compare among $\mathcal{M}_0,\mathcal{M}_1,\dots,\mathcal{M}_p$ using the cross-validated prediction error, $C_p$ (AIC), BIC, or adjusted $R^2$.
+\end{enumerate}
+
+This method is significantly less computationally expensive than best subset selection as we only have to fit $p-k$ models for the $k$th iteration. In total, we fit $1+\frac{p(p+1)}{2}$ models. The graph below displays the difference in computation size between best subset selection and forward stepwise selection.
+
+```{r Best Subset vs Forward Stepwise Selection, echo=FALSE}
+p <- 0:8
+
+ggplot(mapping = aes(p, 2^p)) +
+  geom_line(aes(color = "Best Subset Selection")) +
+  geom_line(aes(y = 1 + (p * (p + 1)) / 2, color = "Forward Stepwise Selection")) +
+  scale_color_manual(values = c("Best Subset Selection" = "red", "Forward Stepwise Selection" = "blue")) +
+  labs(y = "# of Models to Fit", color = "Selection Method") +
+  theme_bw() +
+  theme(legend.position = c(0.3, 0.75),
+        legend.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.key.width = unit(0.8, "cm"),
+        legend.key.height = unit(0.6, "cm"))
+```
+
+Another method of subset selection that improves upon best subset selection's demanding computational nature is \textbf{backward stepwise selection}, which proceeds as follows:
+
+\begin{enumerate}
+\item Begin with the model that contains all $p$ predictors, $\mathcal{M}_p$.
+\item For $k=p-1,\dots,0$, fit $k$ models and select the model, $\mathcal{M}_k$, that maximizes $R^2$ and contains all but one of the predictors in $\mathcal{M}_{k+1}$.
+\item Compare among $\mathcal{M}_0,\mathcal{M}_1,\dots,\mathcal{M}_p$ using the cross-validated prediction error, $C_p$ (AIC), BIC, or adjusted $R^2$.
+\end{enumerate}
+
+Both forward stepwise and backward stepwise selection require fitting $1+\frac{p(p+1)}{2}$ models. However, one shortcoming of both methods is their possibility of "missing" the best of the $2^p$ models fit with best subset selection. For example, consider the case of using forward stepwise selection where $p=3$. For both best subset selection and forward stepwise selection the model $\mathcal{M}_1$ is the same. For the purpose of illustration, say both elect $X_1$. It may be the case that best subset selection identifies $\mathcal{M}_2$ as that which uses $X_2$ and $X_3$, while forward stepwise selection must still use $X_1$. If it turns out that $\mathcal{M}_2$ outperforms $\mathcal{M}_1$ and $\mathcal{M}_3$, then forward stepwise selection will miss the best model. The same concept holds for backward stepwise selection.
+
+### Methods for Estimating the Test Error Rate
+
+We've already seen methods of using cross validation to directly estimate the test error. In addition to these methods, there are \emph{indirect} methods for estimating the test error. These methods involve adjusting the training error to account for the bias due to overfitting.
+
+One such method is using the $\boldsymbol{C_p}$ statistic. For a fitted least squares model with $d$ predictors, the $C_p$ estimate of the test MSE is given by
+$$C_p=\frac{1}{n}\left(\text{RSS}+2d\hat{\sigma}_\epsilon^2\right)$$
+Essentially, the $C_p$ statistic adjusts the training error by adding the term $2d\hat{\sigma}_\epsilon^2$. Hence, if adding an additional regressor does not decrease the RSS enough to offset the increase in $2d\hat{\sigma}_\epsilon^2$, then we will not use the additional regressor. It should be noted that $\hat{\sigma}_\epsilon^2$ is typically estimated using the model with all $p$ predictors.
+
+Two additional approaches are the \textbf{Akaike information criterion (AIC)} statistic and the \textbf{Bayesian information criterion (BIC)}. These criteria are defined for a large class of models fit by maximum likelihood. In the case of $d$ predictors with Gaussian errors, these statistics can be found using the formulas
+$$\text{AIC}=\frac{1}{n\hat{\sigma}_\epsilon^2}\left(\text{RSS}+2d\hat{\sigma}_\epsilon^2\right)$$
+$$\text{BIC}=\frac{1}{n\hat{\sigma}_\epsilon^2}\left(\text{RSS}+\log(n)d\hat{\sigma}_\epsilon^2\right)$$
+Much like the $C_p$ statistic, AIC and BIC adjust the training error by adding the terms $2d\hat{\sigma}_\epsilon^2$ and $\log(n)d\hat{\sigma}_\epsilon^2$. Note that for $n>7$, $\log(n)>2$, so BIC penalizes/adjusts the training error more than AIC and $C_p$. This generally results in the selection of fewer predictors in the model.
+
+One final approach for indirectly estimating the test error is using the \textbf{adjusted $\boldsymbol{R^2}$} (denoted $\boldsymbol{\bar{R}^2}$). Recall from earlier that $R^2$ is computed by $1-\text{RSS}/\text{TSS}$ and is an estimator of the squared population correlation between $\hat{y}$ and $y$ ($\rho^2$) given by $1-\sigma_\epsilon^2/\sigma_y^2$. As we showed in chapter 3, $R^2$ estimates this value by estimating $\sigma_\epsilon^2$ as $\text{RSS}/n$ and $\sigma_y^2$ as $\text{TSS}/n$, which we know are both biased estimators of the true parameters since they do not employ Bessel's correction. $\bar{R}^2$ instead uses the unbiased estimators of $\sigma_\epsilon^2$ [$\text{RSS}/(n-d-1)$] and $\sigma_y^2$ [$\text{TSS}/(n-1)$]. Thus, the adjusted $R^2$ for a least squares model with $d$ predictors can be found using the formula
+$$\bar{R}^2=1-\frac{\text{RSS}/(n-d-1)}{\text{TSS}/(n-1)}$$
+Unlike $R^2$, $\bar{R}^2$ pays a price for the inclusion of an unnecessary variable in a model.
+
+$C_p$, AIC, and BIC all have rigorous theoretical justifications while adjusted $R^2$ does not despite in intuitive nature and widespread popularity. All of the formulas provided here are for the case of linear models fit by least squares but can be extended to more general types of models.
+
+### Ridge Regression
+
+\textbf{Shrinkage methods} are an alternative to subset selection methods where we fit a model containing all $p$ predictors using a technique that \emph{shrinks} the coefficient estimates toward zero. This methodology can lead to improvements over least squares as shrinking the coefficient estimates can significantly reduce their variances.
+
+One such shrinkage method is called \textbf{ridge regression} where we fit our coefficient estimates $\hat{\beta}^R$ by minimizing
+$$\sum_{i=1}^{n}\left(y_i-\hat{\beta}^R_0-\sum_{j=1}^{p}\hat{\beta}_j^Rx_{ij}\right)^2+\lambda\sum_{j=1}^{p}\left(\hat{\beta}_j^R\right)^2=\text{RSS}+\lambda\sum_{j=1}^{p}\left(\hat{\beta}_j^R\right)^2,$$
+where $\lambda\geq0$ is a \textbf{tuning parameter} to be fit separately. The above quantity contains two fitting criteria; the RSS, which is used to find coefficient estimates that fit the data well, and a \textbf{shrinkage penalty}, which serves the purpose of shrinking the coefficient estimates toward zero. Unlike least squares, where multiplying $X_{ij}$ by a constant $c$ results in scaling $\beta_j$ by $1/c$, ridge regression is sensitive to different scales. Thus, it's best to apply ridge regression after standardizing the predictors.
+
+Ridge regression does well compared to least squares when minimizing variance is a key issue. As $\lambda$ increases, the flexibility of the model decreases leading to a decrease in variance and an increase in bias. Additionally, ridge regression is computationally advantageous when compared to the requirements of best subset selection. As it turns out, simultaneously fitting the model for \emph{all} values of $\lambda$ is computationally similar to fitting a model using least squares.
+
+### The Lasso
+
+Ridge regression has one obvious drawback in that it suffers from interpretability since all $p$ predictors are included in the model. Increasing the value of $\lambda$ will tend to reduce the magnitude of the coefficients but will not result in exclusion of any of the variables. The \textbf{lasso} is an alternative to ridge regression that overcomes this disadvantage. Similar to ridge regression, the lasso coefficients $\hat{\beta}^L$ minimize the quantity
+$$\sum_{i=1}^{n}\left(y_i-\hat{\beta}^L_0-\sum_{j=1}^{p}\hat{\beta}_j^Lx_{ij}\right)^2+\lambda\sum_{j=1}^{p}\left|\hat{\beta}^L\right|=\text{RSS}+\lambda||\hat{\beta}^L||_1$$
+This quantity is very similar to that used for ridge regression, however it uses the $\ell_1$ (pronounced "ell 1") norm for the shrinkage penalty instead of the squared $\ell_2$ norm. The effect of using the $\ell_1$ norm instead is that some of the coefficient estimates are forced to exactly zero. Thus, we say that the lasso yields \textbf{sparse} models, meaning that the models involve only a subset of the variables. As a result, the lasso can result in models that are easier to interpret. 
+
+Much like ridge regression, the lasso should involve standardized predictors and can lead to improvements of least squares by reducing variance for additional bias. Unlike ridge regression, the lasso performs variable selection. Choosing between ridge regression and the lasso is a question to be solved using cross validation. In general, the lasso will outperform ridge regression when only a relatively small subset of the $p$ predictors have very small or exactly zero coefficients. On the other hand, ridge regression will tend to perform better than the lasso when all or most of the $p$ predictors should be included in the model.
+
+### Selecting the Tuning Parameter
+
+Both the lasso and ridge regression are heavily dependent on the value chosen for the tuning parameter $\lambda$ (or equivalently, the value for the constraint $s$). Selecting a value for $\lambda$ is another task for cross-validation. Generally, we start out by selecting a grid of values for $\lambda$. Then, we compute the cross-validation errors for each of these values for $\lambda$ and select the value for which the CV error is smallest. Finally, we re-fit the model using all of the available observations and the selected value of $\lambda$.
+
+### Dimension Reduction Methods
+
+In addition to shrinkage and subset selection methods, another common approach for controlling the variance of our estimators is \textbf{dimension reduction}. If we let $Z_1,Z_2,\dots,Z_M$ represent $M<p$ linear combinations of our $p$ predictors such that
+$$Z_m=\sum_{j=1}^{p}\phi_{jm}X_j,$$
+then we can fit a linear regression model
+$$y_i=\theta_0+\sum_{m=1}^{M}\theta_m z_{im}+\epsilon_i$$
+using OLS. If the constants $\phi_{1m},\phi_{2m},\dots,\phi_{pm}$ are chosen wisely, dimension reduction methods can outperform regular OLS. Combining the two above equations, we find that
+$$\sum_{m=1}^{M}\theta_m z_{im}=\sum_{m=1}^{M}\theta_m \sum_{j=1}^{p}\phi_{jm}x_{ij}=\sum_{m=1}^{M}\sum_{j=1}^{p}\theta_m\phi_{jm}x_{ij}$$
+$$=\sum_{j=1}^{p}\sum_{m=1}^{M}\theta_m\phi_{jm}x_{ij}=\sum_{j=1}^{p}\beta_jx_{ij},$$
+where $\beta_j=\sum_{m=1}^{M}\phi_{jm}\theta_{m}$. Thus, dimension reduction is a special case of least squares, and it turns out that if $M=p$, then no dimension reduction occurs and we obtain the same results as we would using OLS.
+
+Dimension reduction requires two main steps. First, we obtain the transformed predictors $Z_1,\dots,Z_m$, which we follow with fitting our model using these $M$ predictors. We already know how to fit the model using these $M$ predictors, but it remains to decide on how to obtain the transformed predictors. Two common approaches for achieving this task are principal components and partial least squares.
+
+### Principal Component Analysis for Regression
+
+\textbf{Principal component analysis} (\textbf{PCA}) is a popular approach for deriving a smaller set of features from a large set of variables. The first principal component direction of the data is that along which the predictors vary the \emph{most}. That is we choose the set of values for $\phi_{11},\phi_{21},\dots,\phi_{p1}$ by solving
+$$\max_{\phi_{11},\phi_{21},\dots,\phi_{p1}}\text{Var}\left(\sum_{j=1}^{p}\phi_{j1}\times(X_j-\bar{X}_j)\right)\text{ s.t. }\sum_{j=1}^{p}\phi_{j1}^2=1$$
+After solving for $\phi_{11},\phi_{21},\dots,\phi_{p1}$, we solve the \textbf{principal component scores} $z_{11},\dots,z_{n1}$ using the formula
+$$z_{i1}=\sum_{j=1}^{p}\phi_{j1}(x_{ij}-\bar{x}_j)$$
+
+```{r EOF, include=FALSE}
+parallel::stopCluster(cl)
+```
 
